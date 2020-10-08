@@ -36,7 +36,7 @@ public struct Model: Decodable {
             if let shape = shapes[identifier.rootShapeId]?.shapeSelf {
                 switch shape {
                 case let structure as StructureShape:
-                    return structure.members[member]
+                    return structure.members?[member]
                 default:
                     break
                 }

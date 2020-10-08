@@ -12,15 +12,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct NoReplaceTrait: EmptyTrait {
+public struct NoReplaceTrait: StaticTrait {
     public static let staticName = "smithy.api#noReplace"
-    public static var selector: Selector = ShapeSelector<ResourceShape>()
+    public static var selector: Selector = TypeSelector<ResourceShape>()
     public init() {}
 }
 
 public struct ReferencesTrait: SingleValueTrait {
     public static let staticName = "smithy.api#references"
-    public static var selector: Selector = OrSelector(ShapeSelector<StructureShape>(), ShapeSelector<StringShape>())
+    public static var selector: Selector = OrSelector(TypeSelector<StructureShape>(), TypeSelector<StringShape>())
     public struct Reference: Codable {
         public let service: ShapeId?
         public let resource: ShapeId
@@ -37,9 +37,9 @@ public struct ReferencesTrait: SingleValueTrait {
 public struct ResourceIdentifierTrait: StringTrait {
     public static let staticName = "smithy.api#resourceIdentifier"
     public static var selector: Selector = AndSelector(
-        ShapeSelector<MemberShape>(),
+        TypeSelector<MemberShape>(),
         TraitSelector<RequiredTrait>(),
-        TargetSelector(ShapeSelector<StringShape>())
+        TargetSelector(TypeSelector<StringShape>())
     )
     public var value: String
     public init(value: String) {

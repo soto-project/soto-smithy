@@ -62,18 +62,18 @@ public struct MapShape: Shape {
 public struct StructureShape: Shape {
     public static let type = "structure"
     public var traits: TraitList?
-    public var members: [String: MemberShape]
+    public var members: [String: MemberShape]?
     public func validate(using model: Model) throws {
-        try members.forEach { try $0.value.validate(using: model) }
+        try members?.forEach { try $0.value.validate(using: model) }
         try traits?.validate(using: model, shape: self)
     }
     public mutating func add(trait: Trait, to member: String) throws {
-        guard members[member]?.add(trait: trait) != nil else {
+        guard members?[member]?.add(trait: trait) != nil else {
             throw Smithy.MemberDoesNotExistError(name: member)
         }
     }
     public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
-        guard members[member]?.remove(trait: trait) != nil else {
+        guard members?[member]?.remove(trait: trait) != nil else {
             throw Smithy.MemberDoesNotExistError(name: member)
         }
     }
@@ -82,16 +82,16 @@ public struct StructureShape: Shape {
 public struct UnionShape: Shape {
     public static let type = "union"
     public var traits: TraitList?
-    public var members: [String: MemberShape]
+    public var members: [String: MemberShape]?
     public func validate(using model: Model) throws {
-        try members.forEach { try $0.value.validate(using: model) }
+        try members?.forEach { try $0.value.validate(using: model) }
         try traits?.validate(using: model, shape: self)
     }
     public mutating func add(trait: Trait, to member: String) {
-        members[member]?.add(trait: trait)
+        members?[member]?.add(trait: trait)
     }
     public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
-        guard members[member]?.remove(trait: trait) != nil else {
+        guard members?[member]?.remove(trait: trait) != nil else {
             throw Smithy.MemberDoesNotExistError(name: member)
         }
     }

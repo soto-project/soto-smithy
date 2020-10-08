@@ -289,8 +289,8 @@ class ShapeTests: XCTestCase {
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
         let structure = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Structure")) as? StructureShape)
-        XCTAssertEqual(structure.members["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
-        XCTAssertEqual(structure.members["age"]?.target, ShapeId(rawValue: "smithy.example#Age"))
+        XCTAssertEqual(structure.members?["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
+        XCTAssertEqual(structure.members?["age"]?.target, ShapeId(rawValue: "smithy.example#Age"))
     }
 
     func testUnion() throws {
@@ -313,8 +313,8 @@ class ShapeTests: XCTestCase {
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
         let structure = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Union")) as? UnionShape)
-        XCTAssertEqual(structure.members["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
-        XCTAssertEqual(structure.members["age"]?.target, ShapeId(rawValue: "smithy.example#Age"))
+        XCTAssertEqual(structure.members?["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
+        XCTAssertEqual(structure.members?["age"]?.target, ShapeId(rawValue: "smithy.example#Age"))
     }
 
     func testService() throws {

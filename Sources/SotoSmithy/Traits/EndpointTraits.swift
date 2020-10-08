@@ -14,12 +14,12 @@
 
 public struct EndpointTrait: StaticTrait {
     public static let staticName = "smithy.api#endpoint"
-    public static let selector: Selector = ShapeSelector<OperationShape>()
+    public static let selector: Selector = TypeSelector<OperationShape>()
     public let hostPrefix: String
 }
 
-public struct HostLabelTrait: EmptyTrait {
+public struct HostLabelTrait: StaticTrait {
     public static let staticName = "smithy.api#hostLabel"
-    public static let selector: Selector = AndSelector(TraitSelector<RequiredTrait>(), TargetSelector(ShapeSelector<StringShape>()))
+    public static let selector: Selector = AndSelector(TraitSelector<RequiredTrait>(), TargetSelector(TypeSelector<StringShape>()))
     public init() { }
 }

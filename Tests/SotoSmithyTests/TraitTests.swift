@@ -127,6 +127,35 @@ class TraitTests: XCTestCase {
         XCTAssertNil(model.shape(for: "smithy.example#Structure$name")?.trait(type: XmlNameTrait.self))
     }
 
+    func testCustomTrait() throws {
+        let json = """
+        {
+            "smithy": "1.0",
+            "shapes": {
+                "smithy.example#WeatherService": {
+                    "type": "service",
+                    "version": "2017-02-11",
+                    "traits": {
+                        "smithy.example#fooExample": {},
+                        "smithy.api#httpBasicAuth": {}
+                    }
+                },
+                "smithy.example#fooExample": {
+                    "type": "structure",
+                    "traits": {
+                        "smithy.api#authDefinition": {},
+                        "smithy.api#trait": {
+                            "selector": "service"
+                        }
+                    }
+                }
+            }
+        }
+        """
+        let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
+        try model.validate()
+    }
+
     func testEnumTrait() throws {
         let json = """
         {

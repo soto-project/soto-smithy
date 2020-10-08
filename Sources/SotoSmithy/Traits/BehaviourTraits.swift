@@ -12,41 +12,41 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct IdempotencyTokenTrait: EmptyTrait {
+public struct IdempotencyTokenTrait: StaticTrait {
     public static var staticName = "smithy.api#idempotencyToken"
-    public static var selector: Selector = TargetSelector(ShapeSelector<StringShape>())
+    public static var selector: Selector = TargetSelector(TypeSelector<StringShape>())
     public init() {}
 }
 
-public struct IdempotentTrait: EmptyTrait {
+public struct IdempotentTrait: StaticTrait {
     public static var staticName = "smithy.api#idempotent"
-    public static var selector: Selector = ShapeSelector<OperationShape>()
+    public static var selector: Selector = TypeSelector<OperationShape>()
     public init() {}
 }
 
-public struct ReadonlyTrait: EmptyTrait {
+public struct ReadonlyTrait: StaticTrait {
     public static var staticName = "smithy.api#readonly"
-    public static var selector: Selector = ShapeSelector<OperationShape>()
+    public static var selector: Selector = TypeSelector<OperationShape>()
     public init() {}
 }
 
 public struct RetryableTrait: StaticTrait {
     public static var staticName = "smithy.api#retryable"
-    public static var selector: Selector = AndSelector(ShapeSelector<StructureShape>(), TraitSelector<ErrorTrait>())
+    public static var selector: Selector = AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>())
     public let throttling: Bool?
 }
 
 public struct PaginatedTrait: StaticTrait {
     public static var staticName = "smithy.api#paginated"
-    public static var selector: Selector = OrSelector(ShapeSelector<OperationShape>(), ShapeSelector<ServiceShape>())
+    public static var selector: Selector = OrSelector(TypeSelector<OperationShape>(), TypeSelector<ServiceShape>())
     public let inputToken: String?
     public let outputToken: String?
     public let items: String?
     public let pageSize: String?
 }
 
-public struct HttpChecksumRequiredTrait: EmptyTrait {
+public struct HttpChecksumRequiredTrait: StaticTrait {
     public static var staticName = "smithy.api#httpChecksumRequired"
-    public static var selector: Selector = ShapeSelector<OperationShape>()
+    public static var selector: Selector = TypeSelector<OperationShape>()
     public init() {}
 }

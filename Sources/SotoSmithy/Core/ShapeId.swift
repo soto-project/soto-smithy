@@ -12,30 +12,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct ShapeId: Codable, Equatable, Hashable, RawRepresentable, CustomStringConvertible, ExpressibleByStringLiteral {
-    public typealias StringLiteralType = String
-    
-    public typealias RawValue = String
+public struct ShapeId: Equatable, Hashable, RawRepresentable {
+
     public let rawValue: String
     
     public init(rawValue: String) {
         self.rawValue = rawValue
     }
 
-    public init(stringLiteral: String) {
-        self.rawValue = stringLiteral
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.rawValue = try container.decode(String.self)
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.rawValue)
-    }
-    
     /// namespace
     public var namespace: String? {
         return rawValue.firstIndex(of: "#").map { return String(rawValue[rawValue.startIndex..<$0])}
@@ -55,6 +39,27 @@ public struct ShapeId: Codable, Equatable, Hashable, RawRepresentable, CustomStr
         let end = rawValue.firstIndex(of: "$") ?? rawValue.endIndex
         return ShapeId(rawValue: String(rawValue[rawValue.startIndex..<end]))
     }
-    
+}
+
+extension ShapeId: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.rawValue = try container.decode(String.self)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
+}
+
+extension ShapeId: ExpressibleByStringLiteral {
+    public typealias StringLiteralType = String
+    public init(stringLiteral: String) {
+        self.rawValue = stringLiteral
+    }
+}
+
+extension ShapeId: CustomStringConvertible {
     public var description: String { return rawValue }
 }

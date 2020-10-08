@@ -12,17 +12,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct BoxTrait: EmptyTrait {
+public struct BoxTrait: StaticTrait {
     public static let staticName = "smithy.api#box"
     public static let selector: Selector = OrTargetSelector(
         OrSelector(
-            ShapeSelector<BooleanShape>(),
-            ShapeSelector<ByteShape>(),
-            ShapeSelector<ShortShape>(),
-            ShapeSelector<IntegerShape>(),
-            ShapeSelector<LongShape>(),
-            ShapeSelector<FloatShape>(),
-            ShapeSelector<DoubleShape>()
+            TypeSelector<BooleanShape>(),
+            TypeSelector<ByteShape>(),
+            TypeSelector<ShortShape>(),
+            TypeSelector<IntegerShape>(),
+            TypeSelector<LongShape>(),
+            TypeSelector<FloatShape>(),
+            TypeSelector<DoubleShape>()
         )
     )
     public init() {}
@@ -30,7 +30,7 @@ public struct BoxTrait: EmptyTrait {
 
 public struct ErrorTrait: SingleValueTrait {
     public static let staticName = "smithy.api#error"
-    public static let selector: Selector = ShapeSelector<StructureShape>()
+    public static let selector: Selector = TypeSelector<StructureShape>()
     public enum ErrorType: String, Codable {
         case client
         case server

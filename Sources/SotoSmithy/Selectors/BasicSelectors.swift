@@ -18,7 +18,7 @@ public struct AllSelector: Selector {
     }
 }
 
-public struct ShapeSelector<S: Shape>: Selector {
+public struct TypeSelector<S: Shape>: Selector {
     public func select(using model: Model, shape: Shape) -> Bool {
         return type(of: shape) == S.self
     }
@@ -35,6 +35,20 @@ public struct NumberSelector: Selector {
             shape is DoubleShape ||
             shape is BigDecimalShape ||
             shape is BigIntegerShape
+    }
+}
+
+public struct ShapeSelector: Selector {
+    let shapeId: ShapeId
+    let selector: Selector
+
+    init(_ shapeId: ShapeId, _ selector: Selector) {
+        self.shapeId = shapeId
+        self.selector = selector
+    }
+    public func select(using model: Model, shape: Shape) -> Bool {
+        guard let otherShape = model.shape(for: self.shapeId) else { return false }
+        return selector.select(using: model, shape: otherShape)
     }
 }
 

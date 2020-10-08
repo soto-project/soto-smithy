@@ -14,7 +14,7 @@
 
 public struct HttpTrait: StaticTrait {
     public static let staticName = "smithy.api#http"
-    public static let selector: Selector = ShapeSelector<OperationShape>()
+    public static let selector: Selector = TypeSelector<OperationShape>()
     public let method: String
     public let uri: String
     public let code: Int?
@@ -22,7 +22,7 @@ public struct HttpTrait: StaticTrait {
 
 public struct HttpErrorTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpError"
-    public static let selector: Selector = AndSelector(ShapeSelector<StructureShape>(), TraitSelector<ErrorTrait>())
+    public static let selector: Selector = AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>())
     public typealias Value = Int
     public var value: Int
     public init(value: Int) {
@@ -33,13 +33,13 @@ public struct HttpErrorTrait: SingleValueTrait {
 public struct HttpHeaderTrait: StringTrait {
     public static let staticName = "smithy.api#httpHeader"
     public static let selector: Selector = TargetSelector(OrSelector(
-        ShapeSelector<BooleanShape>(),
+        TypeSelector<BooleanShape>(),
         NumberSelector(),
-        ShapeSelector<StringShape>(),
-        ShapeSelector<TimestampShape>(),
+        TypeSelector<StringShape>(),
+        TypeSelector<TimestampShape>(),
         // TODO: really need to check member of List/Set
-        ShapeSelector<ListShape>(),
-        ShapeSelector<SetShape>()
+        TypeSelector<ListShape>(),
+        TypeSelector<SetShape>()
     ))
     public var value: String
     public init(value: String) {
@@ -47,35 +47,35 @@ public struct HttpHeaderTrait: StringTrait {
     }
 }
 
-public struct HttpLabelTrait: EmptyTrait {
+public struct HttpLabelTrait: StaticTrait {
     public static let staticName = "smithy.api#httpLabel"
     public static let selector: Selector = AndSelector(
         TargetSelector(OrSelector(
-            ShapeSelector<BooleanShape>(),
+            TypeSelector<BooleanShape>(),
             NumberSelector(),
-            ShapeSelector<StringShape>(),
-            ShapeSelector<TimestampShape>()
+            TypeSelector<StringShape>(),
+            TypeSelector<TimestampShape>()
         )),
         TraitSelector<RequiredTrait>()
     )
     public init() { }
 }
 
-public struct HttpPayloadTrait: EmptyTrait {
+public struct HttpPayloadTrait: StaticTrait {
     public static let staticName = "smithy.api#httpPayload"
     public static let selector: Selector = TargetSelector(OrSelector(
-        ShapeSelector<StringShape>(),
-        ShapeSelector<BlobShape>(),
-        ShapeSelector<StructureShape>(),
-        ShapeSelector<UnionShape>(),
-        ShapeSelector<DocumentShape>()
+        TypeSelector<StringShape>(),
+        TypeSelector<BlobShape>(),
+        TypeSelector<StructureShape>(),
+        TypeSelector<UnionShape>(),
+        TypeSelector<DocumentShape>()
     ))
     public init() { }
 }
 
 public struct HttpPrefixHeadersTrait: StringTrait {
     public static let staticName = "smithy.api#httpPrefixHeaders"
-    public static let selector: Selector = TargetSelector(ShapeSelector<MapShape>())
+    public static let selector: Selector = TargetSelector(TypeSelector<MapShape>())
     public var value: String
     public init(value: String) {
         self.value = value
@@ -85,13 +85,13 @@ public struct HttpPrefixHeadersTrait: StringTrait {
 public struct HttpQueryTrait: StringTrait {
     public static let staticName = "smithy.api#httpQuery"
     public static let selector: Selector = TargetSelector(OrSelector(
-        ShapeSelector<BooleanShape>(),
+        TypeSelector<BooleanShape>(),
         NumberSelector(),
-        ShapeSelector<StringShape>(),
-        ShapeSelector<TimestampShape>(),
+        TypeSelector<StringShape>(),
+        TypeSelector<TimestampShape>(),
         // TODO: really need to check member of List/Set
-        ShapeSelector<ListShape>(),
-        ShapeSelector<SetShape>()
+        TypeSelector<ListShape>(),
+        TypeSelector<SetShape>()
     ))
     public var value: String
     public init(value: String) {
@@ -99,15 +99,15 @@ public struct HttpQueryTrait: StringTrait {
     }
 }
 
-public struct HttpResponseCodeTrait: EmptyTrait {
+public struct HttpResponseCodeTrait: StaticTrait {
     public static let staticName = "smithy.api#httpResponseCode"
-    public static let selector: Selector = TargetSelector(ShapeSelector<IntegerShape>())
+    public static let selector: Selector = TargetSelector(TypeSelector<IntegerShape>())
     public init() { }
 }
 
 public struct HttpCorsTrait: StaticTrait {
     public static let staticName = "smithy.api#cors"
-    public static let selector: Selector = ShapeSelector<ServiceShape>()
+    public static let selector: Selector = TypeSelector<ServiceShape>()
     public let origin: String?
     public let maxAge: Int?
     public let additionalAllowedHeaders: [String]?

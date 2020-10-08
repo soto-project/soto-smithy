@@ -12,40 +12,40 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct StreamingTrait: EmptyTrait {
+public struct StreamingTrait: StaticTrait {
     public static let staticName = "smithy.api#streaming"
-    public static let selector: Selector = OrSelector(ShapeSelector<BlobShape>(), ShapeSelector<UnionShape>())
+    public var selector: Selector { OrSelector(TypeSelector<BlobShape>(), TypeSelector<UnionShape>()) }
     public init() {}
 }
 
-public struct RequiresLengthTrait: EmptyTrait {
+public struct RequiresLengthTrait: StaticTrait {
     public static let staticName = "smithy.api#requiresLength"
-    public static let selector: Selector = TraitSelector<StreamingTrait>()
+    public var selector: Selector { TraitSelector<StreamingTrait>() }
     public init() {}
 }
 
-public struct EventHeaderTrait: EmptyTrait {
+public struct EventHeaderTrait: StaticTrait {
     public static let staticName = "smithy.api#eventHeader"
-    public static let selector: Selector = TargetSelector(OrSelector(
-        ShapeSelector<BooleanShape>(),
-        ShapeSelector<ByteShape>(),
-        ShapeSelector<ShortShape>(),
-        ShapeSelector<IntegerShape>(),
-        ShapeSelector<LongShape>(),
-        ShapeSelector<BlobShape>(),
-        ShapeSelector<StringShape>(),
-        ShapeSelector<TimestampShape>()
-    ))
+    public var selector: Selector { TargetSelector(OrSelector(
+        TypeSelector<BooleanShape>(),
+        TypeSelector<ByteShape>(),
+        TypeSelector<ShortShape>(),
+        TypeSelector<IntegerShape>(),
+        TypeSelector<LongShape>(),
+        TypeSelector<BlobShape>(),
+        TypeSelector<StringShape>(),
+        TypeSelector<TimestampShape>()
+    )) }
     public init() {}
 }
 
-public struct EventPayloadTrait: EmptyTrait {
+public struct EventPayloadTrait: StaticTrait {
     public static let staticName = "smithy.api#eventPayload"
-    public static let selector: Selector = TargetSelector(OrSelector(
-        ShapeSelector<BlobShape>(),
-        ShapeSelector<StringShape>(),
-        ShapeSelector<StructureShape>(),
-        ShapeSelector<UnionShape>()
-    ))
+    public var selector: Selector { TargetSelector(OrSelector(
+        TypeSelector<BlobShape>(),
+        TypeSelector<StringShape>(),
+        TypeSelector<StructureShape>(),
+        TypeSelector<UnionShape>()
+    )) }
     public init() {}
 }

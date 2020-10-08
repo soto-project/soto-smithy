@@ -17,13 +17,15 @@
 public struct TraitList: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        var traits: [String: StaticTrait] = [:]
+        var traits: [String: Trait] = [:]
         for key in container.allKeys {
-            guard let traitType = Self.possibleTraits[key.stringValue] else {
-                throw DecodingError.dataCorruptedError(forKey: key, in: container, debugDescription: "Unrecognised trait type")
+            let trait: Trait
+            if let traitType = Self.possibleTraits[key.stringValue] {
+                trait = try traitType.decode(from: decoder, key: key)
+            } else {
+                trait = CustomTrait(shapeId: ShapeId(rawValue: key.stringValue))
             }
-            let trait = try traitType.decode(from: decoder, key: key)
-            traits[traitType.staticName] = trait
+            traits[trait.name] = trait
         }
         self.traits = traits
     }
@@ -64,7 +66,7 @@ public struct TraitList: Codable {
         self.traits = traits
     }
 
-    private static var possibleTraits: [String: StaticTrait.Type] = [:]
+    private static var possibleTraits: [String: Trait.Type] = [:]
     private var traits: [String: Trait]
 
     private struct CodingKeys: CodingKey {

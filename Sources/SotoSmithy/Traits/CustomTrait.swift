@@ -12,10 +12,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-public protocol EmptyTrait: StaticTrait {
-    init()
+public struct CustomTrait: Trait {
+    public let shapeId: ShapeId
+    public var selector: Selector { return ShapeSelector(shapeId, TraitSelector<TraitTrait>()) }
+    public var name: String { return shapeId.description }
 }
 
-extension EmptyTrait {
-    public init(from decoder: Decoder) throws { self.init() }
+public struct TraitTrait: StaticTrait {
+    public static var staticName = "smithy.api#trait"
+    init() {
+        print("SFSDF")
+    }
 }

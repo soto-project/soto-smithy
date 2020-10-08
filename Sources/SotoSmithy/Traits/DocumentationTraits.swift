@@ -28,7 +28,7 @@ public struct DocumentationTrait: StringTrait {
 
 public struct ExamplesTrait: SingleValueTrait {
     public static let staticName = "smithy.api#examples"
-    public static let selector: Selector = ShapeSelector<OperationShape>()
+    public static let selector: Selector = TypeSelector<OperationShape>()
     public struct Example: Codable {
         public let title: String
         public let documentation: String?
@@ -52,18 +52,18 @@ public struct ExternalDocumentationTrait: SingleValueTrait {
 
 }
 
-public struct InternalTrait: EmptyTrait {
+public struct InternalTrait: StaticTrait {
     public static let staticName = "smithy.api#internal"
     public init() {}
 }
 
-public struct SensitiveTrait: EmptyTrait {
+public struct SensitiveTrait: StaticTrait {
     public static let staticName = "smithy.api#sensitive"
     public static let selector: Selector = NotSelector(
         OrSelector(
-            ShapeSelector<OperationShape>(),
-            ShapeSelector<ServiceShape>(),
-            ShapeSelector<ResourceShape>()
+            TypeSelector<OperationShape>(),
+            TypeSelector<ServiceShape>(),
+            TypeSelector<ResourceShape>()
         )
     )
     public init() {}
@@ -88,14 +88,14 @@ public struct TagsTrait: SingleValueTrait {
 
 public struct TitleTrait: StringTrait {
     public static let staticName = "smithy.api#title"
-    public static let selector: Selector = OrSelector(ShapeSelector<ServiceShape>(), ShapeSelector<ResourceShape>())
+    public static let selector: Selector = OrSelector(TypeSelector<ServiceShape>(), TypeSelector<ResourceShape>())
     public var value: String
     public init(value: String) {
         self.value = value
     }
 }
 
-public struct UnstableTrait: EmptyTrait {
+public struct UnstableTrait: StaticTrait {
     public static let staticName = "smithy.api#unstable"
     public init() {}
 }

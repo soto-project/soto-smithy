@@ -15,3 +15,4 @@
 public protocol Selector {
     func select(using model: Model, shape: Shape) -> Bool
 }
+

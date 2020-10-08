@@ -113,7 +113,9 @@ public struct Smithy {
             EndpointTrait.self,
             HostLabelTrait.self,
             // suppress trait
-            SuppressTrait.self
+            SuppressTrait.self,
+            // trait trait
+            TraitTrait.self
         )
     }
     
