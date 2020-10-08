@@ -5,10 +5,12 @@ import PackageDescription
 let package = Package(
     name: "soto-smithy",
     products: [
-        .library(name: "SotoSmithy", targets: ["SotoSmithy"])
+        .library(name: "SotoSmithy", targets: ["SotoSmithy"]),
+        .library(name: "SotoSmithyAWS", targets: ["SotoSmithy"])
     ],
     targets: [
         .target(name: "SotoSmithy", dependencies: []),
-        .testTarget(name: "SotoSmithyTests", dependencies: ["SotoSmithy"]),
+        .target(name: "SotoSmithyAWS", dependencies: ["SotoSmithy"]),
+        .testTarget(name: "SotoSmithyTests", dependencies: ["SotoSmithy", "SotoSmithyAWS"]),
     ]
 )
