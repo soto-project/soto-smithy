@@ -62,16 +62,8 @@ enum SelectorParser {
         switch string {
         case "*": return AllSelector()
         case "number": return NumberSelector()
-        case "simpleType":
-            return OrSelector(
-                TypeSelector<BlobShape>(),
-                TypeSelector<BooleanShape>(),
-                TypeSelector<StringShape>(),
-                NumberSelector(),
-                TypeSelector<TimestampShape>(),
-                TypeSelector<DocumentShape>()
-            )
-        case "collection": return OrSelector(TypeSelector<ListShape>(), TypeSelector<SetShape>())
+        case "simpleType": return SimpleTypeSelector()
+        case "collection": return CollectionSelector()
         default:
             let shape = Model.possibleShapes[string]
             return shape?.typeSelector

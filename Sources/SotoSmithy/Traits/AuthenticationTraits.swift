@@ -19,38 +19,38 @@ public struct AuthDefinitionTrait: StaticTrait {
 
 public struct HttpBasicAuthTrait: StaticTrait {
     public static let staticName = "smithy.api#httpBasicAuth"
-    public static let selector: Selector = TypeSelector<ServiceShape>()
+    public var selector: Selector { TypeSelector<ServiceShape>() }
     public init() {}
 }
 
 public struct HttpDigestAuthTrait: StaticTrait {
     public static let staticName = "smithy.api#httpDigestAuth"
-    public static let selector: Selector = TypeSelector<ServiceShape>()
+    public var selector: Selector { TypeSelector<ServiceShape>() }
     public init() {}
 }
 
 public struct HttpBearerAuthTrait: StaticTrait {
     public static let staticName = "smithy.api#httpBearerAuth"
-    public static let selector: Selector = TypeSelector<ServiceShape>()
+    public var selector: Selector { TypeSelector<ServiceShape>() }
     public init() {}
 }
 
 public struct HttpApiKeyAuthTrait: StaticTrait {
     public static let staticName = "smithy.api#httpApiKeyAuth"
-    public static let selector: Selector = TypeSelector<ServiceShape>()
+    public var selector: Selector { TypeSelector<ServiceShape>() }
     public let name: String
     public let `in`: String
 }
 
 public struct OptionalAuthTrait: StaticTrait {
     public static let staticName = "smithy.api#optionalAuth"
-    public static let selector: Selector = TypeSelector<OperationShape>()
+    public var selector: Selector { TypeSelector<OperationShape>() }
     public init() {}
 }
 
 public struct AuthTrait: SingleValueTrait {
     public static let staticName = "smithy.api#auth"
-    public static let selector: Selector = OrSelector(TypeSelector<ServiceShape>(), TypeSelector<OperationShape>())
+    public var selector: Selector { OrSelector(TypeSelector<ServiceShape>(), TypeSelector<OperationShape>()) }
     public typealias Value = [String]
     public let value: Value
     public init(value: Value) {

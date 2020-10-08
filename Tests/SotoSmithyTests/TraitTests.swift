@@ -200,7 +200,7 @@ class TraitTests: XCTestCase {
         let traitList = try JSONDecoder().decode(TraitList.self, from: Data(json.utf8))
         let idRefTrait = traitList.trait(type: IdRefTrait.self)
         XCTAssertEqual(idRefTrait?.failWhenMissing, true)
-        XCTAssertEqual(idRefTrait?.selector, "integer")
+        XCTAssertEqual(idRefTrait?.resolvedShapeSelector, "integer")
     }
 
     func testLengthTrait() throws {

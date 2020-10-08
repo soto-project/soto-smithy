@@ -14,7 +14,7 @@
 
 public struct BoxTrait: StaticTrait {
     public static let staticName = "smithy.api#box"
-    public static let selector: Selector = OrTargetSelector(
+    public var selector: Selector { OrTargetSelector(
         OrSelector(
             TypeSelector<BooleanShape>(),
             TypeSelector<ByteShape>(),
@@ -24,13 +24,13 @@ public struct BoxTrait: StaticTrait {
             TypeSelector<FloatShape>(),
             TypeSelector<DoubleShape>()
         )
-    )
+    ) }
     public init() {}
 }
 
 public struct ErrorTrait: SingleValueTrait {
     public static let staticName = "smithy.api#error"
-    public static let selector: Selector = TypeSelector<StructureShape>()
+    public var selector: Selector { TypeSelector<StructureShape>() }
     public enum ErrorType: String, Codable {
         case client
         case server

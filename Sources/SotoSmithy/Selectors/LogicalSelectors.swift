@@ -13,6 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 public struct AllSelector: Selector {
+    public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
         return true
     }

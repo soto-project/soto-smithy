@@ -14,32 +14,32 @@
 
 public struct XmlAttributeTrait: StaticTrait {
     public static let staticName = "smithy.api#xmlAttribute"
-    public static let selector: Selector = TargetSelector(OrSelector(
+    public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<BooleanShape>(),
         NumberSelector(),
         TypeSelector<StringShape>(),
         TypeSelector<TimestampShape>()
-    ))
+    )) }
     public init() {}
 }
 
 public struct XmlFlattenedTrait: StaticTrait {
     public static let staticName = "smithy.api#xmlFlattened"
-    public static let selector: Selector = TargetSelector(OrSelector(
+    public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<ListShape>(),
         TypeSelector<SetShape>(),
         TypeSelector<MapShape>()
-    ))
+    )) }
     public init() {}
 }
 
 public struct XmlNameTrait: StringTrait {
     public static let staticName = "smithy.api#xmlName"
-    public static let selector: Selector = OrSelector(
+    public var selector: Selector { OrSelector(
         TypeSelector<StructureShape>(),
         TypeSelector<UnionShape>(),
         TypeSelector<MemberShape>()
-    )
+    ) }
     public var value: String
     public init(value: String) {
         self.value = value
