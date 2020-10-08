@@ -12,118 +12,127 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Foundation
+
 public struct Smithy {
     public init() {
-        AnyShape.registerShapeTypes([
-            // Simple shapes
-            BlobShape.self,
-            BooleanShape.self,
-            StringShape.self,
-            ByteShape.self,
-            ShortShape.self,
-            IntegerShape.self,
-            LongShape.self,
-            FloatShape.self,
-            DoubleShape.self,
-            BigIntegerShape.self,
-            BigDecimalShape.self,
-            TimestampShape.self,
-            DocumentShape.self,
-            // Aggregate shapes
-            ListShape.self,
-            SetShape.self,
-            MapShape.self,
-            StructureShape.self,
-            UnionShape.self,
-            // Service shapes
-            ServiceShape.self,
-            OperationShape.self,
-            ResourceShape.self,
-        ])
+        if Self.registeredShapes == false {
+            Model.registerShapeTypes([
+                // Simple shapes
+                BlobShape.self,
+                BooleanShape.self,
+                StringShape.self,
+                ByteShape.self,
+                ShortShape.self,
+                IntegerShape.self,
+                LongShape.self,
+                FloatShape.self,
+                DoubleShape.self,
+                BigIntegerShape.self,
+                BigDecimalShape.self,
+                TimestampShape.self,
+                DocumentShape.self,
+                // Aggregate shapes
+                ListShape.self,
+                SetShape.self,
+                MapShape.self,
+                StructureShape.self,
+                UnionShape.self,
+                // Service shapes
+                ServiceShape.self,
+                OperationShape.self,
+                ResourceShape.self,
+            ])
 
-        self.registerTraitTypes(
-            // constraint traits
-            EnumTrait.self,
-            IdRefTrait.self,
-            LengthTrait.self,
-            PatternTrait.self,
-            PrivateTrait.self,
-            RangeTrait.self,
-            RequiredTrait.self,
-            UniqueItemsTrait.self,
-            // documentation traits
-            DeprecatedTrait.self,
-            DocumentationTrait.self,
-            ExamplesTrait.self,
-            ExternalDocumentationTrait.self,
-            InternalTrait.self,
-            SensitiveTrait.self,
-            SinceTrait.self,
-            TagsTrait.self,
-            TitleTrait.self,
-            UnstableTrait.self,
-            // type refinement traits
-            BoxTrait.self,
-            ErrorTrait.self,
-            // protocol traits
-            ProtocolDefinitionTrait.self,
-            JsonNameTrait.self,
-            MediaTypeTrait.self,
-            TimestampFormatTrait.self,
-            // authentication traits
-            AuthDefinitionTrait.self,
-            HttpBasicAuthTrait.self,
-            HttpDigestAuthTrait.self,
-            HttpBearerAuthTrait.self,
-            HttpApiKeyAuthTrait.self,
-            OptionalAuthTrait.self,
-            AuthTrait.self,
-            // behaviour traits
-            IdempotencyTokenTrait.self,
-            IdempotentTrait.self,
-            ReadonlyTrait.self,
-            RetryableTrait.self,
-            PaginatedTrait.self,
-            HttpChecksumRequiredTrait.self,
-            // resource traits
-            NoReplaceTrait.self,
-            ReferencesTrait.self,
-            ResourceIdentifierTrait.self,
-            // streaming traits
-            StreamingTrait.self,
-            RequiresLengthTrait.self,
-            EventHeaderTrait.self,
-            EventPayloadTrait.self,
-            // http protocol binding traits
-            HttpTrait.self,
-            HttpErrorTrait.self,
-            HttpHeaderTrait.self,
-            HttpLabelTrait.self,
-            HttpPayloadTrait.self,
-            HttpPrefixHeadersTrait.self,
-            HttpQueryTrait.self,
-            HttpResponseCodeTrait.self,
-            HttpCorsTrait.self,
-            // xml binding traits
-            XmlAttributeTrait.self,
-            XmlFlattenedTrait.self,
-            XmlNameTrait.self,
-            XmlNamespaceTrait.self,
-            // endpoint traits
-            EndpointTrait.self,
-            HostLabelTrait.self,
-            // suppress trait
-            SuppressTrait.self,
-            // trait trait
-            TraitTrait.self
-        )
+            Smithy.registerTraitTypes(
+                // constraint traits
+                EnumTrait.self,
+                IdRefTrait.self,
+                LengthTrait.self,
+                PatternTrait.self,
+                PrivateTrait.self,
+                RangeTrait.self,
+                RequiredTrait.self,
+                UniqueItemsTrait.self,
+                // documentation traits
+                DeprecatedTrait.self,
+                DocumentationTrait.self,
+                ExamplesTrait.self,
+                ExternalDocumentationTrait.self,
+                InternalTrait.self,
+                SensitiveTrait.self,
+                SinceTrait.self,
+                TagsTrait.self,
+                TitleTrait.self,
+                UnstableTrait.self,
+                // type refinement traits
+                BoxTrait.self,
+                ErrorTrait.self,
+                // protocol traits
+                ProtocolDefinitionTrait.self,
+                JsonNameTrait.self,
+                MediaTypeTrait.self,
+                TimestampFormatTrait.self,
+                // authentication traits
+                AuthDefinitionTrait.self,
+                HttpBasicAuthTrait.self,
+                HttpDigestAuthTrait.self,
+                HttpBearerAuthTrait.self,
+                HttpApiKeyAuthTrait.self,
+                OptionalAuthTrait.self,
+                AuthTrait.self,
+                // behaviour traits
+                IdempotencyTokenTrait.self,
+                IdempotentTrait.self,
+                ReadonlyTrait.self,
+                RetryableTrait.self,
+                PaginatedTrait.self,
+                HttpChecksumRequiredTrait.self,
+                // resource traits
+                NoReplaceTrait.self,
+                ReferencesTrait.self,
+                ResourceIdentifierTrait.self,
+                // streaming traits
+                StreamingTrait.self,
+                RequiresLengthTrait.self,
+                EventHeaderTrait.self,
+                EventPayloadTrait.self,
+                // http protocol binding traits
+                HttpTrait.self,
+                HttpErrorTrait.self,
+                HttpHeaderTrait.self,
+                HttpLabelTrait.self,
+                HttpPayloadTrait.self,
+                HttpPrefixHeadersTrait.self,
+                HttpQueryTrait.self,
+                HttpResponseCodeTrait.self,
+                HttpCorsTrait.self,
+                // xml binding traits
+                XmlAttributeTrait.self,
+                XmlFlattenedTrait.self,
+                XmlNameTrait.self,
+                XmlNamespaceTrait.self,
+                // endpoint traits
+                EndpointTrait.self,
+                HostLabelTrait.self,
+                // suppress trait
+                SuppressTrait.self,
+                // trait trait
+                TraitTrait.self
+            )
+            Self.registeredShapes = true
+        }
     }
 
-    public func registerTraitTypes(_ traitTypes: StaticTrait.Type ...) {
+    public func decode(from data: Data) throws -> Model {
+        try JSONDecoder().decode(Model.self, from: data)
+    }
+
+    public static func registerTraitTypes(_ traitTypes: StaticTrait.Type ...) {
         TraitList.registerTraitTypes(traitTypes)
     }
 
-    var preludeShapes: [ShapeId: Shape] = [
+    static var preludeShapes: [ShapeId: Shape] = [
         "smithy.api#String": StringShape(traits: nil),
         "smithy.api#Blob": BlobShape(traits: nil),
         "smithy.api#BigInteger": BigIntegerShape(traits: nil),
@@ -145,4 +154,7 @@ public struct Smithy {
         "smithy.api#Double": DoubleShape(traits: [BoxTrait()]),
         "smithy.api#PrimitiveDouble": DoubleShape(traits: nil),
     ]
+
+    private static var registeredShapes: Bool = false
+
 }

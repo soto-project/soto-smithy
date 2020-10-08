@@ -12,24 +12,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct Model: Decodable {
-    static let smithy = Smithy()
+public struct Model {
     let version: String
     let metadata: [String: MetadataValue]?
     var shapes: [ShapeId: Shape]
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.version = try container.decode(String.self, forKey: .version)
-        self.metadata = try container.decodeIfPresent([String: MetadataValue].self, forKey: .metadata)
-        var shapes = Self.smithy.preludeShapes
-        if let decodedShapes = try container.decodeIfPresent([String: AnyShape].self, forKey: .shapes) {
-            for shape in decodedShapes {
-                shapes[ShapeId(rawValue: shape.key)] = shape.value.value
-            }
-        }
-        self.shapes = shapes
-    }
 
     public func shape(for identifier: ShapeId) -> Shape? {
         if let member = identifier.member {
@@ -90,9 +76,34 @@ public struct Model: Decodable {
         }
     }
 
+    public static func registerShapeTypes(_ shapes: [Shape.Type]) {
+        for shape in shapes {
+            self.possibleShapes[shape.type] = shape
+        }
+    }
+
+    static var possibleShapes: [String: Shape.Type] = [:]
+
     private enum CodingKeys: String, CodingKey {
         case version = "smithy"
         case metadata
         case shapes
     }
+}
+
+extension Model: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.version = try container.decode(String.self, forKey: .version)
+        self.metadata = try container.decodeIfPresent([String: MetadataValue].self, forKey: .metadata)
+        var shapes = Smithy.preludeShapes
+        if let decodedShapes = try container.decodeIfPresent([String: DecodableShape].self, forKey: .shapes) {
+            for shape in decodedShapes {
+                shapes[ShapeId(rawValue: shape.key)] = shape.value.value
+            }
+        }
+        self.shapes = shapes
+    }
+
+
 }

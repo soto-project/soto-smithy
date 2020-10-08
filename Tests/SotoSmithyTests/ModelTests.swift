@@ -18,7 +18,7 @@ import XCTest
 class ModelTests: XCTestCase {
     func testVersion() throws {
         let json = #"{"smithy": "1.0"}"#
-        let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
+        let model = try Smithy().decode(from: Data(json.utf8))
         XCTAssertEqual(model.version, "1.0")
     }
 
@@ -33,7 +33,7 @@ class ModelTests: XCTestCase {
             }
         }
         """
-        let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
+        let model = try Smithy().decode(from: Data(json.utf8))
         try model.validate()
         XCTAssertEqual(model.version, "1.0")
         XCTAssertNotNil(model.shapes[ShapeId(rawValue: "smithy.example#Blob")])
@@ -53,7 +53,7 @@ class ModelTests: XCTestCase {
             }
         }
         """
-        let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
+        let model = try Smithy().decode(from: Data(json.utf8))
         try model.validate()
         XCTAssertEqual(model.version, "1.0")
         XCTAssertNotNil(model.shapes[ShapeId(rawValue: "smithy.example#Blob")])
@@ -117,7 +117,7 @@ class ModelTests: XCTestCase {
             }
         }
         """
-        let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
+        let model = try Smithy().decode(from: Data(json.utf8))
         try model.validate()
     }
 }

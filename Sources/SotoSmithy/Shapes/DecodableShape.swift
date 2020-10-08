@@ -12,8 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct AnyShape: Decodable {
-    static var possibleShapes: [String: Shape.Type] = [:]
+public struct DecodableShape: Decodable {
     public var value: Shape
     public var traits: TraitList? {
         get { return self.shapeSelf.traits }
@@ -29,17 +28,11 @@ public struct AnyShape: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
-        guard let shapeType = Self.possibleShapes[type] else {
+        guard let shapeType = Model.possibleShapes[type] else {
             throw DecodingError.dataCorruptedError(forKey: CodingKeys.type, in: container, debugDescription: "Unrecognised shape type")
         }
         self.value = try shapeType.init(from: decoder)
     }
-
-    /*public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(type(of:value).type, forKey: .type)
-        try self.value.encode(to: encoder)
-    }*/
 
     public func validate(using model: Model) throws {
         try self.value.validate(using: model)
@@ -51,12 +44,6 @@ public struct AnyShape: Decodable {
 
     public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
         try self.value.remove(trait: trait, from: member)
-    }
-
-    public static func registerShapeTypes(_ shapes: [Shape.Type]) {
-        for shape in shapes {
-            self.possibleShapes[shape.type] = shape
-        }
     }
 
     private enum CodingKeys: CodingKey {
