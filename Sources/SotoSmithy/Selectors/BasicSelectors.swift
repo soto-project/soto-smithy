@@ -12,12 +12,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct AllSelector: Selector {
-    public func select(using model: Model, shape: Shape) -> Bool {
-        return true
-    }
-}
-
 public struct TypeSelector<S: Shape>: Selector {
     public func select(using model: Model, shape: Shape) -> Bool {
         return type(of: shape) == S.self
@@ -51,6 +45,22 @@ public struct TargetSelector: Selector {
     }
 }
 
+public struct OrTargetSelector: Selector {
+    let selector: Selector
+    init(_ selector: Selector) {
+        self.selector = selector
+    }
+
+    public func select(using model: Model, shape: Shape) -> Bool {
+        if self.selector.select(using: model, shape: shape) {
+            return true
+        }
+        guard let member = shape as? MemberShape else { return false }
+        guard let memberShape = model.shape(for: member.target) else { return false }
+        return self.selector.select(using: model, shape: memberShape)
+    }
+}
+
 public struct TraitSelector<T: StaticTrait>: Selector {
     public func select(using model: Model, shape: Shape) -> Bool {
         return shape.trait(type: T.self) != nil
@@ -69,70 +79,3 @@ public struct TraitNameSelector: Selector {
     }
 }
 
-public struct OrTargetSelector: Selector {
-    let selector: Selector
-    init(_ selector: Selector) {
-        self.selector = selector
-    }
-
-    public func select(using model: Model, shape: Shape) -> Bool {
-        if self.selector.select(using: model, shape: shape) {
-            return true
-        }
-        guard let member = shape as? MemberShape else { return false }
-        guard let memberShape = model.shape(for: member.target) else { return false }
-        return self.selector.select(using: model, shape: memberShape)
-    }
-}
-
-public struct NotSelector: Selector {
-    let selector: Selector
-    public init(_ selector: Selector) {
-        self.selector = selector
-    }
-
-    public func select(using model: Model, shape: Shape) -> Bool {
-        return !self.selector.select(using: model, shape: shape)
-    }
-}
-
-public struct AndSelector: Selector {
-    let selectors: [Selector]
-    public init(_ selectors: Selector...) {
-        self.selectors = selectors
-    }
-
-    public init(_ selectors: [Selector]) {
-        self.selectors = selectors
-    }
-
-    public func select(using model: Model, shape: Shape) -> Bool {
-        for selector in self.selectors {
-            if selector.select(using: model, shape: shape) == false {
-                return false
-            }
-        }
-        return true
-    }
-}
-
-public struct OrSelector: Selector {
-    let selectors: [Selector]
-
-    public init(_ selectors: Selector...) {
-        self.selectors = selectors
-    }
-
-    public init(_ selectors: [Selector]) {
-        self.selectors = selectors
-    }
-
-    public func select(using model: Model, shape: Shape) -> Bool {
-        for selector in self.selectors {
-            if selector.select(using: model, shape: shape) == true {
-                return true
-            }
-        }
-        return false
-    }
-}
