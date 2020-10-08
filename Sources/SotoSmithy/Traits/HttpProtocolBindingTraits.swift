@@ -30,7 +30,7 @@ public struct HttpErrorTrait: SingleValueTrait {
     }
 }
 
-public struct HttpHeaderTrait: StringTrait {
+public struct HttpHeaderTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpHeader"
     public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<BooleanShape>(),
@@ -73,7 +73,7 @@ public struct HttpPayloadTrait: StaticTrait {
     public init() {}
 }
 
-public struct HttpPrefixHeadersTrait: StringTrait {
+public struct HttpPrefixHeadersTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpPrefixHeaders"
     public var selector: Selector { TargetSelector(TypeSelector<MapShape>()) }
     public var value: String
@@ -82,7 +82,7 @@ public struct HttpPrefixHeadersTrait: StringTrait {
     }
 }
 
-public struct HttpQueryTrait: StringTrait {
+public struct HttpQueryTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpQuery"
     public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<BooleanShape>(),

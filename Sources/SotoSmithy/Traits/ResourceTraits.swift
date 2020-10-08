@@ -35,7 +35,7 @@ public struct ReferencesTrait: SingleValueTrait {
     }
 }
 
-public struct ResourceIdentifierTrait: StringTrait {
+public struct ResourceIdentifierTrait: SingleValueTrait {
     public static let staticName = "smithy.api#resourceIdentifier"
     public static var selector: Selector { AndSelector(
         TypeSelector<MemberShape>(),

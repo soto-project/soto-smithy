@@ -58,7 +58,7 @@ public struct LengthTrait: StaticTrait {
     public let max: Int?
 }
 
-public struct PatternTrait: StringTrait {
+public struct PatternTrait: SingleValueTrait {
     public static let staticName = "smithy.api#pattern"
     public var selector: Selector { OrTargetSelector(TypeSelector<StringShape>()) }
     public var value: String

@@ -17,7 +17,7 @@ public struct ProtocolDefinitionTrait: StaticTrait {
     public init() {}
 }
 
-public struct JsonNameTrait: StringTrait {
+public struct JsonNameTrait: SingleValueTrait {
     public static let staticName = "smithy.api#jsonName"
     public var selector: Selector { TypeSelector<MemberShape>() }
     public var value: String
@@ -26,7 +26,7 @@ public struct JsonNameTrait: StringTrait {
     }
 }
 
-public struct MediaTypeTrait: StringTrait {
+public struct MediaTypeTrait: SingleValueTrait {
     public static let staticName = "smithy.api#mediaType"
     public var selector: Selector { OrSelector(TypeSelector<BlobShape>(), TypeSelector<StringShape>()) }
     public var value: String

@@ -18,7 +18,7 @@ public struct DeprecatedTrait: StaticTrait {
     public let since: String?
 }
 
-public struct DocumentationTrait: StringTrait {
+public struct DocumentationTrait: SingleValueTrait {
     public init(value: String) {
         self.value = value
     }
@@ -70,7 +70,7 @@ public struct SensitiveTrait: StaticTrait {
     public init() {}
 }
 
-public struct SinceTrait: StringTrait {
+public struct SinceTrait: SingleValueTrait {
     public static let staticName = "smithy.api#since"
     public var value: String
     public init(value: String) {
@@ -87,7 +87,7 @@ public struct TagsTrait: SingleValueTrait {
     }
 }
 
-public struct TitleTrait: StringTrait {
+public struct TitleTrait: SingleValueTrait {
     public static let staticName = "smithy.api#title"
     public var selector: Selector { OrSelector(TypeSelector<ServiceShape>(), TypeSelector<ResourceShape>()) }
     public var value: String

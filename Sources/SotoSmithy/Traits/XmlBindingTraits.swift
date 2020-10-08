@@ -33,7 +33,7 @@ public struct XmlFlattenedTrait: StaticTrait {
     public init() {}
 }
 
-public struct XmlNameTrait: StringTrait {
+public struct XmlNameTrait: SingleValueTrait {
     public static let staticName = "smithy.api#xmlName"
     public var selector: Selector { OrSelector(
         TypeSelector<StructureShape>(),

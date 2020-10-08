@@ -30,5 +30,3 @@ extension SingleValueTrait {
         try container.encode(value)
     }
 }
-
-public protocol StringTrait: SingleValueTrait where Value == String {}
