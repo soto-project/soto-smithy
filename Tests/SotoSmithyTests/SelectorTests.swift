@@ -40,6 +40,45 @@ class SelectorTests: XCTestCase {
         try model.validate()
         XCTAssertEqual(try model.select(from: "string").count, 5) // this includes the prelude string type
         XCTAssertEqual(try model.select(from: "union").count, 1)
-        XCTAssertEqual(try model.select(from: "integer").count, 3)
+        XCTAssertEqual(try model.select(from: "integer").count, 3) // this includes the prelude integer types
+    }
+
+    func testTraitType() throws {
+        let json = """
+        {
+            "smithy": "1.0",
+            "shapes": {
+                "smithy.example#Name": {
+                    "type": "string",
+                    "traits": { "smithy.api#deprecated": {} }
+                },
+                "smithy.example#Age": { "type": "integer" },
+            }
+        }
+        """
+        let model = try Smithy().decode(from: Data(json.utf8))
+        try model.validate()
+        XCTAssertEqual(try model.select(from: "[trait:deprecated]").count, 1)
+    }
+
+    func testCustomTraitType() throws {
+        let json = """
+        {
+            "smithy": "1.0",
+            "shapes": {
+                "smithy.example#Name": {
+                    "type": "string",
+                    "traits": { "smithy.example#StringDimensions": {} }
+                },
+                "smithy.example#StringDimensions": {
+                    "type": "structure",
+                    "traits": { "smithy.api#trait": { "selector": "string" } }
+                }
+            }
+        }
+        """
+        let model = try Smithy().decode(from: Data(json.utf8))
+        try model.validate()
+        XCTAssertEqual(try model.select(from: "[trait:smithy.example#StringDimensions]").count, 1)
     }
 }

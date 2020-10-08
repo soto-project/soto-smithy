@@ -53,21 +53,19 @@ public struct TargetSelector: Selector {
 
 public struct TraitSelector<T: StaticTrait>: Selector {
     public func select(using model: Model, shape: Shape) -> Bool {
-        return shape.traits?.trait(type: T.self) != nil
+        return shape.trait(type: T.self) != nil
     }
 }
 
-public struct CustomTraitSelector: Selector {
-    let shapeId: ShapeId
+public struct TraitNameSelector: Selector {
+    let name: String
 
-    init(_ shapeId: ShapeId) {
-        self.shapeId = shapeId
+    init(_ name: String) {
+        self.name = name
     }
 
     public func select(using model: Model, shape: Shape) -> Bool {
-        guard let traitShape = model.shape(for: self.shapeId) else { return false }
-        guard let traitSelector = traitShape.trait(type: TraitTrait.self)?.selectorToApply else { return false }
-        return traitSelector.select(using: model, shape: shape)
+        return shape.trait(named: name) != nil
     }
 }
 

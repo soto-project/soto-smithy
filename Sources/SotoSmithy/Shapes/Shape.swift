@@ -33,6 +33,10 @@ extension Shape {
         return traits?.trait(type: T.self)
     }
 
+    public func trait(named: String) -> Trait? {
+        return traits?.trait(named: named)
+    }
+
     public mutating func add(trait: Trait) {
         if var traits = self.traits {
             traits.add(trait: trait)
@@ -52,4 +56,6 @@ extension Shape {
     public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
         throw Smithy.MemberDoesNotExistError(name: member)
     }
+
+    static var typeSelector: Selector { return TypeSelector<Self>() }
 }

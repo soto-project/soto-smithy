@@ -19,6 +19,10 @@ public struct ShapeId: Equatable, Hashable, RawRepresentable {
         self.rawValue = rawValue
     }
 
+    public init(namespace: String, shapeName: String) {
+        self.rawValue = "\(namespace)#\(shapeName)"
+    }
+
     /// namespace
     public var namespace: String? {
         return self.rawValue.firstIndex(of: "#").map { return String(rawValue[rawValue.startIndex..<$0]) }

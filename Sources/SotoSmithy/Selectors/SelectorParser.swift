@@ -13,12 +13,19 @@
 //===----------------------------------------------------------------------===//
 
 enum SelectorParser {
+    // parse Smithy selector IDL string
     static func parse(from string: String) throws -> Selector {
         var selectors: [Selector] = []
         var stringPosition: String.Index = string.startIndex
         while let next = nextSelector(string, startIndex: stringPosition) {
-            guard let selector = typeSelector(from: next) else { throw Smithy.UnrecognisedSelectorError(value: String(next)) }
-            selectors.append(selector)
+            let selector: Selector?
+            if next.prefix(6) == "[trait" {
+                selector = traitSelector(from: next)
+            } else {
+                selector = typeSelector(from: String(next))
+            }
+            guard let selector2 = selector else { throw Smithy.UnrecognisedSelectorError(value: String(next)) }
+            selectors.append(selector2)
             stringPosition = next.endIndex
         }
         switch selectors.count {
@@ -31,6 +38,7 @@ enum SelectorParser {
         }
     }
 
+    /// Get next selector in a string
     static func nextSelector(_ string: String, startIndex: String.Index) -> Substring? {
         guard startIndex != string.endIndex else { return nil }
         var startIndex = startIndex
@@ -49,8 +57,8 @@ enum SelectorParser {
         return string[startIndex..<endIndex]
     }
 
-    static func typeSelector(from string: Substring) -> Selector? {
-        //for shape in 
+    /// get TypeSelector from string
+    static func typeSelector(from string: String) -> Selector? {
         switch string {
         case "*": return AllSelector()
         case "number": return NumberSelector()
@@ -64,29 +72,24 @@ enum SelectorParser {
                 TypeSelector<DocumentShape>()
             )
         case "collection": return OrSelector(TypeSelector<ListShape>(), TypeSelector<SetShape>())
-        case "blob": return TypeSelector<BlobShape>()
-        case "boolean": return TypeSelector<BooleanShape>()
-        case "document": return TypeSelector<DocumentShape>()
-        case "string": return TypeSelector<StringShape>()
-        case "byte": return TypeSelector<ByteShape>()
-        case "short": return TypeSelector<ShortShape>()
-        case "integer": return TypeSelector<IntegerShape>()
-        case "long": return TypeSelector<LongShape>()
-        case "float": return TypeSelector<FloatShape>()
-        case "double": return TypeSelector<DoubleShape>()
-        case "bigDecimal": return TypeSelector<BigDecimalShape>()
-        case "bigInteger": return TypeSelector<BigIntegerShape>()
-        case "timestamp": return TypeSelector<TimestampShape>()
-        case "list": return TypeSelector<ListShape>()
-        case "set": return TypeSelector<SetShape>()
-        case "map": return TypeSelector<MapShape>()
-        case "structure": return TypeSelector<StructureShape>()
-        case "union": return TypeSelector<UnionShape>()
-        case "service": return TypeSelector<ServiceShape>()
-        case "operation": return TypeSelector<OperationShape>()
-        case "resource": return TypeSelector<ResourceShape>()
-        case "member": return TypeSelector<MemberShape>()
-        default: return nil
+        default:
+            let shape = Model.possibleShapes[string]
+            return shape?.typeSelector
+        }
+    }
+
+    /// get TraitSelector from string
+    static func traitSelector(from string: Substring) -> Selector? {
+        let traitStart = string.dropFirst(7) // drop [trait|
+        guard let traitEnd = traitStart.firstIndex(where: { $0 == "|" || $0 == "]" }) else { return nil }
+        var traitShapeId = ShapeId(rawValue: String(traitStart[traitStart.startIndex..<traitEnd]))
+        if traitShapeId.namespace == nil {
+            traitShapeId = ShapeId(namespace: "smithy.api", shapeName: traitShapeId.shapeName)
+        }
+        if let trait = TraitList.possibleTraits[traitShapeId.rawValue] {
+            return trait.traitSelector
+        } else {
+            return TraitNameSelector(traitShapeId.rawValue)
         }
     }
 }

@@ -29,3 +29,18 @@ public struct TraitTrait: StaticTrait {
         case selector
     }
 }
+
+struct CustomTraitSelector: Selector {
+    let shapeId: ShapeId
+
+    init(_ shapeId: ShapeId) {
+        self.shapeId = shapeId
+    }
+
+    func select(using model: Model, shape: Shape) -> Bool {
+        guard let traitShape = model.shape(for: self.shapeId) else { return false }
+        guard let traitSelector = traitShape.trait(type: TraitTrait.self)?.selectorToApply else { return false }
+        return traitSelector.select(using: model, shape: shape)
+    }
+}
+

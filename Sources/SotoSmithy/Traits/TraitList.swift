@@ -38,6 +38,10 @@ public struct TraitList: Codable {
         return self.traits[T.staticName].map { $0 as! T }
     }
 
+    public func trait(named: String) -> Trait? {
+        return self.traits[named]
+    }
+
     public mutating func add(trait: Trait) {
         self.traits[trait.name] = trait
     }
@@ -66,7 +70,8 @@ public struct TraitList: Codable {
         self.traits = traits
     }
 
-    private static var possibleTraits: [String: Trait.Type] = [:]
+    static var possibleTraits: [String: StaticTrait.Type] = [:]
+
     private var traits: [String: Trait]
 
     private struct CodingKeys: CodingKey {
