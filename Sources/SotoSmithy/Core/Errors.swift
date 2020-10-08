@@ -24,4 +24,8 @@ extension Smithy {
     public struct MemberDoesNotExistError: Error {
         let name: String
     }
+
+    public struct UnrecognisedSelectorError: Error {
+        let value: String
+    }
 }

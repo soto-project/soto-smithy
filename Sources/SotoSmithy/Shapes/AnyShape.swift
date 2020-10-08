@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct AnyShape: Shape {
+public struct AnyShape: Decodable {
     static var possibleShapes: [String: Shape.Type] = [:]
     public var value: Shape
     public var traits: TraitList? {
@@ -35,11 +35,11 @@ public struct AnyShape: Shape {
         self.value = try shapeType.init(from: decoder)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    /*public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(Self.type, forKey: .type)
+        try container.encode(type(of:value).type, forKey: .type)
         try self.value.encode(to: encoder)
-    }
+    }*/
 
     public func validate(using model: Model) throws {
         try self.value.validate(using: model)

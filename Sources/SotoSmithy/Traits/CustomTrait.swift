@@ -14,13 +14,18 @@
 
 public struct CustomTrait: Trait {
     public let shapeId: ShapeId
-    public var selector: Selector { return ShapeSelector(self.shapeId, TraitSelector<TraitTrait>()) }
+    public var selector: Selector { return CustomTraitSelector(self.shapeId) }
     public var name: String { return self.shapeId.description }
 }
 
 public struct TraitTrait: StaticTrait {
     public static var staticName = "smithy.api#trait"
-    init() {
-        print("SFSDF")
+    public var selectorToApply: Selector
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.selectorToApply = try container.decode(DecodableSelector.self, forKey: .selector).selector
+    }
+    private enum CodingKeys: String, CodingKey {
+        case selector
     }
 }

@@ -38,21 +38,6 @@ public struct NumberSelector: Selector {
     }
 }
 
-public struct ShapeSelector: Selector {
-    let shapeId: ShapeId
-    let selector: Selector
-
-    init(_ shapeId: ShapeId, _ selector: Selector) {
-        self.shapeId = shapeId
-        self.selector = selector
-    }
-
-    public func select(using model: Model, shape: Shape) -> Bool {
-        guard let otherShape = model.shape(for: self.shapeId) else { return false }
-        return self.selector.select(using: model, shape: otherShape)
-    }
-}
-
 public struct TargetSelector: Selector {
     let selector: Selector
     init(_ selector: Selector) {
@@ -63,6 +48,26 @@ public struct TargetSelector: Selector {
         guard let member = shape as? MemberShape else { return false }
         guard let memberShape = model.shape(for: member.target) else { return false }
         return self.selector.select(using: model, shape: memberShape)
+    }
+}
+
+public struct TraitSelector<T: StaticTrait>: Selector {
+    public func select(using model: Model, shape: Shape) -> Bool {
+        return shape.traits?.trait(type: T.self) != nil
+    }
+}
+
+public struct CustomTraitSelector: Selector {
+    let shapeId: ShapeId
+
+    init(_ shapeId: ShapeId) {
+        self.shapeId = shapeId
+    }
+
+    public func select(using model: Model, shape: Shape) -> Bool {
+        guard let traitShape = model.shape(for: self.shapeId) else { return false }
+        guard let traitSelector = traitShape.trait(type: TraitTrait.self)?.selectorToApply else { return false }
+        return traitSelector.select(using: model, shape: shape)
     }
 }
 
@@ -79,12 +84,6 @@ public struct OrTargetSelector: Selector {
         guard let member = shape as? MemberShape else { return false }
         guard let memberShape = model.shape(for: member.target) else { return false }
         return self.selector.select(using: model, shape: memberShape)
-    }
-}
-
-public struct TraitSelector<T: StaticTrait>: Selector {
-    public func select(using model: Model, shape: Shape) -> Bool {
-        return shape.traits?.trait(type: T.self) != nil
     }
 }
 
@@ -105,6 +104,10 @@ public struct AndSelector: Selector {
         self.selectors = selectors
     }
 
+    public init(_ selectors: [Selector]) {
+        self.selectors = selectors
+    }
+
     public func select(using model: Model, shape: Shape) -> Bool {
         for selector in self.selectors {
             if selector.select(using: model, shape: shape) == false {
@@ -117,7 +120,12 @@ public struct AndSelector: Selector {
 
 public struct OrSelector: Selector {
     let selectors: [Selector]
+
     public init(_ selectors: Selector...) {
+        self.selectors = selectors
+    }
+
+    public init(_ selectors: [Selector]) {
         self.selectors = selectors
     }
 

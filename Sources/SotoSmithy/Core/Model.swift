@@ -16,16 +16,16 @@ public struct Model: Decodable {
     static let smithy = Smithy()
     let version: String
     let metadata: [String: MetadataValue]?
-    var shapes: [ShapeId: AnyShape]
+    var shapes: [ShapeId: Shape]
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.version = try container.decode(String.self, forKey: .version)
         self.metadata = try container.decodeIfPresent([String: MetadataValue].self, forKey: .metadata)
-        var shapes = Self.smithy.preludeShapes.mapValues { AnyShape(value: $0) }
+        var shapes = Self.smithy.preludeShapes
         if let decodedShapes = try container.decodeIfPresent([String: AnyShape].self, forKey: .shapes) {
             for shape in decodedShapes {
-                shapes[ShapeId(rawValue: shape.key)] = shape.value
+                shapes[ShapeId(rawValue: shape.key)] = shape.value.value
             }
         }
         self.shapes = shapes
@@ -48,11 +48,22 @@ public struct Model: Decodable {
     }
 
     public func shapes<S: Shape>(of shapeType: S.Type) -> [ShapeId: S] {
-        return self.shapes.compactMapValues { $0.value as? S }
+        return self.shapes.compactMapValues { $0 as? S }
     }
 
     public func validate() throws {
         try self.shapes.forEach { try $0.value.validate(using: self) }
+    }
+
+    public func select(from string: String) throws -> [ShapeId] {
+        var shapeIds: [ShapeId] = []
+        let selector = try SelectorParser.parse(from: string)
+        for shape in self.shapes {
+            if selector.select(using: self, shape: shape.value) {
+                shapeIds.append(shape.key)
+            }
+        }
+        return shapeIds
     }
 
     public mutating func add(trait: Trait, to identifier: ShapeId) throws {

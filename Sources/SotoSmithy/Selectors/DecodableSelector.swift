@@ -12,20 +12,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-struct DecodableSelector: Selector, Decodable {
+struct DecodableSelector: Decodable {
     let selector: Selector
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let string = try container.decode(String.self)
-        self.selector = try Self.convert(from: string)
+        self.selector = try SelectorParser.parse(from: string)
     }
 
     func select(using model: Model, shape: Shape) -> Bool {
         return self.selector.select(using: model, shape: shape)
-    }
-
-    static func convert(from string: String) throws -> Selector {
-        return AllSelector()
     }
 }
