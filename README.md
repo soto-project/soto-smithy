@@ -1,3 +1,3 @@
-# soto-codegen
+# Soto Smithy
 
-A description of this package.
+Load AWS Smithy JSON AST models.
