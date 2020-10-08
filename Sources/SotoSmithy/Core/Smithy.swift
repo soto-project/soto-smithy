@@ -40,8 +40,8 @@ public struct Smithy {
             OperationShape.self,
             ResourceShape.self,
         ])
-        
-        registerTraitTypes(
+
+        self.registerTraitTypes(
             // constraint traits
             EnumTrait.self,
             IdRefTrait.self,
@@ -118,11 +118,11 @@ public struct Smithy {
             TraitTrait.self
         )
     }
-    
+
     public func registerTraitTypes(_ traitTypes: StaticTrait.Type ...) {
         TraitList.registerTraitTypes(traitTypes)
     }
-    
+
     var preludeShapes: [ShapeId: Shape] = [
         "smithy.api#String": StringShape(traits: nil),
         "smithy.api#Blob": BlobShape(traits: nil),

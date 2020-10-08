@@ -20,7 +20,7 @@ class ShapeIdTests: XCTestCase {
         XCTAssertEqual(ShapeId(rawValue: "namespace#test").namespace, "namespace")
         XCTAssertNil(ShapeId(rawValue: "test").namespace)
     }
-    
+
     func testShape() {
         XCTAssertEqual(ShapeId(rawValue: "namespace#test").shapeName, "test")
         XCTAssertEqual(ShapeId(rawValue: "test").shapeName, "test")
@@ -28,13 +28,13 @@ class ShapeIdTests: XCTestCase {
         XCTAssertEqual(ShapeId(rawValue: "namespace#test$member").shapeName, "test")
         XCTAssertEqual(ShapeId(rawValue: "#test$").shapeName, "test")
     }
-    
+
     func testMember() {
         XCTAssertNil(ShapeId(rawValue: "test").member)
         XCTAssertEqual(ShapeId(rawValue: "test$member").member, "member")
         XCTAssertEqual(ShapeId(rawValue: "namespace#test$member").member, "member")
     }
-    
+
     func testRootShapeId() {
         XCTAssertEqual(ShapeId(rawValue: "test").rootShapeId, "test")
         XCTAssertEqual(ShapeId(rawValue: "namespace#test").rootShapeId, "namespace#test")

@@ -27,6 +27,7 @@ public struct ReferencesTrait: SingleValueTrait {
         public let ids: [String: String]?
         public let rel: String?
     }
+
     public typealias Value = [Reference]
     public let value: Value
     public init(value: Value) {

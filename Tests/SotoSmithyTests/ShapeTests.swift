@@ -16,7 +16,6 @@ import SotoSmithy
 import XCTest
 
 class ShapeTests: XCTestCase {
-
     func testBlobShape() throws {
         let json = """
         {
@@ -30,7 +29,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Blob")) is BlobShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Blob")) is BlobShape)
     }
 
     func testBooleanShape() throws {
@@ -46,7 +45,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Bool")) is BooleanShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Bool")) is BooleanShape)
     }
 
     func testByteShape() throws {
@@ -62,7 +61,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Byte")) is ByteShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Byte")) is ByteShape)
     }
 
     func testShortShape() throws {
@@ -78,7 +77,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Short")) is ShortShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Short")) is ShortShape)
     }
 
     func testIntegerShape() throws {
@@ -94,7 +93,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Integer")) is IntegerShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Integer")) is IntegerShape)
     }
 
     func testLongShape() throws {
@@ -110,7 +109,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Long")) is LongShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Long")) is LongShape)
     }
 
     func testFloatShape() throws {
@@ -126,7 +125,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Float")) is FloatShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Float")) is FloatShape)
     }
 
     func testDoubleShape() throws {
@@ -142,7 +141,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Double")) is DoubleShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Double")) is DoubleShape)
     }
 
     func testBigIntegerShape() throws {
@@ -158,7 +157,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#BigInteger")) is BigIntegerShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#BigInteger")) is BigIntegerShape)
     }
 
     func testBigDecimalShape() throws {
@@ -174,7 +173,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#BigDecimal")) is BigDecimalShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#BigDecimal")) is BigDecimalShape)
     }
 
     func testTimestamp() throws {
@@ -190,7 +189,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Timestamp")) is TimestampShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Timestamp")) is TimestampShape)
     }
 
     func testDocument() throws {
@@ -206,9 +205,9 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        XCTAssert(model.shape(for:ShapeId(rawValue:"smithy.example#Document")) is DocumentShape)
+        XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Document")) is DocumentShape)
     }
-    
+
     func testList() throws {
         let json = """
         {
@@ -224,7 +223,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        let list = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#List")) as? ListShape)
+        let list = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#List")) as? ListShape)
         XCTAssertEqual(list.member.target, ShapeId(rawValue: "smithy.example#Integer"))
     }
 
@@ -243,7 +242,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        let set = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Set")) as? SetShape)
+        let set = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Set")) as? SetShape)
         XCTAssertEqual(set.member.target, ShapeId(rawValue: "smithy.example#Integer"))
     }
 
@@ -264,7 +263,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        let map = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Map")) as? MapShape)
+        let map = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Map")) as? MapShape)
         XCTAssertEqual(map.key.target, ShapeId(rawValue: "smithy.example#Key"))
         XCTAssertEqual(map.value.target, ShapeId(rawValue: "smithy.example#Value"))
     }
@@ -288,7 +287,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        let structure = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Structure")) as? StructureShape)
+        let structure = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Structure")) as? StructureShape)
         XCTAssertEqual(structure.members?["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
         XCTAssertEqual(structure.members?["age"]?.target, ShapeId(rawValue: "smithy.example#Age"))
     }
@@ -312,7 +311,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        let structure = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Union")) as? UnionShape)
+        let structure = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Union")) as? UnionShape)
         XCTAssertEqual(structure.members?["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
         XCTAssertEqual(structure.members?["age"]?.target, ShapeId(rawValue: "smithy.example#Age"))
     }
@@ -331,7 +330,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        let service = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Service")) as? ServiceShape)
+        let service = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Service")) as? ServiceShape)
         XCTAssertEqual(service.version, "10-10-20")
     }
 
@@ -364,7 +363,7 @@ class ShapeTests: XCTestCase {
         """
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
-        let service = try XCTUnwrap(model.shape(for:ShapeId(rawValue:"smithy.example#Service")) as? ServiceShape)
+        let service = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Service")) as? ServiceShape)
         let operations = try XCTUnwrap(service.operations)
         let operation1 = try XCTUnwrap(model.shape(for: operations[0].target) as? OperationShape)
         let operation2 = try XCTUnwrap(model.shape(for: operations[1].target) as? OperationShape)
@@ -372,4 +371,3 @@ class ShapeTests: XCTestCase {
         XCTAssertEqual(operation2.output?.target, ShapeId(rawValue: "smithy.example#String"))
     }
 }
-

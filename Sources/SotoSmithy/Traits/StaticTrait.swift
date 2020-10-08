@@ -19,4 +19,3 @@ public protocol StaticTrait: Trait {
 extension StaticTrait {
     public var name: String { return Self.staticName }
 }
-

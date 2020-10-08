@@ -46,9 +46,10 @@ public struct ShapeSelector: Selector {
         self.shapeId = shapeId
         self.selector = selector
     }
+
     public func select(using model: Model, shape: Shape) -> Bool {
         guard let otherShape = model.shape(for: self.shapeId) else { return false }
-        return selector.select(using: model, shape: otherShape)
+        return self.selector.select(using: model, shape: otherShape)
     }
 }
 
@@ -57,10 +58,11 @@ public struct TargetSelector: Selector {
     init(_ selector: Selector) {
         self.selector = selector
     }
+
     public func select(using model: Model, shape: Shape) -> Bool {
         guard let member = shape as? MemberShape else { return false }
         guard let memberShape = model.shape(for: member.target) else { return false }
-        return selector.select(using: model, shape: memberShape)
+        return self.selector.select(using: model, shape: memberShape)
     }
 }
 
@@ -69,13 +71,14 @@ public struct OrTargetSelector: Selector {
     init(_ selector: Selector) {
         self.selector = selector
     }
+
     public func select(using model: Model, shape: Shape) -> Bool {
-        if selector.select(using: model, shape: shape) {
+        if self.selector.select(using: model, shape: shape) {
             return true
         }
         guard let member = shape as? MemberShape else { return false }
         guard let memberShape = model.shape(for: member.target) else { return false }
-        return selector.select(using: model, shape: memberShape)
+        return self.selector.select(using: model, shape: memberShape)
     }
 }
 
@@ -92,7 +95,7 @@ public struct NotSelector: Selector {
     }
 
     public func select(using model: Model, shape: Shape) -> Bool {
-        return !selector.select(using: model, shape: shape)
+        return !self.selector.select(using: model, shape: shape)
     }
 }
 
@@ -103,7 +106,7 @@ public struct AndSelector: Selector {
     }
 
     public func select(using model: Model, shape: Shape) -> Bool {
-        for selector in selectors {
+        for selector in self.selectors {
             if selector.select(using: model, shape: shape) == false {
                 return false
             }
@@ -119,7 +122,7 @@ public struct OrSelector: Selector {
     }
 
     public func select(using model: Model, shape: Shape) -> Bool {
-        for selector in selectors {
+        for selector in self.selectors {
             if selector.select(using: model, shape: shape) == true {
                 return true
             }
@@ -127,4 +130,3 @@ public struct OrSelector: Selector {
         return false
     }
 }
-

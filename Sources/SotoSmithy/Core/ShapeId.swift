@@ -13,31 +13,33 @@
 //===----------------------------------------------------------------------===//
 
 public struct ShapeId: Equatable, Hashable, RawRepresentable {
-
     public let rawValue: String
-    
+
     public init(rawValue: String) {
         self.rawValue = rawValue
     }
 
     /// namespace
     public var namespace: String? {
-        return rawValue.firstIndex(of: "#").map { return String(rawValue[rawValue.startIndex..<$0])}
+        return self.rawValue.firstIndex(of: "#").map { return String(rawValue[rawValue.startIndex..<$0]) }
     }
+
     /// shape
     public var shapeName: String {
-        let start = rawValue.firstIndex(of: "#").map { rawValue.index(after: $0) } ?? rawValue.startIndex
-        let end = rawValue.firstIndex(of: "$") ?? rawValue.endIndex
-        return String(rawValue[start..<end])
+        let start = self.rawValue.firstIndex(of: "#").map { rawValue.index(after: $0) } ?? self.rawValue.startIndex
+        let end = self.rawValue.firstIndex(of: "$") ?? self.rawValue.endIndex
+        return String(self.rawValue[start..<end])
     }
+
     /// member
     public var member: String? {
-        return rawValue.firstIndex(of: "$").map { return String(rawValue[rawValue.index(after: $0)..<rawValue.endIndex])}
+        return self.rawValue.firstIndex(of: "$").map { return String(rawValue[rawValue.index(after: $0)..<rawValue.endIndex]) }
     }
+
     /// root shape id
     public var rootShapeId: ShapeId {
-        let end = rawValue.firstIndex(of: "$") ?? rawValue.endIndex
-        return ShapeId(rawValue: String(rawValue[rawValue.startIndex..<end]))
+        let end = self.rawValue.firstIndex(of: "$") ?? self.rawValue.endIndex
+        return ShapeId(rawValue: String(self.rawValue[self.rawValue.startIndex..<end]))
     }
 }
 
@@ -61,5 +63,5 @@ extension ShapeId: ExpressibleByStringLiteral {
 }
 
 extension ShapeId: CustomStringConvertible {
-    public var description: String { return rawValue }
+    public var description: String { return self.rawValue }
 }

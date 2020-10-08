@@ -16,7 +16,6 @@ import SotoSmithy
 import XCTest
 
 class TraitTests: XCTestCase {
-
     func testAddTraitToShape() throws {
         let json = """
         {

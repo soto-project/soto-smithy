@@ -16,10 +16,11 @@ public struct AnyShape: Shape {
     static var possibleShapes: [String: Shape.Type] = [:]
     public var value: Shape
     public var traits: TraitList? {
-        get { return shapeSelf.traits }
-        set { value.traits = newValue }
+        get { return self.shapeSelf.traits }
+        set { self.value.traits = newValue }
     }
-    public var shapeSelf: Shape { return value }
+
+    public var shapeSelf: Shape { return self.value }
 
     init(value: Shape) {
         self.value = value
@@ -37,7 +38,7 @@ public struct AnyShape: Shape {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.type, forKey: .type)
-        try value.encode(to: encoder)
+        try self.value.encode(to: encoder)
     }
 
     public func validate(using model: Model) throws {
@@ -54,7 +55,7 @@ public struct AnyShape: Shape {
 
     public static func registerShapeTypes(_ shapes: [Shape.Type]) {
         for shape in shapes {
-            possibleShapes[shape.type] = shape
+            self.possibleShapes[shape.type] = shape
         }
     }
 
@@ -62,4 +63,3 @@ public struct AnyShape: Shape {
         case type
     }
 }
-

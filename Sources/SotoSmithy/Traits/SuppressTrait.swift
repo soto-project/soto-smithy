@@ -20,4 +20,3 @@ public struct SuppressTrait: SingleValueTrait {
         self.value = value
     }
 }
-

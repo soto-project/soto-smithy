@@ -53,4 +53,3 @@ extension Shape {
         throw Smithy.MemberDoesNotExistError(name: member)
     }
 }
-

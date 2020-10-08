@@ -42,6 +42,5 @@ extension MetadataValue: Decodable {
         } else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyDecodable value cannot be decoded")
         }
-
     }
 }

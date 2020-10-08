@@ -23,11 +23,11 @@ public struct ServiceShape: Shape {
 public struct OperationMemberShape: Shape {
     public var traits: TraitList?
     public let target: ShapeId
-    
+
     public func validate(using model: Model) throws {
-        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member references non-existent shape \(target)") }
-        guard shape is OperationShape else { throw Smithy.ValidationError(reason: "Operation references illegal shape \(target)") }
-        try traits?.validate(using: model, shape: self)
+        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member references non-existent shape \(self.target)") }
+        guard shape is OperationShape else { throw Smithy.ValidationError(reason: "Operation references illegal shape \(self.target)") }
+        try self.traits?.validate(using: model, shape: self)
     }
 }
 
@@ -42,11 +42,11 @@ public struct OperationShape: Shape {
 public struct ResourceMemberShape: Shape {
     public var traits: TraitList?
     public let target: ShapeId
-    
+
     public func validate(using model: Model) throws {
-        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member references non-existent shape \(target)") }
-        guard shape is ResourceShape else { throw Smithy.ValidationError(reason: "Operation references illegal shape \(target)") }
-        try traits?.validate(using: model, shape: self)
+        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member references non-existent shape \(self.target)") }
+        guard shape is ResourceShape else { throw Smithy.ValidationError(reason: "Operation references illegal shape \(self.target)") }
+        try self.traits?.validate(using: model, shape: self)
     }
 }
 

@@ -35,10 +35,10 @@ public struct ErrorTrait: SingleValueTrait {
         case client
         case server
     }
+
     public typealias Value = ErrorType
     public let value: Value
     public init(value: Value) {
         self.value = value
     }
 }
-

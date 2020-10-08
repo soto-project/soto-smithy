@@ -22,7 +22,7 @@ struct DecodableSelector: Selector, Decodable {
     }
 
     func select(using model: Model, shape: Shape) -> Bool {
-        return selector.select(using: model, shape: shape)
+        return self.selector.select(using: model, shape: shape)
     }
 
     static func convert(from string: String) throws -> Selector {

@@ -22,6 +22,7 @@ public struct EnumTrait: SingleValueTrait {
         public let tags: [String]?
         public let deprecated: Bool?
     }
+
     public typealias Value = [EnumDefinition]
     public let value: Value
     public init(value: Value) {

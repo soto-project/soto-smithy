@@ -58,7 +58,7 @@ public struct HttpLabelTrait: StaticTrait {
         )),
         TraitSelector<RequiredTrait>()
     )
-    public init() { }
+    public init() {}
 }
 
 public struct HttpPayloadTrait: StaticTrait {
@@ -70,7 +70,7 @@ public struct HttpPayloadTrait: StaticTrait {
         TypeSelector<UnionShape>(),
         TypeSelector<DocumentShape>()
     ))
-    public init() { }
+    public init() {}
 }
 
 public struct HttpPrefixHeadersTrait: StringTrait {
@@ -102,7 +102,7 @@ public struct HttpQueryTrait: StringTrait {
 public struct HttpResponseCodeTrait: StaticTrait {
     public static let staticName = "smithy.api#httpResponseCode"
     public static let selector: Selector = TargetSelector(TypeSelector<IntegerShape>())
-    public init() { }
+    public init() {}
 }
 
 public struct HttpCorsTrait: StaticTrait {

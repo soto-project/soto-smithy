@@ -21,5 +21,5 @@ public struct EndpointTrait: StaticTrait {
 public struct HostLabelTrait: StaticTrait {
     public static let staticName = "smithy.api#hostLabel"
     public static let selector: Selector = AndSelector(TraitSelector<RequiredTrait>(), TargetSelector(TypeSelector<StringShape>()))
-    public init() { }
+    public init() {}
 }

@@ -17,7 +17,7 @@ public struct Model: Decodable {
     let version: String
     let metadata: [String: MetadataValue]?
     var shapes: [ShapeId: AnyShape]
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.version = try container.decode(String.self, forKey: .version)
@@ -25,12 +25,12 @@ public struct Model: Decodable {
         var shapes = Self.smithy.preludeShapes.mapValues { AnyShape(value: $0) }
         if let decodedShapes = try container.decodeIfPresent([String: AnyShape].self, forKey: .shapes) {
             for shape in decodedShapes {
-                shapes[ShapeId(rawValue:shape.key)] = shape.value
+                shapes[ShapeId(rawValue: shape.key)] = shape.value
             }
         }
         self.shapes = shapes
     }
-    
+
     public func shape(for identifier: ShapeId) -> Shape? {
         if let member = identifier.member {
             if let shape = shapes[identifier.rootShapeId]?.shapeSelf {
@@ -43,25 +43,25 @@ public struct Model: Decodable {
             }
             return nil
         } else {
-            return shapes[identifier]?.shapeSelf
+            return self.shapes[identifier]?.shapeSelf
         }
     }
 
     public func shapes<S: Shape>(of shapeType: S.Type) -> [ShapeId: S] {
-        return shapes.compactMapValues { $0.value as? S }
+        return self.shapes.compactMapValues { $0.value as? S }
     }
 
     public func validate() throws {
-        try shapes.forEach { try $0.value.validate(using: self) }
+        try self.shapes.forEach { try $0.value.validate(using: self) }
     }
 
     public mutating func add(trait: Trait, to identifier: ShapeId) throws {
         if let member = identifier.member {
-            guard try shapes[identifier.rootShapeId]?.add(trait: trait, to: member) != nil else {
+            guard try self.shapes[identifier.rootShapeId]?.add(trait: trait, to: member) != nil else {
                 throw Smithy.ShapeDoesNotExistError(id: identifier)
             }
         } else {
-            guard shapes[identifier]?.add(trait: trait) != nil else {
+            guard self.shapes[identifier]?.add(trait: trait) != nil else {
                 throw Smithy.ShapeDoesNotExistError(id: identifier)
             }
         }
@@ -69,11 +69,11 @@ public struct Model: Decodable {
 
     public mutating func remove(trait: StaticTrait.Type, from identifier: ShapeId) throws {
         if let member = identifier.member {
-            guard try shapes[identifier.rootShapeId]?.remove(trait: trait, from: member) != nil else {
+            guard try self.shapes[identifier.rootShapeId]?.remove(trait: trait, from: member) != nil else {
                 throw Smithy.ShapeDoesNotExistError(id: identifier)
             }
         } else {
-            guard shapes[identifier]?.remove(trait: trait) != nil else {
+            guard self.shapes[identifier]?.remove(trait: trait) != nil else {
                 throw Smithy.ShapeDoesNotExistError(id: identifier)
             }
         }

@@ -31,5 +31,4 @@ extension SingleValueTrait {
     }
 }
 
-public protocol StringTrait: SingleValueTrait where Value == String {
-}
+public protocol StringTrait: SingleValueTrait where Value == String {}

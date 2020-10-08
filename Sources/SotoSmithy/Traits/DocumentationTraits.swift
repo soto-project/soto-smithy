@@ -22,6 +22,7 @@ public struct DocumentationTrait: StringTrait {
     public init(value: String) {
         self.value = value
     }
+
     public static let staticName = "smithy.api#documentation"
     public let value: String
 }
@@ -35,6 +36,7 @@ public struct ExamplesTrait: SingleValueTrait {
         public let input: String
         public let output: String
     }
+
     public typealias Value = [Example]
     public let value: Value
     public init(value: Value) {
@@ -49,7 +51,6 @@ public struct ExternalDocumentationTrait: SingleValueTrait {
     public init(value: Value) {
         self.value = value
     }
-
 }
 
 public struct InternalTrait: StaticTrait {

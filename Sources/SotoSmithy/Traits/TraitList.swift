@@ -35,25 +35,25 @@ public struct TraitList: Codable {
     }
 
     public func trait<T: StaticTrait>(type: T.Type) -> T? {
-        return traits[T.staticName].map { $0 as! T }
+        return self.traits[T.staticName].map { $0 as! T }
     }
 
     public mutating func add(trait: Trait) {
-        traits[trait.name] = trait
+        self.traits[trait.name] = trait
     }
 
     public mutating func remove(trait: StaticTrait.Type) {
-        traits[trait.staticName] = nil
+        self.traits[trait.staticName] = nil
     }
 
     static func registerTraitTypes(_ traitTypes: [StaticTrait.Type]) {
         for trait in traitTypes {
-            possibleTraits[trait.staticName] = trait
+            self.possibleTraits[trait.staticName] = trait
         }
     }
 
     func validate(using model: Model, shape: Shape) throws {
-        try traits.forEach {
+        try self.traits.forEach {
             try $0.value.validate(using: model, shape: shape)
         }
     }
@@ -76,6 +76,7 @@ public struct TraitList: Codable {
         init?(stringValue: String) {
             self.stringValue = stringValue
         }
+
         init?(intValue: Int) {
             return nil
         }
@@ -94,6 +95,6 @@ extension TraitList: Sequence {
     public typealias Iterator = Dictionary<String, Trait>.Values.Iterator
 
     public func makeIterator() -> Iterator {
-        return traits.values.makeIterator()
+        return self.traits.values.makeIterator()
     }
 }

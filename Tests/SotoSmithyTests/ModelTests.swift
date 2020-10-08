@@ -36,7 +36,7 @@ class ModelTests: XCTestCase {
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
         XCTAssertEqual(model.version, "1.0")
-        XCTAssertNotNil(model.shapes[ShapeId(rawValue:"smithy.example#Blob")])
+        XCTAssertNotNil(model.shapes[ShapeId(rawValue: "smithy.example#Blob")])
     }
 
     func testTraits() throws {
@@ -56,10 +56,10 @@ class ModelTests: XCTestCase {
         let model = try JSONDecoder().decode(Model.self, from: Data(json.utf8))
         try model.validate()
         XCTAssertEqual(model.version, "1.0")
-        XCTAssertNotNil(model.shapes[ShapeId(rawValue:"smithy.example#Blob")])
-        XCTAssertNotNil(model.shapes[ShapeId(rawValue:"smithy.example#Blob")]?.traits?.trait(type: InternalTrait.self))
+        XCTAssertNotNil(model.shapes[ShapeId(rawValue: "smithy.example#Blob")])
+        XCTAssertNotNil(model.shapes[ShapeId(rawValue: "smithy.example#Blob")]?.traits?.trait(type: InternalTrait.self))
     }
-    
+
     func testSamplePaginatedTraits() throws {
         let json = """
         {
@@ -121,5 +121,3 @@ class ModelTests: XCTestCase {
         try model.validate()
     }
 }
-
-

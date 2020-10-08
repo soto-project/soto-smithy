@@ -43,19 +43,19 @@ public struct TimestampFormatTrait: StaticTrait {
         case httpDate = "http-date"
         case epochSeconds = "epoch-seconds"
     }
+
     public let format: TimestampFormat
     public init(format: TimestampFormat) {
         self.format = format
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         self.format = try container.decode(TimestampFormat.self)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(format)
+        try container.encode(self.format)
     }
 }
-

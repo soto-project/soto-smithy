@@ -20,7 +20,7 @@ public struct XmlAttributeTrait: StaticTrait {
         TypeSelector<StringShape>(),
         TypeSelector<TimestampShape>()
     ))
-    public init() { }
+    public init() {}
 }
 
 public struct XmlFlattenedTrait: StaticTrait {
@@ -30,7 +30,7 @@ public struct XmlFlattenedTrait: StaticTrait {
         TypeSelector<SetShape>(),
         TypeSelector<MapShape>()
     ))
-    public init() { }
+    public init() {}
 }
 
 public struct XmlNameTrait: StringTrait {
