@@ -6,7 +6,7 @@ let package = Package(
     name: "soto-smithy",
     products: [
         .library(name: "SotoSmithy", targets: ["SotoSmithy"]),
-        .library(name: "SotoSmithyAWS", targets: ["SotoSmithy"])
+        .library(name: "SotoSmithyAWS", targets: ["SotoSmithyAWS"])
     ],
     targets: [
         .target(name: "SotoSmithy", dependencies: []),
