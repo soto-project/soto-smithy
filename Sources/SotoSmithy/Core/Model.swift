@@ -33,23 +33,21 @@ public struct Model {
         }
     }
 
-    public func shapes<S: Shape>(of shapeType: S.Type) -> [ShapeId: S] {
-        return self.shapes.compactMapValues { $0 as? S }
-    }
-
     public func validate() throws {
         try self.shapes.forEach { try $0.value.validate(using: self) }
     }
 
-    public func select(from string: String) throws -> [ShapeId] {
-        var shapeIds: [ShapeId] = []
+    public func select(with selector: Selector) -> [ShapeId: Shape] {
+        return self.shapes.compactMapValues { selector.select(using: self, shape: $0) ? $0 : nil }
+    }
+
+    public func select(from string: String) throws -> [ShapeId: Shape] {
         let selector = try SelectorParser.parse(from: string)
-        for shape in self.shapes {
-            if selector.select(using: self, shape: shape.value) {
-                shapeIds.append(shape.key)
-            }
-        }
-        return shapeIds
+        return select(with: selector)
+    }
+
+    public func select<S: Shape>(type shapeType: S.Type) -> [ShapeId: S] {
+        return self.shapes.compactMapValues { $0 as? S }
     }
 
     public mutating func add(trait: Trait, to identifier: ShapeId) throws {
