@@ -16,18 +16,18 @@
 
 import SotoSmithy
 
-struct AwsAuthSigV4Trait: StaticTrait {
-    static let staticName = "aws.auth#sigv4"
-    var selector: Selector { return TypeSelector<ServiceShape>() }
-    let name: String
+public struct AwsAuthSigV4Trait: StaticTrait {
+    public static let staticName = "aws.auth#sigv4"
+    public var selector: Selector { return TypeSelector<ServiceShape>() }
+    public let name: String
 }
 
-struct AwsAuthUnsignedPayloadTrait: StaticTrait {
-    static let staticName = "aws.auth#unsignedPayload"
-    var selector: Selector { return TypeSelector<OperationShape>() }
+public struct AwsAuthUnsignedPayloadTrait: StaticTrait {
+    public static let staticName = "aws.auth#unsignedPayload"
+    public var selector: Selector { return TypeSelector<OperationShape>() }
 }
 
-struct AwsAuthCognitoUserPoolsTrait: StaticTrait {
-    static let staticName = "aws.auth#cognitoUserPools"
-    var selector: Selector { return TypeSelector<ServiceShape>() }
+public struct AwsAuthCognitoUserPoolsTrait: StaticTrait {
+    public static let staticName = "aws.auth#cognitoUserPools"
+    public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
