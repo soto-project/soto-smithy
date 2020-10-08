@@ -25,7 +25,7 @@ public struct TraitList: Codable {
             } else {
                 trait = CustomTrait(shapeId: ShapeId(rawValue: key.stringValue))
             }
-            traits[trait.name] = trait
+            traits[trait.traitName] = trait
         }
         self.traits = traits
     }
@@ -43,7 +43,7 @@ public struct TraitList: Codable {
     }
 
     public mutating func add(trait: Trait) {
-        self.traits[trait.name] = trait
+        self.traits[trait.traitName] = trait
     }
 
     public mutating func remove(trait: StaticTrait.Type) {
@@ -65,7 +65,7 @@ public struct TraitList: Codable {
     init(traits traitsArray: [Trait]) {
         var traits: [String: Trait] = [:]
         traitsArray.forEach {
-            traits[$0.name] = $0
+            traits[$0.traitName] = $0
         }
         self.traits = traits
     }

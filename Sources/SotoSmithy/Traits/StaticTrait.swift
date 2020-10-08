@@ -17,6 +17,6 @@ public protocol StaticTrait: Trait {
 }
 
 extension StaticTrait {
-    public var name: String { return Self.staticName }
+    public var traitName: String { return Self.staticName }
     static var traitSelector: Selector { TraitSelector<Self>() }
 }

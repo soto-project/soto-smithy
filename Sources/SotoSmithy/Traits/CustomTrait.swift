@@ -15,7 +15,7 @@
 public struct CustomTrait: Trait {
     public let shapeId: ShapeId
     public var selector: Selector { return CustomTraitSelector(self.shapeId) }
-    public var name: String { return self.shapeId.description }
+    public var traitName: String { return self.shapeId.description }
 }
 
 public struct TraitTrait: StaticTrait {
