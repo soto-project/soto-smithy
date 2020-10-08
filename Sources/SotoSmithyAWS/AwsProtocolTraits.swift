@@ -46,8 +46,11 @@ public struct AwsProtocolsRestXmlTrait: StaticTrait {
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
-public struct AwsProtocolsEc2QueryNameTrait: StaticTrait {
+public struct AwsProtocolsEc2QueryNameTrait: SingleValueTrait {
     public static let staticName = "aws.protocols#ec2QueryName"
     public var selector: Selector { return TypeSelector<MemberShape>() }
     public var value: String
+    public init(value: String) {
+        self.value = value
+    }
 }
