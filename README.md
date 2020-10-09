@@ -68,9 +68,8 @@ string [trait|sensitive]
 
 ## SotoSmithyAWS
 
-This library can be used for reading any Smithy AST but was written specifically for parsing the AWS service Smithy files. There is an additional library SotoSmithyAWS that includes the traits required to load AWS service Smithy AST. If you want to use the AWs traits library you need to register these traits with SotoSmithy by calling 
+This library can be used for reading any Smithy AST but was written specifically for parsing the AWS service Smithy files. There is an additional library SotoSmithyAWS that includes the traits required to load AWS service Smithy AST. If you want to use the AWs traits library you need to register these traits with SotoSmithy by calling the following before you load any files.
 
 ```swift
 Smithy.registerAWSTraits()
 ```
-before you load any files.
