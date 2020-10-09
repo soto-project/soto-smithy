@@ -39,7 +39,20 @@ extension Smithy {
             AwsProtocolsAwsQueryTrait.self,
             AwsProtocolsEc2QueryTrait.self,
             AwsProtocolsRestXmlTrait.self,
-            AwsProtocolsEc2QueryNameTrait.self
+            AwsProtocolsEc2QueryNameTrait.self,
+            // IAM traits
+            AwsIAMConditionKeysTrait.self,
+            AwsIAMRequiredActionsTrait.self,
+            AwsIAMDefineConditionKeysTrait.self,
+            AwsIAMActionPermissionDescriptionTrait.self,
+            AwsDisableConditionKeyInferenceTrait.self,
+            // API Gateway traits
+            AwsApiGatewayApiKeySourceTrait.self,
+            AwsApiGatewayAuthorizersTrait.self,
+            AwsApiGatewayAuthorizerTrait.self,
+            AwsApiGatewayRequestValidatorTrait.self,
+            AwsApiGatewayIntegrationTrait.self,
+            AwsApiGatewayMockIntegrationTrait.self
         )
     }
 

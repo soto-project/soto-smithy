@@ -22,7 +22,7 @@ public struct AwsServiceTrait: StaticTrait {
     public let sdkId: String
     public let arnNamespace: String
     public let cloudFormationName: String?
-    public let cloudTrailEventSource: String
+    public let cloudTrailEventSource: String?
 }
 
 public struct AwsArnTrait: StaticTrait {
