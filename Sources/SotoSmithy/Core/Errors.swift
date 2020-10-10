@@ -14,18 +14,18 @@
 
 extension Smithy {
     public struct ValidationError: Error {
-        let reason: String
+        public let reason: String
     }
 
     public struct ShapeDoesNotExistError: Error {
-        let id: ShapeId
+        public let id: ShapeId
     }
 
     public struct MemberDoesNotExistError: Error {
-        let name: String
+        public let name: String
     }
 
     public struct UnrecognisedSelectorError: Error {
-        let value: String
+        public let value: String
     }
 }

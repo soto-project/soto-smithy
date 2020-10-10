@@ -26,7 +26,7 @@ extension Shape {
     public var shapeSelf: Shape { return self }
 
     public func validate(using model: Model) throws {
-        try traits?.validate(using: model, shape: self)
+        try validateTraits(using: model)
     }
 
     public func trait<T: StaticTrait>(type: T.Type) -> T? {
@@ -57,5 +57,9 @@ extension Shape {
         throw Smithy.MemberDoesNotExistError(name: member)
     }
 
-    static var typeSelector: Selector { return TypeSelector<Self>() }
+    static public var typeSelector: Selector { return TypeSelector<Self>() }
+
+    func validateTraits(using model: Model) throws {
+        try traits?.validate(using: model, shape: self)
+    }
 }

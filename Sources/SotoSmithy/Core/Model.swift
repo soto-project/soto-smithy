@@ -34,7 +34,14 @@ public struct Model {
     }
 
     public func validate() throws {
-        try self.shapes.forEach { try $0.value.validate(using: self) }
+        try self.shapes.forEach {
+            do {
+                try $0.value.validate(using: self)
+            } catch let error as Smithy.ValidationError {
+                // replace "**" with name of shape
+                throw Smithy.ValidationError(reason: error.reason.replacingOccurrences(of: "**", with: $0.key.rawValue))
+            }
+        }
     }
 
     public func select(with selector: Selector) -> [ShapeId: Shape] {

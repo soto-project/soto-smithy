@@ -29,7 +29,7 @@ public struct DecodableShape: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         guard let shapeType = Model.possibleShapes[type] else {
-            throw DecodingError.dataCorruptedError(forKey: CodingKeys.type, in: container, debugDescription: "Unrecognised shape type")
+            throw DecodingError.dataCorruptedError(forKey: CodingKeys.type, in: container, debugDescription: "Unrecognised shape type \(type)")
         }
         self.value = try shapeType.init(from: decoder)
     }

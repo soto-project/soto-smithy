@@ -28,7 +28,7 @@ extension Trait {
     public var selector: Selector { return AllSelector() }
     public func validate(using model: Model, shape: Shape) throws {
         guard self.selector.select(using: model, shape: shape) else {
-            throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to \(type(of: shape).type)")
+            throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
         }
     }
 }

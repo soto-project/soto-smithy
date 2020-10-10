@@ -17,14 +17,14 @@ public struct MemberShape: Shape {
     public var traits: TraitList?
 
     public func validate(using model: Model) throws {
-        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member references non-existent shape \(self.target)") }
+        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)") }
         guard !(shape is OperationShape),
             !(shape is ResourceShape),
             !(shape is ServiceShape)
         else {
-            throw Smithy.ValidationError(reason: "Member references illegal shape \(self.target)")
+            throw Smithy.ValidationError(reason: "Member of ** references illegal shape \(self.target)")
         }
-        try self.traits?.validate(using: model, shape: self)
+        try self.validateTraits(using: model)
     }
 }
 
@@ -34,7 +34,7 @@ public struct ListShape: Shape {
     public let member: MemberShape
     public func validate(using model: Model) throws {
         try self.member.validate(using: model)
-        try self.traits?.validate(using: model, shape: self)
+        try self.validateTraits(using: model)
     }
 }
 
@@ -44,7 +44,7 @@ public struct SetShape: Shape {
     public let member: MemberShape
     public func validate(using model: Model) throws {
         try self.member.validate(using: model)
-        try self.traits?.validate(using: model, shape: self)
+        try self.validateTraits(using: model)
     }
 }
 
@@ -56,7 +56,7 @@ public struct MapShape: Shape {
     public func validate(using model: Model) throws {
         try self.key.validate(using: model)
         try self.value.validate(using: model)
-        try self.traits?.validate(using: model, shape: self)
+        try self.validateTraits(using: model)
     }
 }
 
@@ -66,7 +66,7 @@ public struct StructureShape: Shape {
     public var members: [String: MemberShape]?
     public func validate(using model: Model) throws {
         try self.members?.forEach { try $0.value.validate(using: model) }
-        try self.traits?.validate(using: model, shape: self)
+        try self.validateTraits(using: model)
     }
 
     public mutating func add(trait: Trait, to member: String) throws {
@@ -88,7 +88,7 @@ public struct UnionShape: Shape {
     public var members: [String: MemberShape]?
     public func validate(using model: Model) throws {
         try self.members?.forEach { try $0.value.validate(using: model) }
-        try self.traits?.validate(using: model, shape: self)
+        try self.validateTraits(using: model)
     }
 
     public mutating func add(trait: Trait, to member: String) {
