@@ -42,6 +42,8 @@ public struct Smithy {
                 ServiceShape.self,
                 OperationShape.self,
                 ResourceShape.self,
+                // Apply shape
+                ApplyShape.self
             ])
 
             Smithy.registerTraitTypes(

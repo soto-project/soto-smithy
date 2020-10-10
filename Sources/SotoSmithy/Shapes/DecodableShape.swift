@@ -12,20 +12,19 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct DecodableShape: Decodable {
-    public var value: Shape
-    public var traits: TraitList? {
-        get { return self.shapeSelf.traits }
+/// Internal Shape type used to decode Shapes from JSON. Decodes shape name first to decide what shape is meant to be created
+struct DecodableShape: Decodable {
+    var value: Shape
+    var traits: TraitList? {
+        get { return self.value.traits }
         set { self.value.traits = newValue }
     }
-
-    public var shapeSelf: Shape { return self.value }
 
     init(value: Shape) {
         self.value = value
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         guard let shapeType = Model.possibleShapes[type] else {
@@ -34,15 +33,15 @@ public struct DecodableShape: Decodable {
         self.value = try shapeType.init(from: decoder)
     }
 
-    public func validate(using model: Model) throws {
+    func validate(using model: Model) throws {
         try self.value.validate(using: model)
     }
 
-    public mutating func add(trait: Trait, to member: String) throws {
+    mutating func add(trait: Trait, to member: String) throws {
         try self.value.add(trait: trait, to: member)
     }
 
-    public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
+    mutating func remove(trait: StaticTrait.Type, from member: String) throws {
         try self.value.remove(trait: trait, from: member)
     }
 

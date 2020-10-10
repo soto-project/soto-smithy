@@ -19,7 +19,7 @@ public struct Model {
 
     public func shape(for identifier: ShapeId) -> Shape? {
         if let member = identifier.member {
-            if let shape = shapes[identifier.rootShapeId]?.shapeSelf {
+            if let shape = shapes[identifier.rootShapeId] {
                 switch shape {
                 case let structure as StructureShape:
                     return structure.members?[member]
@@ -29,7 +29,7 @@ public struct Model {
             }
             return nil
         } else {
-            return self.shapes[identifier]?.shapeSelf
+            return self.shapes[identifier]
         }
     }
 
@@ -104,7 +104,19 @@ extension Model: Decodable {
         var shapes = Smithy.preludeShapes
         if let decodedShapes = try container.decodeIfPresent([String: DecodableShape].self, forKey: .shapes) {
             for shape in decodedShapes {
+                guard !(shape.value.value is ApplyShape) else { continue }
                 shapes[ShapeId(rawValue: shape.key)] = shape.value.value
+            }
+            // Apply changes from AppyShapes
+            for shape in decodedShapes {
+                guard let applyShape = shape.value.value as? ApplyShape,
+                      let traitsToApply = applyShape.traits else { continue }
+                let applyToShapeId = ShapeId(rawValue: shape.key)
+                // assume shapes are members as we cannot have two keys the same in one Smithy JSON file
+                guard let member = applyToShapeId.member else { continue }
+                for trait in traitsToApply {
+                    try shapes[applyToShapeId.rootShapeId]?.add(trait: trait, to: member)
+                }
             }
         }
         self.shapes = shapes

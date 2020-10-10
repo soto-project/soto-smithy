@@ -120,4 +120,35 @@ class ModelTests: XCTestCase {
         let model = try Smithy().decode(from: Data(json.utf8))
         try model.validate()
     }
+
+    func testApplyShape() throws {
+        let json = """
+        {
+            "smithy": "1.0",
+            "shapes": {
+                "smithy.example#Struct": {
+                    "type": "structure",
+                    "members": {
+                        "foo": {
+                            "target": "smithy.api#String"
+                        }
+                    }
+                },
+                "smithy.example#Struct$foo": {
+                    "type": "apply",
+                    "traits": {
+                        "smithy.api#documentation": "My documentation string"
+                    }
+                }
+            }
+        }
+        """
+        let model = try Smithy().decode(from: Data(json.utf8))
+        try model.validate()
+        let structure = model.shape(for: ShapeId(rawValue: "smithy.example#Struct")) as? StructureShape
+        XCTAssertEqual(
+            structure?.members?["foo"]?.trait(type: DocumentationTrait.self)?.value,
+            "My documentation string"
+        )
+    }
 }

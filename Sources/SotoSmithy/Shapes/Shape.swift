@@ -15,7 +15,6 @@
 public protocol Shape: Codable {
     static var type: String { get }
     var traits: TraitList? { get set }
-    var shapeSelf: Shape { get }
     func validate(using model: Model) throws
     mutating func add(trait: Trait, to member: String) throws
     mutating func remove(trait: StaticTrait.Type, from member: String) throws
@@ -23,7 +22,6 @@ public protocol Shape: Codable {
 
 extension Shape {
     public static var type: String { return "_undefined_" }
-    public var shapeSelf: Shape { return self }
 
     public func validate(using model: Model) throws {
         try validateTraits(using: model)
