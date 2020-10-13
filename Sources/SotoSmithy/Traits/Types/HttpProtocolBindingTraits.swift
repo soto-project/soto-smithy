@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Configures the HTTP bindings of an operation.
 public struct HttpTrait: StaticTrait {
     public static let staticName = "smithy.api#http"
     public var selector: Selector { TypeSelector<OperationShape>() }
@@ -20,6 +21,7 @@ public struct HttpTrait: StaticTrait {
     public let code: Int?
 }
 
+/// Defines an HTTP response code for an operation error.
 public struct HttpErrorTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpError"
     public var selector: Selector { AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>()) }
@@ -30,6 +32,7 @@ public struct HttpErrorTrait: SingleValueTrait {
     }
 }
 
+/// Binds a structure member to an HTTP header.
 public struct HttpHeaderTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpHeader"
     public var selector: Selector { TargetSelector(OrSelector(
@@ -47,6 +50,7 @@ public struct HttpHeaderTrait: SingleValueTrait {
     }
 }
 
+/// Binds an operation input structure member to an HTTP label.
 public struct HttpLabelTrait: StaticTrait {
     public static let staticName = "smithy.api#httpLabel"
     public var selector: Selector { AndSelector(
@@ -61,6 +65,7 @@ public struct HttpLabelTrait: StaticTrait {
     public init() {}
 }
 
+/// Binds a single structure member to the body of an HTTP request.
 public struct HttpPayloadTrait: StaticTrait {
     public static let staticName = "smithy.api#httpPayload"
     public var selector: Selector { TargetSelector(OrSelector(
@@ -73,6 +78,7 @@ public struct HttpPayloadTrait: StaticTrait {
     public init() {}
 }
 
+/// Binds a map of key-value pairs to prefixed HTTP headers.
 public struct HttpPrefixHeadersTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpPrefixHeaders"
     public var selector: Selector { TargetSelector(TypeSelector<MapShape>()) }
@@ -82,6 +88,7 @@ public struct HttpPrefixHeadersTrait: SingleValueTrait {
     }
 }
 
+/// Binds an operation input structure member to a query string parameter.
 public struct HttpQueryTrait: SingleValueTrait {
     public static let staticName = "smithy.api#httpQuery"
     public var selector: Selector { TargetSelector(OrSelector(
@@ -99,12 +106,14 @@ public struct HttpQueryTrait: SingleValueTrait {
     }
 }
 
+/// Indicates that the structure member represents an HTTP response status code.
 public struct HttpResponseCodeTrait: StaticTrait {
     public static let staticName = "smithy.api#httpResponseCode"
     public var selector: Selector { TargetSelector(TypeSelector<IntegerShape>()) }
     public init() {}
 }
 
+/// Defines how a service supports cross-origin resource sharing
 public struct HttpCorsTrait: StaticTrait {
     public static let staticName = "smithy.api#cors"
     public var selector: Selector { TypeSelector<ServiceShape>() }

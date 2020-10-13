@@ -12,11 +12,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// A meta-trait that marks a trait as a protocol definition trait. Traits that are marked with this trait are applied to
+/// service shapes to define the protocols supported by a service. A client MUST understand at least one of the
+/// protocols in order to successfully communicate with the service.
 public struct ProtocolDefinitionTrait: StaticTrait {
     public static let staticName = "smithy.api#protocolDefinition"
     public init() {}
 }
 
+/// Allows a serialized object property name in a JSON document to differ from a structure member name used in
+/// the model
 public struct JsonNameTrait: SingleValueTrait {
     public static let staticName = "smithy.api#jsonName"
     public var selector: Selector { TypeSelector<MemberShape>() }
@@ -26,6 +31,8 @@ public struct JsonNameTrait: SingleValueTrait {
     }
 }
 
+/// Describes the contents of a blob or string shape using a design-time media type as defined by RFC 6838 (for
+/// example, application/json).
 public struct MediaTypeTrait: SingleValueTrait {
     public static let staticName = "smithy.api#mediaType"
     public var selector: Selector { OrSelector(TypeSelector<BlobShape>(), TypeSelector<StringShape>()) }
@@ -35,7 +42,8 @@ public struct MediaTypeTrait: SingleValueTrait {
     }
 }
 
-public struct TimestampFormatTrait: StaticTrait {
+/// Defines a custom timestamp serialization format.
+public struct TimestampFormatTrait: SingleValueTrait {
     public static let staticName = "smithy.api#timestampFormat"
     public var selector: Selector { OrTargetSelector(TypeSelector<TimestampShape>()) }
     public enum TimestampFormat: String, Codable {
@@ -43,19 +51,8 @@ public struct TimestampFormatTrait: StaticTrait {
         case httpDate = "http-date"
         case epochSeconds = "epoch-seconds"
     }
-
-    public let format: TimestampFormat
-    public init(format: TimestampFormat) {
-        self.format = format
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.format = try container.decode(TimestampFormat.self)
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.format)
+    public let value: TimestampFormat
+    public init(value: TimestampFormat) {
+        self.value = value
     }
 }

@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Constrains the acceptable values of a string to a fixed set.
 public struct EnumTrait: SingleValueTrait {
     public static let staticName = "smithy.api#enum"
     public var selector: Selector { TypeSelector<StringShape>() }
@@ -30,6 +31,11 @@ public struct EnumTrait: SingleValueTrait {
     }
 }
 
+/// Indicates that a string value MUST contain a valid absolute shape ID
+///
+/// The idRef trait is used primarily when declaring trait shapes in a model. A trait shape that targets a string shape
+/// with the idRef trait indicates that when the defined trait is applied to a shape, the value of the trait MUST be a valid
+///  shape ID. The idRef trait can also be applied at any level of nesting on shapes referenced by trait shapes.
 public struct IdRefTrait: StaticTrait {
     public static let staticName = "smithy.api#idRef"
     public var selector: Selector { OrTargetSelector(TypeSelector<StringShape>()) }
@@ -44,6 +50,7 @@ public struct IdRefTrait: StaticTrait {
     }
 }
 
+/// Constrains a shape to minimum and maximum number of elements or size.
 public struct LengthTrait: StaticTrait {
     public static let staticName = "smithy.api#length"
     public var selector: Selector { OrTargetSelector(
@@ -58,6 +65,7 @@ public struct LengthTrait: StaticTrait {
     public let max: Int?
 }
 
+/// Restricts string shape values to a specified regular expression.
 public struct PatternTrait: SingleValueTrait {
     public static let staticName = "smithy.api#pattern"
     public var selector: Selector { OrTargetSelector(TypeSelector<StringShape>()) }
@@ -67,11 +75,14 @@ public struct PatternTrait: SingleValueTrait {
     }
 }
 
+/// Prevents models defined in a different namespace from referencing the targeted shape.
 public struct PrivateTrait: StaticTrait {
     public static let staticName = "smithy.api#private"
     public init() {}
 }
 
+/// Restricts allowed values of byte, short, integer, long, float, double, bigDecimal, and bigInteger shapes within an
+/// acceptable lower and upper bound.
 public struct RangeTrait: StaticTrait {
     public static let staticName = "smithy.api#range"
     public var selector: Selector { OrTargetSelector(NumberSelector()) }
@@ -79,13 +90,16 @@ public struct RangeTrait: StaticTrait {
     public let max: Double?
 }
 
+/// Marks a structure member as required, meaning a value for the member MUST be present.
 public struct RequiredTrait: StaticTrait {
     public static let staticName = "smithy.api#required"
     public var selector: Selector { TypeSelector<MemberShape>() }
     public init() {}
 }
 
+/// Indicates that the items in a List MUST be unique.
 public struct UniqueItemsTrait: StaticTrait {
     public static let staticName = "smithy.api#uniqueItems"
     public init() {}
+    //TODO: Validation :test(list > member > simpleType)
 }

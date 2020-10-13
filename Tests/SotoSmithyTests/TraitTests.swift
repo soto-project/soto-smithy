@@ -306,6 +306,6 @@ class TraitTests: XCTestCase {
         _ = Smithy()
         let traitList = try JSONDecoder().decode(TraitList.self, from: Data(json.utf8))
         let documentationTrait = traitList.trait(type: TimestampFormatTrait.self)
-        XCTAssertEqual(documentationTrait?.format, .httpDate)
+        XCTAssertEqual(documentationTrait?.value, .httpDate)
     }
 }

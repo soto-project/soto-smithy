@@ -12,12 +12,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Marks a shape or member as deprecated.
 public struct DeprecatedTrait: StaticTrait {
     public static let staticName = "smithy.api#deprecated"
     public let message: String?
     public let since: String?
 }
 
+/// Adds documentation to a shape or member using the CommonMark format.
 public struct DocumentationTrait: SingleValueTrait {
     public init(value: String) {
         self.value = value
@@ -27,6 +29,7 @@ public struct DocumentationTrait: SingleValueTrait {
     public let value: String
 }
 
+/// Provides example inputs and outputs for operations.
 public struct ExamplesTrait: SingleValueTrait {
     public static let staticName = "smithy.api#examples"
     public var selector: Selector { TypeSelector<OperationShape>() }
@@ -44,6 +47,7 @@ public struct ExamplesTrait: SingleValueTrait {
     }
 }
 
+/// Provides named links to external documentation for a shape.
 public struct ExternalDocumentationTrait: SingleValueTrait {
     public static let staticName = "smithy.api#externalDocumentation"
     public typealias Value = [String: String]
@@ -53,11 +57,14 @@ public struct ExternalDocumentationTrait: SingleValueTrait {
     }
 }
 
+/// Shapes marked with the internal trait are meant only for internal use. Tooling can use the internal trait to filter
+/// out shapes from models that are not intended for external customers.
 public struct InternalTrait: StaticTrait {
     public static let staticName = "smithy.api#internal"
     public init() {}
 }
 
+/// Indicates that the data stored in the shape or member is sensitive and MUST be handled with care.
 public struct SensitiveTrait: StaticTrait {
     public static let staticName = "smithy.api#sensitive"
     public var selector: Selector { NotSelector(
@@ -70,6 +77,7 @@ public struct SensitiveTrait: StaticTrait {
     public init() {}
 }
 
+/// Defines the version or date in which a shape or member was added to the model.
 public struct SinceTrait: SingleValueTrait {
     public static let staticName = "smithy.api#since"
     public var value: String
@@ -78,6 +86,7 @@ public struct SinceTrait: SingleValueTrait {
     }
 }
 
+/// Tags a shape with arbitrary tag names that can be used to filter and group shapes in the model.
 public struct TagsTrait: SingleValueTrait {
     public static let staticName = "smithy.api#tags"
     public typealias Value = [String]
@@ -87,6 +96,8 @@ public struct TagsTrait: SingleValueTrait {
     }
 }
 
+/// Defines a proper name for a service or resource shape. This title can be used in automatically generated
+/// documentation and other contexts to provide a user friendly name for services and resources.
 public struct TitleTrait: SingleValueTrait {
     public static let staticName = "smithy.api#title"
     public var selector: Selector { OrSelector(TypeSelector<ServiceShape>(), TypeSelector<ResourceShape>()) }
@@ -96,6 +107,9 @@ public struct TitleTrait: SingleValueTrait {
     }
 }
 
+/// Indicates a shape is unstable and MAY change in the future. This trait can be applied to trait shapes to
+/// indicate that a trait is unstable or experimental. If possible, code generators SHOULD use this trait to
+/// warn when code generated from unstable features are used.
 public struct UnstableTrait: StaticTrait {
     public static let staticName = "smithy.api#unstable"
     public init() {}

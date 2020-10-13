@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Serializes an object property as an XML attribute rather than a nested XML element.
 public struct XmlAttributeTrait: StaticTrait {
     public static let staticName = "smithy.api#xmlAttribute"
     public var selector: Selector { TargetSelector(OrSelector(
@@ -23,6 +24,7 @@ public struct XmlAttributeTrait: StaticTrait {
     public init() {}
 }
 
+/// Unwraps the values of a list or map into the containing structure.
 public struct XmlFlattenedTrait: StaticTrait {
     public static let staticName = "smithy.api#xmlFlattened"
     public var selector: Selector { TargetSelector(OrSelector(
@@ -33,6 +35,7 @@ public struct XmlFlattenedTrait: StaticTrait {
     public init() {}
 }
 
+/// Changes the serialized element or attribute name of a structure, union, or member.
 public struct XmlNameTrait: SingleValueTrait {
     public static let staticName = "smithy.api#xmlName"
     public var selector: Selector { OrSelector(
@@ -46,6 +49,7 @@ public struct XmlNameTrait: SingleValueTrait {
     }
 }
 
+/// Adds an XML namespace to an XML element.
 public struct XmlNamespaceTrait: StaticTrait {
     public static let staticName = "smithy.api#xmlNamespace"
     public let uri: String
