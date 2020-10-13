@@ -55,6 +55,4 @@ extension Smithy {
             AwsApiGatewayMockIntegrationTrait.self
         )
     }
-
-
 }

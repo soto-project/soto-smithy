@@ -16,6 +16,8 @@
 
 import SotoSmithy
 
+/// An AWS service is defined using the aws.api#service trait. This trait provides information about the service
+/// like the name used to generate AWS SDK client classes and the namespace used in ARNs.
 public struct AwsServiceTrait: StaticTrait {
     public static let staticName = "aws.api#service"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
@@ -25,6 +27,7 @@ public struct AwsServiceTrait: StaticTrait {
     public let cloudTrailEventSource: String?
 }
 
+/// Defines an ARN of a Smithy resource shape.
 public struct AwsArnTrait: StaticTrait {
     public static let staticName = "aws.api#arn"
     public var selector: Selector { return TypeSelector<ResourceShape>() }
@@ -34,6 +37,7 @@ public struct AwsArnTrait: StaticTrait {
     public let noRegion: Bool
 }
 
+/// Specifies that a string shape contains a fully formed AWS ARN.
 public struct AwsArnReferenceTrait: StaticTrait {
     public static let staticName = "aws.api#arnReference"
     public var selector: Selector { return TypeSelector<StringShape>() }
@@ -42,6 +46,7 @@ public struct AwsArnReferenceTrait: StaticTrait {
     public let resource: ShapeId?
 }
 
+/// Indicates that the target contains data of the specified classification.
 public struct AwsDataTrait: SingleValueTrait {
     public static let staticName = "aws.api#data"
     public var selector: Selector {
@@ -67,6 +72,7 @@ public struct AwsDataTrait: SingleValueTrait {
     }
 }
 
+/// Indicates that a service, resource, or operation is considered part of the control plane.
 public struct AwsControlPlaneTrait: StaticTrait {
     public static let staticName = "aws.api#controlPlane"
     public var selector: Selector {
@@ -78,6 +84,7 @@ public struct AwsControlPlaneTrait: StaticTrait {
     }
 }
 
+/// Indicates that a service, resource, or operation is considered part of the data plane.
 public struct AwsDataPlaneTrait: StaticTrait {
     public static let staticName = "aws.api#dataPlane"
     public var selector: Selector {
@@ -89,6 +96,8 @@ public struct AwsDataPlaneTrait: StaticTrait {
     }
 }
 
+/// The clientEndpointDiscovery trait indicates the operation that the client should use to discover endpoints
+/// for the service and the error returned when the endpoint being accessed has expired.
 public struct AwsClientEndpointDiscoveryTrait: StaticTrait {
     public static let staticName = "aws.api#clientEndpointDiscovery"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
@@ -96,12 +105,16 @@ public struct AwsClientEndpointDiscoveryTrait: StaticTrait {
     public let error: ShapeId
 }
 
+/// The clientDiscoveredEndpoint trait indicates that the target operation should use the client's endpoint
+/// discovery logic.
 public struct AwsClientDiscoveredEndpointTrait: StaticTrait {
     public static let staticName = "aws.api#clientDiscoveredEndpoint"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
     public let required: Bool?
 }
 
+/// The clientEndpointDiscoveryId trait indicates which member(s) of the operation input should be used to
+/// discover an endpoint for the service.
 public struct AwsClientEndpointDiscoveryIdTrait: StaticTrait {
     public static let staticName = "aws.api#clientEndpointDiscoveryId"
 }

@@ -16,17 +16,20 @@
 
 import SotoSmithy
 
+/// The aws.auth#sigv4 trait adds support for AWS signature version 4 to a service.
 public struct AwsAuthSigV4Trait: StaticTrait {
     public static let staticName = "aws.auth#sigv4"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
     public let name: String
 }
 
+/// Indicates that the payload of an operation is not to be part of the signature computed for the request of an operation.
 public struct AwsAuthUnsignedPayloadTrait: StaticTrait {
     public static let staticName = "aws.auth#unsignedPayload"
     public var selector: Selector { return TypeSelector<OperationShape>() }
 }
 
+/// The aws.auth#cognitoUserPools trait adds support for Amazon Cognito User Pools to a service.
 public struct AwsAuthCognitoUserPoolsTrait: StaticTrait {
     public static let staticName = "aws.auth#cognitoUserPools"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
