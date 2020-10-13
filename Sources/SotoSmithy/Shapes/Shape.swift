@@ -12,12 +12,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-public protocol Shape: Codable {
+public protocol Shape: class, Codable {
     static var type: String { get }
     var traits: TraitList? { get set }
     func validate(using model: Model) throws
-    mutating func add(trait: Trait, to member: String) throws
-    mutating func remove(trait: StaticTrait.Type, from member: String) throws
+    func add(trait: Trait, to member: String) throws
+    func remove(trait: StaticTrait.Type, from member: String) throws
 }
 
 extension Shape {
@@ -35,23 +35,21 @@ extension Shape {
         return traits?.trait(named: named)
     }
 
-    public mutating func add(trait: Trait) {
-        if var traits = self.traits {
-            traits.add(trait: trait)
-        } else {
+    public func add(trait: Trait) {
+        if traits?.add(trait: trait) == nil {
             self.traits = TraitList(traits: [trait])
         }
     }
 
-    public mutating func remove(trait: StaticTrait.Type) {
+    public func remove(trait: StaticTrait.Type) {
         self.traits?.remove(trait: trait)
     }
 
-    public mutating func add(trait: Trait, to member: String) throws {
+    public func add(trait: Trait, to member: String) throws {
         throw Smithy.MemberDoesNotExistError(name: member)
     }
 
-    public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
+    public func remove(trait: StaticTrait.Type, from member: String) throws {
         throw Smithy.MemberDoesNotExistError(name: member)
     }
 

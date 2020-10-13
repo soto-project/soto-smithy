@@ -12,11 +12,35 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct Model {
+public class Model: Decodable {
     let version: String
     let metadata: [String: MetadataValue]?
     var shapes: [ShapeId: Shape]
 
+    public required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.version = try container.decode(String.self, forKey: .version)
+        self.metadata = try container.decodeIfPresent([String: MetadataValue].self, forKey: .metadata)
+        var shapes = Smithy.preludeShapes
+        if let decodedShapes = try container.decodeIfPresent([String: DecodableShape].self, forKey: .shapes) {
+            for shape in decodedShapes {
+                guard !(shape.value.value is ApplyShape) else { continue }
+                shapes[ShapeId(rawValue: shape.key)] = shape.value.value
+            }
+            // Apply changes from AppyShapes
+            for shape in decodedShapes {
+                guard let applyShape = shape.value.value as? ApplyShape,
+                      let traitsToApply = applyShape.traits else { continue }
+                let applyToShapeId = ShapeId(rawValue: shape.key)
+                // assume shapes are members as we cannot have two keys the same in one Smithy JSON file
+                guard let member = applyToShapeId.member else { continue }
+                for trait in traitsToApply {
+                    try shapes[applyToShapeId.rootShapeId]?.add(trait: trait, to: member)
+                }
+            }
+        }
+        self.shapes = shapes
+    }
     public func shape(for identifier: ShapeId) -> Shape? {
         if let member = identifier.member {
             if let shape = shapes[identifier.rootShapeId] {
@@ -57,7 +81,7 @@ public struct Model {
         return self.shapes.compactMapValues { $0 as? S }
     }
 
-    public mutating func add(trait: Trait, to identifier: ShapeId) throws {
+    public func add(trait: Trait, to identifier: ShapeId) throws {
         if let member = identifier.member {
             guard try self.shapes[identifier.rootShapeId]?.add(trait: trait, to: member) != nil else {
                 throw Smithy.ShapeDoesNotExistError(id: identifier)
@@ -69,7 +93,7 @@ public struct Model {
         }
     }
 
-    public mutating func remove(trait: StaticTrait.Type, from identifier: ShapeId) throws {
+    public func remove(trait: StaticTrait.Type, from identifier: ShapeId) throws {
         if let member = identifier.member {
             guard try self.shapes[identifier.rootShapeId]?.remove(trait: trait, from: member) != nil else {
                 throw Smithy.ShapeDoesNotExistError(id: identifier)
@@ -94,33 +118,4 @@ public struct Model {
         case metadata
         case shapes
     }
-}
-
-extension Model: Decodable {
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.version = try container.decode(String.self, forKey: .version)
-        self.metadata = try container.decodeIfPresent([String: MetadataValue].self, forKey: .metadata)
-        var shapes = Smithy.preludeShapes
-        if let decodedShapes = try container.decodeIfPresent([String: DecodableShape].self, forKey: .shapes) {
-            for shape in decodedShapes {
-                guard !(shape.value.value is ApplyShape) else { continue }
-                shapes[ShapeId(rawValue: shape.key)] = shape.value.value
-            }
-            // Apply changes from AppyShapes
-            for shape in decodedShapes {
-                guard let applyShape = shape.value.value as? ApplyShape,
-                      let traitsToApply = applyShape.traits else { continue }
-                let applyToShapeId = ShapeId(rawValue: shape.key)
-                // assume shapes are members as we cannot have two keys the same in one Smithy JSON file
-                guard let member = applyToShapeId.member else { continue }
-                for trait in traitsToApply {
-                    try shapes[applyToShapeId.rootShapeId]?.add(trait: trait, to: member)
-                }
-            }
-        }
-        self.shapes = shapes
-    }
-
-
 }

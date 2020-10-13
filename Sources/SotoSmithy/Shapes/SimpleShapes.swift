@@ -12,67 +12,106 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct BlobShape: Shape {
+public class BlobShape: Shape {
     public static let type = "blob"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct BooleanShape: Shape {
+public class BooleanShape: Shape {
     public static let type = "boolean"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct StringShape: Shape {
+public class StringShape: Shape {
     public static let type = "string"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct ByteShape: Shape {
+public class ByteShape: Shape {
     public static let type = "byte"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct ShortShape: Shape {
+public class ShortShape: Shape {
     public static let type = "short"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct IntegerShape: Shape {
+public class IntegerShape: Shape {
     public static let type = "integer"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct LongShape: Shape {
+public class LongShape: Shape {
     public static let type = "long"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct FloatShape: Shape {
+public class FloatShape: Shape {
     public static let type = "float"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct DoubleShape: Shape {
+public class DoubleShape: Shape {
     public static let type = "double"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct BigIntegerShape: Shape {
+public class BigIntegerShape: Shape {
     public static let type = "bigInteger"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct BigDecimalShape: Shape {
+public class BigDecimalShape: Shape {
     public static let type = "bigDecimal"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct TimestampShape: Shape {
+public class TimestampShape: Shape {
     public static let type = "timestamp"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }
 
-public struct DocumentShape: Shape {
+public class DocumentShape: Shape {
     public static let type = "document"
     public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
 }

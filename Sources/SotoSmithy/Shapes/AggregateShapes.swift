@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct MemberShape: Shape {
+public class MemberShape: Shape {
     public let target: ShapeId
     public var traits: TraitList?
 
@@ -28,7 +28,7 @@ public struct MemberShape: Shape {
     }
 }
 
-public struct ListShape: Shape {
+public class ListShape: Shape {
     public static let type = "list"
     public var traits: TraitList?
     public let member: MemberShape
@@ -38,7 +38,7 @@ public struct ListShape: Shape {
     }
 }
 
-public struct SetShape: Shape {
+public class SetShape: Shape {
     public static let type = "set"
     public var traits: TraitList?
     public let member: MemberShape
@@ -48,7 +48,7 @@ public struct SetShape: Shape {
     }
 }
 
-public struct MapShape: Shape {
+public class MapShape: Shape {
     public static let type = "map"
     public var traits: TraitList?
     public let key: MemberShape
@@ -60,7 +60,7 @@ public struct MapShape: Shape {
     }
 }
 
-public struct StructureShape: Shape {
+public class StructureShape: Shape {
     public static let type = "structure"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
@@ -69,20 +69,20 @@ public struct StructureShape: Shape {
         try self.validateTraits(using: model)
     }
 
-    public mutating func add(trait: Trait, to member: String) throws {
+    public func add(trait: Trait, to member: String) throws {
         guard self.members?[member]?.add(trait: trait) != nil else {
             throw Smithy.MemberDoesNotExistError(name: member)
         }
     }
 
-    public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
+    public func remove(trait: StaticTrait.Type, from member: String) throws {
         guard self.members?[member]?.remove(trait: trait) != nil else {
             throw Smithy.MemberDoesNotExistError(name: member)
         }
     }
 }
 
-public struct UnionShape: Shape {
+public class UnionShape: Shape {
     public static let type = "union"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
@@ -91,11 +91,11 @@ public struct UnionShape: Shape {
         try self.validateTraits(using: model)
     }
 
-    public mutating func add(trait: Trait, to member: String) {
+    public func add(trait: Trait, to member: String) {
         self.members?[member]?.add(trait: trait)
     }
 
-    public mutating func remove(trait: StaticTrait.Type, from member: String) throws {
+    public func remove(trait: StaticTrait.Type, from member: String) throws {
         guard self.members?[member]?.remove(trait: trait) != nil else {
             throw Smithy.MemberDoesNotExistError(name: member)
         }

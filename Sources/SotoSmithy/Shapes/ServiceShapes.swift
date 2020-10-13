@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct ServiceShape: Shape {
+public class ServiceShape: Shape {
     public static let type = "service"
     public var traits: TraitList?
     public let version: String
@@ -20,7 +20,7 @@ public struct ServiceShape: Shape {
     public let resources: [ResourceMemberShape]?
 }
 
-public struct OperationMemberShape: Shape {
+public class OperationMemberShape: Shape {
     public var traits: TraitList?
     public let target: ShapeId
 
@@ -31,7 +31,7 @@ public struct OperationMemberShape: Shape {
     }
 }
 
-public struct OperationShape: Shape {
+public class OperationShape: Shape {
     public static let type = "operation"
     public var traits: TraitList?
     public let input: MemberShape?
@@ -39,7 +39,7 @@ public struct OperationShape: Shape {
     public let errors: [MemberShape]?
 }
 
-public struct ResourceMemberShape: Shape {
+public class ResourceMemberShape: Shape {
     public var traits: TraitList?
     public let target: ShapeId
 
@@ -50,7 +50,7 @@ public struct ResourceMemberShape: Shape {
     }
 }
 
-public struct ResourceShape: Shape {
+public class ResourceShape: Shape {
     public static let type = "resource"
     public var traits: TraitList?
     public let identifiers: [String: MemberShape]?

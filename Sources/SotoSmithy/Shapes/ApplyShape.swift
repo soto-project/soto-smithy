@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-struct ApplyShape: Shape {
+class ApplyShape: Shape {
     public static var type: String { return "apply" }
     var traits: TraitList?    
 }
