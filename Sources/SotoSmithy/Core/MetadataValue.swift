@@ -13,6 +13,7 @@
 //===----------------------------------------------------------------------===//
 import Foundation
 
+/// Struct used for holding generic metadata values
 public struct MetadataValue {
     public let value: Any
     public init(value: Any) {

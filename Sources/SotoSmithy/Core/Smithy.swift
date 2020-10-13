@@ -14,6 +14,7 @@
 
 import Foundation
 
+/// Management for SotoSmithy. Decode Smithy models with this and register new Trait types
 public struct Smithy {
     public init() {
         if Self.registeredShapes == false {
@@ -125,11 +126,16 @@ public struct Smithy {
             Self.registeredShapes = true
         }
     }
-
+    
+    /// Decode Smithy model
+    /// - Parameter data: Data holding Smithy model in JSON format
+    /// - Returns: Smithy model
     public func decode(from data: Data) throws -> Model {
         try JSONDecoder().decode(Model.self, from: data)
     }
-
+    
+    /// Register trait types with Smithy. All `StaticTrait` have to be registered if you want to decode them
+    /// - Parameter traitTypes: List of traits to register
     public static func registerTraitTypes(_ traitTypes: StaticTrait.Type ...) {
         TraitList.registerTraitTypes(traitTypes)
     }

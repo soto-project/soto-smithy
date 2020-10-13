@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Class for holding Smithy Model
 public class Model: Decodable {
     let version: String
     let metadata: [String: MetadataValue]?
@@ -41,6 +42,10 @@ public class Model: Decodable {
         }
         self.shapes = shapes
     }
+    
+    /// Return Shape given ShapeId
+    /// - Parameter identifier: shape identifier
+    /// - Returns: Returns Shape if it exists in Model
     public func shape(for identifier: ShapeId) -> Shape? {
         if let member = identifier.member {
             if let shape = shapes[identifier.rootShapeId] {
@@ -56,7 +61,9 @@ public class Model: Decodable {
             return self.shapes[identifier]
         }
     }
-
+    
+    /// Validate Model. Runs validate on all Shapes and verifies Trait selectors
+    /// - Throws: `Smithy.ValidationError`
     public func validate() throws {
         try self.shapes.forEach {
             do {
@@ -67,20 +74,37 @@ public class Model: Decodable {
             }
         }
     }
-
+    
+    /// Return shapes from model that are matched by Selector
+    /// - Parameter selector: Selector to match shapes
+    /// - Returns: Map of shapeIds to Shapes that match selector
     public func select(with selector: Selector) -> [ShapeId: Shape] {
         return self.shapes.compactMapValues { selector.select(using: self, shape: $0) ? $0 : nil }
     }
 
+    /// Return shapes from model that are matched by Selector IDL string.
+    /// See https://awslabs.github.io/smithy/1.0/spec/core/selectors.html for more info. Only a basuc set of
+    /// selectors are supported at the moment.
+    ///
+    /// - Parameter selector: Selector IDL string to match shapes
+    /// - Returns: Map of shapeIds to Shapes that match selector
     public func select(from string: String) throws -> [ShapeId: Shape] {
         let selector = try SelectorParser.parse(from: string)
         return select(with: selector)
     }
-
+    
+    /// Return shapes from model that are of a certain type
+    /// - Parameter shapeType: Shape type to match
+    /// - Returns: Map of shapeIds to Shapes that match shape
     public func select<S: Shape>(type shapeType: S.Type) -> [ShapeId: S] {
         return self.shapes.compactMapValues { $0 as? S }
     }
-
+    
+    /// Add trait to shape. This function will also match shape members if shape id is referencing a shape member
+    /// - Parameters:
+    ///   - trait: Trait to add
+    ///   - identifier: Shape identifier of Shape.
+    /// - Throws: `Smithy.ShapeDoesNotExistError`, `Smithy.MemberDoesNotExistError`
     public func add(trait: Trait, to identifier: ShapeId) throws {
         if let member = identifier.member {
             guard try self.shapes[identifier.rootShapeId]?.add(trait: trait, to: member) != nil else {
@@ -93,6 +117,11 @@ public class Model: Decodable {
         }
     }
 
+    /// Remove trait of type from shape. This function will also match shape members if shape id is referencing a shape member
+    /// - Parameters:
+    ///   - trait: Trait to add
+    ///   - identifier: Shape identifier of Shape.
+    /// - Throws: `Smithy.ShapeDoesNotExistError`, `Smithy.MemberDoesNotExistError`
     public func remove(trait: StaticTrait.Type, from identifier: ShapeId) throws {
         if let member = identifier.member {
             guard try self.shapes[identifier.rootShapeId]?.remove(trait: trait, from: member) != nil else {
@@ -105,7 +134,7 @@ public class Model: Decodable {
         }
     }
 
-    public static func registerShapeTypes(_ shapes: [Shape.Type]) {
+    static func registerShapeTypes(_ shapes: [Shape.Type]) {
         for shape in shapes {
             self.possibleShapes[shape.type] = shape
         }

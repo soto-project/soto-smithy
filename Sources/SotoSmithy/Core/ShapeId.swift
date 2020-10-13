@@ -12,7 +12,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Identifier for shape in model
 public struct ShapeId: Equatable, Hashable, RawRepresentable {
+    /// Raw string value
     public let rawValue: String
 
     public init(rawValue: String) {

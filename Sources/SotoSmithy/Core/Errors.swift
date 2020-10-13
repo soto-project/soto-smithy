@@ -17,15 +17,18 @@ extension Smithy {
     public struct ValidationError: Error {
         public let reason: String
     }
-
+    
+    /// Error thrown when shape being looked for doesnt exist
     public struct ShapeDoesNotExistError: Error {
         public let id: ShapeId
     }
 
+    /// Error thrown when shape member being looked for doesnt exist
     public struct MemberDoesNotExistError: Error {
         public let name: String
     }
-
+    
+    /// Error thrown when parsing a selector failed
     public struct UnrecognisedSelectorError: Error {
         public let value: String
     }
