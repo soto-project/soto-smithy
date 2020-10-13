@@ -13,7 +13,6 @@
 //===----------------------------------------------------------------------===//
 
 /// List of traits.
-///
 public struct TraitList: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -33,19 +32,29 @@ public struct TraitList: Codable {
     public func encode(to encoder: Encoder) throws {
         fatalError("TraitList.encode Not implemented")
     }
-
+    
+    /// Return trait of type from list if it exists
+    /// - Parameter type: Trait type
+    /// - Returns: Trait if found
     public func trait<T: StaticTrait>(type: T.Type) -> T? {
         return self.traits[T.staticName].map { $0 as! T }
     }
-
+    
+    /// Return trait with name from list if it exists
+    /// - Parameter named: Trait nam
+    /// - Returns: Trait if found
     public func trait(named: String) -> Trait? {
         return self.traits[named]
     }
-
+    
+    /// Add trait to list
+    /// - Parameter trait: trait to add
     public mutating func add(trait: Trait) {
         self.traits[trait.traitName] = trait
     }
-
+    
+    /// Remove trait of type from list
+    /// - Parameter trait: trait type to remove
     public mutating func remove(trait: StaticTrait.Type) {
         self.traits[trait.staticName] = nil
     }

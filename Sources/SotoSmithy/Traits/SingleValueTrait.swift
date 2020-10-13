@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// This protocol is used to ease decoding of single value traits. 
 public protocol SingleValueTrait: StaticTrait {
     associatedtype Value: Codable
     var value: Value { get }

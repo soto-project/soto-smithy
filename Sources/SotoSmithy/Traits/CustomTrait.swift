@@ -12,12 +12,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Trait reference structure defined in Smithy file
 public struct CustomTrait: Trait {
     public let shapeId: ShapeId
     public var selector: Selector { return CustomTraitSelector(self.shapeId) }
     public var traitName: String { return self.shapeId.description }
 }
 
+/// Trait indicating this is a structure that can be referenced as a trait
 public struct TraitTrait: StaticTrait {
     public static var staticName = "smithy.api#trait"
     public var selectorToApply: Selector
@@ -30,6 +32,7 @@ public struct TraitTrait: StaticTrait {
     }
 }
 
+/// Selector ensuring custom traits are selecting a structure tagged a trait
 struct CustomTraitSelector: Selector {
     let shapeId: ShapeId
 

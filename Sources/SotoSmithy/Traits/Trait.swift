@@ -12,9 +12,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Protocol for Trait in Smithy model
 public protocol Trait: Decodable {
+    /// name of trait
     var traitName: String { get }
+    /// Selector defining what shapes this trait can be attached to
     var selector: Selector { get }
+    /// Validate this trait and whether it is attached to the correct model
     func validate(using model: Model, shape: Shape) throws
 }
 

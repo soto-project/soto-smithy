@@ -12,7 +12,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Protocol for traits defined in code
 public protocol StaticTrait: Trait {
+    /// name of trait
     static var staticName: String { get }
 }
 
