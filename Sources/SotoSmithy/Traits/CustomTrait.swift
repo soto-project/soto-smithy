@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-/// Trait reference structure defined in Smithy file
+/// Reference to trait structure defined in Smithy file
 public struct CustomTrait: Trait {
     public let shapeId: ShapeId
     public var selector: Selector { return CustomTraitSelector(self.shapeId) }

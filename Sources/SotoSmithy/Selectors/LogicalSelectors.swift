@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Always return true
 public struct AllSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
@@ -19,6 +20,7 @@ public struct AllSelector: Selector {
     }
 }
 
+/// Return true if selector returns false
 public struct NotSelector: Selector {
     let selector: Selector
     public init(_ selector: Selector) {
@@ -30,6 +32,7 @@ public struct NotSelector: Selector {
     }
 }
 
+/// Return true if all Selectors return true
 public struct AndSelector: Selector {
     let selectors: [Selector]
     public init(_ selectors: Selector...) {
@@ -50,6 +53,7 @@ public struct AndSelector: Selector {
     }
 }
 
+/// Return true if one of the selectors returns true
 public struct OrSelector: Selector {
     let selectors: [Selector]
 

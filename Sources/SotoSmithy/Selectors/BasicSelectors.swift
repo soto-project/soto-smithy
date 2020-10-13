@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Return true if shape is of type
 public struct TypeSelector<S: Shape>: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
@@ -19,6 +20,7 @@ public struct TypeSelector<S: Shape>: Selector {
     }
 }
 
+/// Return true is shape is a number type
 public struct NumberSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
@@ -34,6 +36,7 @@ public struct NumberSelector: Selector {
     }
 }
 
+/// Return true if shape is a simple type
 public struct SimpleTypeSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
@@ -54,6 +57,7 @@ public struct SimpleTypeSelector: Selector {
     }
 }
 
+/// Return true if shape is either a list or a set
 public struct CollectionSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
@@ -61,6 +65,7 @@ public struct CollectionSelector: Selector {
     }
 }
 
+/// Return true is member target matches selector
 public struct TargetSelector: Selector {
     let selector: Selector
     public init(_ selector: Selector) {
@@ -74,6 +79,7 @@ public struct TargetSelector: Selector {
     }
 }
 
+/// Return true if member or member target matches selector
 public struct OrTargetSelector: Selector {
     let selector: Selector
     public init(_ selector: Selector) {
@@ -90,6 +96,7 @@ public struct OrTargetSelector: Selector {
     }
 }
 
+/// Return true is shape has a trait
 public struct TraitSelector<T: StaticTrait>: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
@@ -97,6 +104,7 @@ public struct TraitSelector<T: StaticTrait>: Selector {
     }
 }
 
+/// Return true if shape has a trait with name
 public struct TraitNameSelector: Selector {
     let name: String
 

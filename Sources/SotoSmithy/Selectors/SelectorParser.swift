@@ -12,8 +12,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Parse Selector IDL https://awslabs.github.io/smithy/1.0/spec/core/selectors.html
+/// Currently supports a very limited selection of Selectors: shape type and has trait
 enum SelectorParser {
-    // parse Smithy selector IDL string
+    /// parse Smithy selector IDL string
+    /// - Parameter string: Selector IDL to parse
+    /// - Throws: Smithy.UnrecognisedSelectorError
+    /// - Returns: Selector generated from IDL
     static func parse(from string: String) throws -> Selector {
         var selectors: [Selector] = []
         var stringPosition: String.Index = string.startIndex

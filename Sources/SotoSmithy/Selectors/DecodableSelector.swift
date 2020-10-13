@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Used to decode Selector from Smithy json
 struct DecodableSelector: Decodable {
     let selector: Selector
 

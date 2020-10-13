@@ -12,7 +12,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Protocol for Smithy Selector
 public protocol Selector {
+    /// Return if shape matches this selector
+    /// - Parameters:
+    ///   - model: Model shape is in
+    ///   - shape: Shape to match
     func select(using model: Model, shape: Shape) -> Bool
 }
 
