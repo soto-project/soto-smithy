@@ -12,7 +12,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Shape representing a member of an aggregate shape
 public class MemberShape: Shape {
+    public static let type = "member"
     public let target: ShapeId
     public var traits: TraitList?
 
@@ -28,6 +30,7 @@ public class MemberShape: Shape {
     }
 }
 
+/// Shape representing a list of items
 public class ListShape: Shape {
     public static let type = "list"
     public var traits: TraitList?
@@ -38,6 +41,7 @@ public class ListShape: Shape {
     }
 }
 
+/// Shape representing a list of unique items
 public class SetShape: Shape {
     public static let type = "set"
     public var traits: TraitList?
@@ -48,6 +52,7 @@ public class SetShape: Shape {
     }
 }
 
+/// Shape representing a map of string value to items
 public class MapShape: Shape {
     public static let type = "map"
     public var traits: TraitList?
@@ -60,6 +65,8 @@ public class MapShape: Shape {
     }
 }
 
+/// Shape representing a set of named, unordered, heterogeneous values. Contains a set of members mapping
+/// to other shapes in the model
 public class StructureShape: Shape {
     public static let type = "structure"
     public var traits: TraitList?
@@ -82,6 +89,8 @@ public class StructureShape: Shape {
     }
 }
 
+/// The union type represents a tagged union data structure that can take on several different, but fixed, types.
+/// Unions function similarly to structures except that only one member can be used at any one time. 
 public class UnionShape: Shape {
     public static let type = "union"
     public var traits: TraitList?

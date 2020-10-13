@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Shape representing a data blob
 public class BlobShape: Shape {
     public static let type = "blob"
     public var traits: TraitList?
@@ -20,6 +21,7 @@ public class BlobShape: Shape {
     }
 }
 
+/// Shape representing a boolean value
 public class BooleanShape: Shape {
     public static let type = "boolean"
     public var traits: TraitList?
@@ -28,6 +30,7 @@ public class BooleanShape: Shape {
     }
 }
 
+/// Shape representing a string value
 public class StringShape: Shape {
     public static let type = "string"
     public var traits: TraitList?
@@ -36,6 +39,7 @@ public class StringShape: Shape {
     }
 }
 
+/// Shape representing an 8 bit value
 public class ByteShape: Shape {
     public static let type = "byte"
     public var traits: TraitList?
@@ -44,6 +48,7 @@ public class ByteShape: Shape {
     }
 }
 
+/// Shape representing a short integer
 public class ShortShape: Shape {
     public static let type = "short"
     public var traits: TraitList?
@@ -52,6 +57,7 @@ public class ShortShape: Shape {
     }
 }
 
+/// Shape representing a standard integer
 public class IntegerShape: Shape {
     public static let type = "integer"
     public var traits: TraitList?
@@ -60,6 +66,7 @@ public class IntegerShape: Shape {
     }
 }
 
+/// Shape representing a long integer
 public class LongShape: Shape {
     public static let type = "long"
     public var traits: TraitList?
@@ -68,6 +75,7 @@ public class LongShape: Shape {
     }
 }
 
+/// Shape representing a single precision floating point value
 public class FloatShape: Shape {
     public static let type = "float"
     public var traits: TraitList?
@@ -76,6 +84,7 @@ public class FloatShape: Shape {
     }
 }
 
+/// Shape representing a double precision floating point value
 public class DoubleShape: Shape {
     public static let type = "double"
     public var traits: TraitList?
@@ -84,6 +93,7 @@ public class DoubleShape: Shape {
     }
 }
 
+/// Shape representing an arbitrary large integer
 public class BigIntegerShape: Shape {
     public static let type = "bigInteger"
     public var traits: TraitList?
@@ -92,6 +102,7 @@ public class BigIntegerShape: Shape {
     }
 }
 
+/// Shape representing an arbitrary large floating point value
 public class BigDecimalShape: Shape {
     public static let type = "bigDecimal"
     public var traits: TraitList?
@@ -100,6 +111,7 @@ public class BigDecimalShape: Shape {
     }
 }
 
+/// Shape representing a date value
 public class TimestampShape: Shape {
     public static let type = "timestamp"
     public var traits: TraitList?
@@ -108,6 +120,7 @@ public class TimestampShape: Shape {
     }
 }
 
+/// Shape representing protocol agnostic open content
 public class DocumentShape: Shape {
     public static let type = "document"
     public var traits: TraitList?

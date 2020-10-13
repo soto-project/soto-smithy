@@ -12,6 +12,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Shape used to represent apply type shapes. This shape is not public as it is processed while we are decoding
+/// a Model.
 class ApplyShape: Shape {
     public static var type: String { return "apply" }
     var traits: TraitList?    

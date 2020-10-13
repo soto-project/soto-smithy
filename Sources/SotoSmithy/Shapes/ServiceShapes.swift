@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// Shape representing endpoint of an API that holds operations and resources
 public class ServiceShape: Shape {
     public static let type = "service"
     public var traits: TraitList?
@@ -20,7 +21,9 @@ public class ServiceShape: Shape {
     public let resources: [ResourceMemberShape]?
 }
 
+/// Shape representing operation member of service shape
 public class OperationMemberShape: Shape {
+    public static let type = "member"
     public var traits: TraitList?
     public let target: ShapeId
 
@@ -31,6 +34,7 @@ public class OperationMemberShape: Shape {
     }
 }
 
+/// Shape representing an operation from an API
 public class OperationShape: Shape {
     public static let type = "operation"
     public var traits: TraitList?
@@ -39,7 +43,9 @@ public class OperationShape: Shape {
     public let errors: [MemberShape]?
 }
 
+/// Shape representing resource member of service shape
 public class ResourceMemberShape: Shape {
+    public static let type = "member"
     public var traits: TraitList?
     public let target: ShapeId
 
@@ -50,6 +56,7 @@ public class ResourceMemberShape: Shape {
     }
 }
 
+/// Shape representing an entity with a set of operations attached
 public class ResourceShape: Shape {
     public static let type = "resource"
     public var traits: TraitList?
