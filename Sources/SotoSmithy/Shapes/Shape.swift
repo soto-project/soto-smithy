@@ -89,7 +89,7 @@ extension Shape {
         return TypeSelector<Self>()
     }
 
-    private func validateTraits(using model: Model) throws {
+    func validateTraits(using model: Model) throws {
         try traits?.validate(using: model, shape: self)
     }
 }

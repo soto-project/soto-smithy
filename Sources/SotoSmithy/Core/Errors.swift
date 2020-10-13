@@ -13,6 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 extension Smithy {
+    /// Error thrown when `Model.validate` finds an error
     public struct ValidationError: Error {
         public let reason: String
     }

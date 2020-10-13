@@ -90,13 +90,14 @@ public class StructureShape: Shape {
 }
 
 /// The union type represents a tagged union data structure that can take on several different, but fixed, types.
-/// Unions function similarly to structures except that only one member can be used at any one time. 
+/// Unions function similarly to structures except that only one member can be used at any one time.
 public class UnionShape: Shape {
     public static let type = "union"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
     public func validate(using model: Model) throws {
-        try self.members?.forEach { try $0.value.validate(using: model) }
+        guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Union has no members") }
+        try members.forEach { try $0.value.validate(using: model) }
         try self.validateTraits(using: model)
     }
 
