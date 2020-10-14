@@ -65,12 +65,12 @@ public class MapShape: Shape {
     }
 }
 
-/// Shape representing a set of named, unordered, heterogeneous values. Contains a set of members mapping
-/// to other shapes in the model
-public class StructureShape: Shape {
-    public static let type = "structure"
-    public var traits: TraitList?
-    public var members: [String: MemberShape]?
+/// Protocol for shape holding a collection of member shapes
+public protocol CollectionShape: Shape {
+    var members: [String: MemberShape]? { get }
+}
+
+extension CollectionShape {
     public func validate(using model: Model) throws {
         try self.members?.forEach { try $0.value.validate(using: model) }
         try self.validateTraits(using: model)
@@ -89,9 +89,17 @@ public class StructureShape: Shape {
     }
 }
 
+/// Shape representing a set of named, unordered, heterogeneous values. Contains a set of members mapping
+/// to other shapes in the model
+public class StructureShape: CollectionShape {
+    public static let type = "structure"
+    public var traits: TraitList?
+    public var members: [String: MemberShape]?
+}
+
 /// The union type represents a tagged union data structure that can take on several different, but fixed, types.
 /// Unions function similarly to structures except that only one member can be used at any one time.
-public class UnionShape: Shape {
+public class UnionShape: CollectionShape {
     public static let type = "union"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
@@ -99,15 +107,5 @@ public class UnionShape: Shape {
         guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Union has no members") }
         try members.forEach { try $0.value.validate(using: model) }
         try self.validateTraits(using: model)
-    }
-
-    public func add(trait: Trait, to member: String) {
-        self.members?[member]?.add(trait: trait)
-    }
-
-    public func remove(trait: StaticTrait.Type, from member: String) throws {
-        guard self.members?[member]?.remove(trait: trait) != nil else {
-            throw Smithy.MemberDoesNotExistError(name: member)
-        }
     }
 }

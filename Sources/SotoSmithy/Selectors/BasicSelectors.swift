@@ -61,7 +61,7 @@ public struct SimpleTypeSelector: Selector {
 public struct CollectionSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
-        return shape is SetShape || shape is ListShape
+        return shape is CollectionShape
     }
 }
 
