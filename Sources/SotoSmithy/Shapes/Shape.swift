@@ -51,6 +51,13 @@ extension Shape {
         return traits?.trait(type: T.self)
     }
     
+    /// Return if shape has a trait of type
+    /// - Parameter type: Trait type
+    /// - Returns: whether shape has trait
+    public func hasTrait(type: StaticTrait.Type) -> Bool {
+        return traits?.hasTrait(type: type) ?? false
+    }
+
     /// Get trait with name that is attached to shape
     /// - Parameter named: Name of trait we are looking for
     /// - Returns: Trait if it exists

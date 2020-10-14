@@ -39,14 +39,21 @@ public struct TraitList: Codable {
     public func trait<T: StaticTrait>(type: T.Type) -> T? {
         return self.traits[T.staticName].map { $0 as! T }
     }
-    
+
+    /// Return if trait is in list
+    /// - Parameter type: Trait type
+    /// - Returns: Is trait in the list
+    public func hasTrait(type: StaticTrait.Type) -> Bool {
+        return self.traits[type.staticName] != nil
+    }
+
     /// Return trait with name from list if it exists
     /// - Parameter named: Trait nam
     /// - Returns: Trait if found
     public func trait(named: String) -> Trait? {
         return self.traits[named]
     }
-    
+
     /// Add trait to list
     /// - Parameter trait: trait to add
     public mutating func add(trait: Trait) {
