@@ -16,7 +16,7 @@
 public class Model: Decodable {
     let version: String
     let metadata: [String: MetadataValue]?
-    var shapes: [ShapeId: Shape]
+    public private(set) var shapes: [ShapeId: Shape]
 
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
