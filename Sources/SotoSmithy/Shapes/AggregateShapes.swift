@@ -18,6 +18,11 @@ public class MemberShape: Shape {
     public let target: ShapeId
     public var traits: TraitList?
 
+    public init(target: ShapeId, traits: TraitList? = nil) {
+        self.target = target
+        self.traits = traits
+    }
+    
     public func validate(using model: Model) throws {
         guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)") }
         guard !(shape is OperationShape),
@@ -35,6 +40,12 @@ public class ListShape: Shape {
     public static let type = "list"
     public var traits: TraitList?
     public let member: MemberShape
+
+    public init(traits: TraitList? = nil, member: MemberShape) {
+        self.traits = traits
+        self.member = member
+    }
+    
     public func validate(using model: Model) throws {
         try self.member.validate(using: model)
         try self.validateTraits(using: model)
@@ -46,6 +57,12 @@ public class SetShape: Shape {
     public static let type = "set"
     public var traits: TraitList?
     public let member: MemberShape
+
+    public init(traits: TraitList? = nil, member: MemberShape) {
+        self.traits = traits
+        self.member = member
+    }
+    
     public func validate(using model: Model) throws {
         try self.member.validate(using: model)
         try self.validateTraits(using: model)
@@ -58,6 +75,13 @@ public class MapShape: Shape {
     public var traits: TraitList?
     public let key: MemberShape
     public let value: MemberShape
+
+    public init(traits: TraitList? = nil, key: MemberShape, value: MemberShape) {
+        self.traits = traits
+        self.key = key
+        self.value = value
+    }
+    
     public func validate(using model: Model) throws {
         try self.key.validate(using: model)
         try self.value.validate(using: model)
