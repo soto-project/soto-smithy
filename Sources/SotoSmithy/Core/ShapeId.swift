@@ -71,3 +71,9 @@ extension ShapeId: ExpressibleByStringLiteral {
 extension ShapeId: CustomStringConvertible {
     public var description: String { return self.rawValue }
 }
+
+extension ShapeId: Comparable {
+    public static func < (lhs: ShapeId, rhs: ShapeId) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+}
