@@ -17,6 +17,14 @@ public struct EnumTrait: SingleValueTrait {
     public static let staticName = "smithy.api#enum"
     public var selector: Selector { TypeSelector<StringShape>() }
     public struct EnumDefinition: Codable {
+        public init(value: String, name: String? = nil, documentation: String? = nil, tags: [String]? = nil, deprecated: Bool? = nil) {
+            self.value = value
+            self.name = name
+            self.documentation = documentation
+            self.tags = tags
+            self.deprecated = deprecated
+        }
+        
         public let value: String
         public let name: String?
         public let documentation: String?
