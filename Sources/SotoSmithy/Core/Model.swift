@@ -14,9 +14,9 @@
 
 /// Class for holding Smithy Model
 public class Model: Decodable {
-    let version: String
-    let metadata: [String: MetadataValue]?
-    public private(set) var shapes: [ShapeId: Shape]
+    public let version: String
+    public let metadata: [String: MetadataValue]?
+    public var shapes: [ShapeId: Shape]
 
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

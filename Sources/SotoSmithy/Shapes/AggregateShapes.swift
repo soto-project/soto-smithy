@@ -95,6 +95,11 @@ public class StructureShape: CollectionShape {
     public static let type = "structure"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
+    
+    public init(traits: TraitList? = nil, members: [String : MemberShape]? = nil) {
+        self.traits = traits
+        self.members = members
+    }
 }
 
 /// The union type represents a tagged union data structure that can take on several different, but fixed, types.
@@ -103,6 +108,12 @@ public class UnionShape: CollectionShape {
     public static let type = "union"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
+    
+    public init(traits: TraitList? = nil, members: [String : MemberShape]? = nil) {
+        self.traits = traits
+        self.members = members
+    }
+
     public func validate(using model: Model) throws {
         guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Union has no members") }
         try members.forEach { try $0.value.validate(using: model) }
