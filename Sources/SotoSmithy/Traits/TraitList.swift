@@ -66,6 +66,12 @@ public struct TraitList: Codable {
         self.traits[trait.staticName] = nil
     }
 
+    /// Remove trait of type from list
+    /// - Parameter trait: trait type to remove
+    public mutating func removeTrait(named: String) {
+        self.traits[named] = nil
+    }
+
     static func registerTraitTypes(_ traitTypes: [StaticTrait.Type]) {
         for trait in traitTypes {
             self.possibleTraits[trait.staticName] = trait

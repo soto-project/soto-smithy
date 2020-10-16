@@ -79,6 +79,12 @@ extension Shape {
         self.traits?.remove(trait: trait)
     }
     
+    /// Remove trait of type from shape
+    /// - Parameter trait: Trait type to remove
+    public func removeTrait(named: String) {
+        self.traits?.removeTrait(named: named)
+    }
+    
     /// Default implementation of adding trait to member. Throws an error. Shape which have members will override this
     /// - Throws: `MemberDoesNotExistError`
     public func add(trait: Trait, to member: String) throws {
