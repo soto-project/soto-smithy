@@ -21,6 +21,7 @@ enum SmithyParserError: Error {
     case badlyDefinedMetadata
     case unexpectedMetadataValue
     case missingShapeName
+    case unattachedTraits
     case unexpectedToken(Tokenizer.Token)
     case overflow
 }
@@ -31,6 +32,7 @@ extension Smithy {
         var model: [Substring: Any] = [:]
         var modelShapes: [Substring: Any] = [:]
         var metaData: [String: Any] = [:]
+        var traits: [Substring: Any] = [:]
         let tokens = try Tokenizer().tokenize(string)
         var tokenParser = TokenParser(tokens)
         var namespace: Substring? = nil
@@ -42,25 +44,53 @@ extension Smithy {
             let token = try tokenParser.nextToken()
             if case .token(let string) = token {
                 if string == "namespace" {
+                    if traits.count > 0 {
+                        throw SmithyParserError.unattachedTraits
+                    }
                     let token = try tokenParser.nextToken()
                     guard case .token(let name) = token else { throw SmithyParserError.missingNamespace }
                     guard modelShapes["shapes"] == nil else { throw SmithyParserError.shapesDefinedBeforeNamespace }
                     guard namespace == nil else { throw SmithyParserError.namespaceAlreadyDefined }
                     namespace = name
                 } else if string == "metadata" {
+                    if traits.count > 0 {
+                        throw SmithyParserError.unattachedTraits
+                    }
                     let token = try tokenParser.nextToken()
                     guard case .string(let string) = token else { throw SmithyParserError.badlyDefinedMetadata }
                     try tokenParser.expect(.grammar("="))
                     let value = try parseValue(&tokenParser)
                     metaData[string] = value
                 } else if string.first == "@" {
-                    //let traitName = string.dropFirst()
+                    let traitName = string.dropFirst()
+                    let token = try tokenParser.token()
+                    if token == .newline {
+                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
+                    } else if token == .grammar("(") {
+                        try tokenParser.advance()
+                        let value = try parseParameters(&tokenParser)
+                        traits[fullTraitName(traitName, namespace: namespace)] = value
+                    } else {
+                        throw SmithyParserError.unexpectedToken(token)
+                    }
+                    try tokenParser.expect(.newline)
                 } else {
                     let token = try tokenParser.nextToken()
                     guard case .token(let name) = token else { throw SmithyParserError.missingShapeName }
                     let shapeName = namespace != nil ? "\(namespace!)#\(name)" : name
-                    modelShapes[shapeName] = try parseShape(&tokenParser, type: string, namespace: namespace)
+                    var shape = try parseShape(&tokenParser, type: string, namespace: namespace)
+                    if traits.count > 0 {
+                        shape["traits"] = traits
+                    }
+                    traits = [:]
+                    modelShapes[shapeName] = shape
                 }
+            } else if token == .newline{
+                if traits.count > 0 {
+                    throw SmithyParserError.unattachedTraits
+                }
+            } else {
+                throw SmithyParserError.unexpectedToken(token)
             }
         }
         model["metadata"] = metaData
@@ -86,17 +116,8 @@ extension Smithy {
             if case .token(let string) = token {
                 try tokenParser.expect(.grammar(":"))
                 let token = try tokenParser.nextToken()
-                guard case .token(var name) = token else { throw SmithyParserError.unexpectedToken(token) }
-                // if name has no namespace check if it is a prelude object
-                let shapeId = ShapeId(rawValue: String(name))
-                if shapeId.namespace == nil {
-                    if Self.preludeShapes[ShapeId(rawValue: "smithy.api#\(name)")] != nil {
-                        name = "smithy.api#\(name)"
-                    } else if let namespace = namespace {
-                        name = "\(namespace)#\(name)"
-                    }
-                }
-                members[string] = ["target": name]
+                guard case .token(let name) = token else { throw SmithyParserError.unexpectedToken(token) }
+                members[string] = ["target": fullShapeName(name, namespace: namespace)]
                 if try endCollection(&tokenParser, endToken: .grammar("}")) {
                     break
                 }
@@ -118,6 +139,32 @@ extension Smithy {
         return shape
     }
     
+    func fullShapeName(_ name: Substring, namespace: Substring?) -> Substring {
+        // if name has no namespace check if it is a prelude object
+        let shapeId = ShapeId(rawValue: String(name))
+        if shapeId.namespace == nil {
+            if Self.preludeShapes[ShapeId(rawValue: "smithy.api#\(name)")] != nil {
+                return "smithy.api#\(name)"
+            } else if let namespace = namespace {
+                return "\(namespace)#\(name)"
+            }
+        }
+        return name
+    }
+    
+    func fullTraitName(_ name: Substring, namespace: Substring?) -> Substring {
+        // if name has no namespace check if it is a prelude object
+        let traitId = ShapeId(rawValue: String(name))
+        if traitId.namespace == nil {
+            if TraitList.possibleTraits["smithy.api#\(name)"] != nil {
+                return "smithy.api#\(name)"
+            } else if let namespace = namespace {
+                return "\(namespace)#\(name)"
+            }
+        }
+        return name
+    }
+    
     func parseValue(_ tokenParser: inout TokenParser) throws -> Any {
         let token = try tokenParser.nextToken()
         switch token {
@@ -135,18 +182,18 @@ extension Smithy {
         }
     }
     
-    func parseDictionary(_ tokenParser: inout TokenParser) throws -> [Substring: Any] {
+    func parseMappedValues(_ tokenParser: inout TokenParser, endToken: Tokenizer.Token) throws -> [Substring: Any] {
         var dictionary: [Substring: Any] = [:]
         while !tokenParser.reachedEnd() {
             tokenParser.skip(while: .newline)
             let token = try tokenParser.nextToken()
-            if token == .grammar("}") {
+            if token == endToken {
                 break
             } else if case .token(let key) = token {
                 try tokenParser.expect(.grammar(":"))
                 let value = try parseValue(&tokenParser)
                 dictionary[key] = value
-                if try endCollection(&tokenParser, endToken: .grammar("}")) {
+                if try endCollection(&tokenParser, endToken: endToken) {
                     break
                 }
             } else {
@@ -154,6 +201,20 @@ extension Smithy {
             }
         }
         return dictionary
+    }
+    
+    func parseParameters(_ tokenParser: inout TokenParser) throws -> Any {
+        if case .token = try tokenParser.token() {
+            return try parseMappedValues(&tokenParser, endToken: .grammar(")"))
+        } else {
+            let value = try parseValue(&tokenParser)
+            try tokenParser.expect(.grammar(")"))
+            return value
+        }
+    }
+    
+    func parseDictionary(_ tokenParser: inout TokenParser) throws -> [Substring: Any] {
+        return try parseMappedValues(&tokenParser, endToken: .grammar("}"))
     }
 
     func parseArray(_ tokenParser: inout TokenParser) throws -> [Any] {
@@ -200,7 +261,7 @@ extension Smithy {
             position = tokens.startIndex
         }
         
-        mutating func token() throws -> Tokenizer.Token {
+        func token() throws -> Tokenizer.Token {
             guard position != tokens.endIndex else { throw SmithyParserError.overflow }
             return tokens[position]
         }

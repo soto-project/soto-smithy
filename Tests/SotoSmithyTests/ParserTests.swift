@@ -112,4 +112,45 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(map.key.target, "smithy.api#String")
         XCTAssertEqual(map.value.target, "soto.example#MyStructure")
     }
+    
+    func testSimpleTrait() throws {
+        let smithy = """
+        namespace soto.example
+        @sensitive
+        string MyString
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let shape = try XCTUnwrap(model.shape(for: "soto.example#MyString"))
+        XCTAssertNotNil(shape.trait(type: SensitiveTrait.self))
+    }
+    
+    func testSingleValueTrait() throws {
+        let smithy = """
+        namespace soto.example
+        @documentation("string value")
+        string MyString
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let shape = try XCTUnwrap(model.shape(for: "soto.example#MyString"))
+        let trait = try XCTUnwrap(shape.trait(type: DocumentationTrait.self))
+        XCTAssertEqual(trait.value, "string value")
+    }
+
+    func testMultipleValueTrait() throws {
+        let smithy = """
+        namespace soto.example
+        @length(min: 0, max: 10)
+        list MyList {
+            member: String
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let shape = try XCTUnwrap(model.shape(for: "soto.example#MyList"))
+        let trait = try XCTUnwrap(shape.trait(type: LengthTrait.self))
+        XCTAssertEqual(trait.min, 0)
+        XCTAssertEqual(trait.max, 10)
+    }
 }
