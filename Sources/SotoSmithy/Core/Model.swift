@@ -18,6 +18,12 @@ public class Model: Decodable {
     public let metadata: [String: MetadataValue]?
     public var shapes: [ShapeId: Shape]
 
+    init() {
+        self.version = "1.0"
+        self.metadata = nil
+        self.shapes = [:]
+    }
+    
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.version = try container.decode(String.self, forKey: .version)

@@ -36,7 +36,7 @@ class SelectorTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssertEqual(try model.select(from: "string").count, 5) // this includes the prelude string type
         XCTAssertEqual(try model.select(from: "union").count, 1)
@@ -56,7 +56,7 @@ class SelectorTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssertEqual(try model.select(from: "[trait:deprecated]").count, 1)
     }
@@ -77,7 +77,7 @@ class SelectorTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssertEqual(try model.select(from: "[trait:smithy.example#StringDimensions]").count, 1)
     }

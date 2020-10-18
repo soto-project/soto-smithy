@@ -27,7 +27,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Blob")) is BlobShape)
     }
@@ -43,7 +43,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Bool")) is BooleanShape)
     }
@@ -59,7 +59,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Byte")) is ByteShape)
     }
@@ -75,7 +75,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Short")) is ShortShape)
     }
@@ -91,7 +91,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Integer")) is IntegerShape)
     }
@@ -107,7 +107,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Long")) is LongShape)
     }
@@ -123,7 +123,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Float")) is FloatShape)
     }
@@ -139,7 +139,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Double")) is DoubleShape)
     }
@@ -155,7 +155,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#BigInteger")) is BigIntegerShape)
     }
@@ -171,7 +171,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#BigDecimal")) is BigDecimalShape)
     }
@@ -187,7 +187,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Timestamp")) is TimestampShape)
     }
@@ -203,7 +203,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssert(model.shape(for: ShapeId(rawValue: "smithy.example#Document")) is DocumentShape)
     }
@@ -221,7 +221,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         let list = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#List")) as? ListShape)
         XCTAssertEqual(list.member.target, ShapeId(rawValue: "smithy.example#Integer"))
@@ -240,7 +240,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         let set = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Set")) as? SetShape)
         XCTAssertEqual(set.member.target, ShapeId(rawValue: "smithy.example#Integer"))
@@ -261,7 +261,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         let map = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Map")) as? MapShape)
         XCTAssertEqual(map.key.target, ShapeId(rawValue: "smithy.example#Key"))
@@ -285,7 +285,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         let structure = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Structure")) as? StructureShape)
         XCTAssertEqual(structure.members?["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
@@ -309,7 +309,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         let structure = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Union")) as? UnionShape)
         XCTAssertEqual(structure.members?["name"]?.target, ShapeId(rawValue: "smithy.example#Name"))
@@ -328,7 +328,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         let service = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Service")) as? ServiceShape)
         XCTAssertEqual(service.version, "10-10-20")
@@ -361,7 +361,7 @@ class ShapeTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         let service = try XCTUnwrap(model.shape(for: ShapeId(rawValue: "smithy.example#Service")) as? ServiceShape)
         let operations = try XCTUnwrap(service.operations)
