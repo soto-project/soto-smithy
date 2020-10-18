@@ -70,6 +70,8 @@ extension Smithy {
                         try tokenParser.advance()
                         let value = try parseParameters(&tokenParser, namespace: namespace)
                         traits[fullTraitName(traitName, namespace: namespace)] = value
+                    } else if case .token = token {
+                        continue
                     } else {
                         throw SmithyParserError.unexpectedToken(token)
                     }
@@ -93,7 +95,9 @@ extension Smithy {
                 throw SmithyParserError.unexpectedToken(token)
             }
         }
-        model["metadata"] = metaData
+        if metaData.count > 0 {
+            model["metadata"] = metaData
+        }
         model["shapes"] = modelShapes
         let data = try JSONSerialization.data(withJSONObject: model, options: [])
         print(String(data: data, encoding: .utf8)!)
@@ -103,6 +107,7 @@ extension Smithy {
     /// Parse shape from tokenized smithy
     func parseShape(_ tokenParser: inout TokenParser, type: Substring, namespace: Substring?) throws -> [Substring: Any] {
         var shape: [Substring: Any] = ["type": type]
+        var traits: [Substring: Any] = [:]
         guard !tokenParser.reachedEnd() else { return shape }
         let next = try tokenParser.nextToken()
         guard next != .newline else { return shape }
@@ -111,16 +116,47 @@ extension Smithy {
         var members: [Substring: Any] = [:]
         
         while !tokenParser.reachedEnd() {
-            tokenParser.skip(while: .newline)
             let token = try tokenParser.nextToken()
             if case .token(let string) = token {
-                try tokenParser.expect(.grammar(":"))
-                let value = try parseValue(&tokenParser, namespace: namespace)
-                members[string] = value
-                if try endCollection(&tokenParser, endToken: .grammar("}")) {
-                    break
+                if string.first == "@" {
+                    let traitName = string.dropFirst()
+                    let token = try tokenParser.token()
+                    if token == .newline {
+                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
+                    } else if token == .grammar("(") {
+                        try tokenParser.advance()
+                        let value = try parseParameters(&tokenParser, namespace: namespace)
+                        traits[fullTraitName(traitName, namespace: namespace)] = value
+                    } else if case .token = token {
+                        continue
+                    } else {
+                        throw SmithyParserError.unexpectedToken(token)
+                    }
+                    try tokenParser.expect(.newline)
+                } else {
+                    try tokenParser.expect(.grammar(":"))
+                    let value = try parseValue(&tokenParser, namespace: namespace)
+                    if traits.count > 0,
+                       var dictionary = value as? [String: Any],
+                       dictionary["target"] != nil {
+                        dictionary["traits"] = traits
+                        members[string] = dictionary
+                    } else {
+                        members[string] = value
+                    }
+                    traits = [:]
+                    if try endCollection(&tokenParser, endToken: .grammar("}")) {
+                        break
+                    }
+                }
+            } else if token == .newline {
+                if traits.count > 0 {
+                    throw SmithyParserError.unattachedTraits
                 }
             } else if token == .grammar("}"){
+                if traits.count > 0 {
+                    throw SmithyParserError.unattachedTraits
+                }
                 // closed curly bracket so we are done
                 break
             } else {

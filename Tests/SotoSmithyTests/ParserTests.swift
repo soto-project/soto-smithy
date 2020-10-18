@@ -115,8 +115,7 @@ class ParserTests: XCTestCase {
     
     func testServiceLoad() throws {
         let smithy = """
-        namespace smithy.example
-
+        namespace soto.example
         service MyService {
             version: "2017-02-11",
             operations: [GetServerTime],
@@ -168,5 +167,26 @@ class ParserTests: XCTestCase {
         let trait = try XCTUnwrap(shape.trait(type: LengthTrait.self))
         XCTAssertEqual(trait.min, 0)
         XCTAssertEqual(trait.max, 10)
+    }
+    
+    func testMemberTrait() throws {
+        let smithy = """
+        namespace soto.example
+        structure MyString {
+            @required
+            value: String
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let shape = try XCTUnwrap(model.shape(for: "soto.example#MyString$value"))
+        XCTAssertNotNil(shape.trait(type: RequiredTrait.self))
+    }
+    
+    func testTraitTrait() throws {
+        let smithy = """
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
     }
 }
