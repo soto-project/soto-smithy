@@ -32,7 +32,7 @@ struct Tokenizer {
 
     static var tokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$")
     static var tokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@")
-    static var numberChars = set(from: "0123456789.,")
+    static var numberChars = set(from: "0123456789.")
     static var numberStartChars = set(from: "0123456789")
     static var grammarChars = set(from: "(){}:[],=")
 

@@ -97,19 +97,8 @@ extension Smithy {
                     }
                 }
                 members[string] = ["target": name]
-                // get next token if it is a closed curly brackets we are done, if it is a comma carry on, if it
-                // is a newline read all newlines and expect a closed curly bracket otherwise throw error
-                let endToken = try tokenParser.nextToken()
-                if endToken == .grammar("}") {
+                if try endCollection(&tokenParser, endToken: .grammar("}")) {
                     break
-                } else if endToken == .grammar(",") {
-                    continue
-                } else if endToken == .newline {
-                    tokenParser.skip(while: .newline)
-                    try tokenParser.expect(.grammar("}"))
-                    break
-                } else {
-                    throw SmithyParserError.unexpectedToken(endToken)
                 }
             } else if token == .grammar("}"){
                 // closed curly bracket so we are done
@@ -147,13 +136,60 @@ extension Smithy {
     }
     
     func parseDictionary(_ tokenParser: inout TokenParser) throws -> [Substring: Any] {
-        return [:]
+        var dictionary: [Substring: Any] = [:]
+        while !tokenParser.reachedEnd() {
+            tokenParser.skip(while: .newline)
+            let token = try tokenParser.nextToken()
+            if token == .grammar("}") {
+                break
+            } else if case .token(let key) = token {
+                try tokenParser.expect(.grammar(":"))
+                let value = try parseValue(&tokenParser)
+                dictionary[key] = value
+                if try endCollection(&tokenParser, endToken: .grammar("}")) {
+                    break
+                }
+            } else {
+                throw SmithyParserError.unexpectedToken(token)
+            }
+        }
+        return dictionary
     }
 
     func parseArray(_ tokenParser: inout TokenParser) throws -> [Any] {
-        return []
+        var array: [Any] = []
+        while !tokenParser.reachedEnd() {
+            tokenParser.skip(while: .newline)
+            let token = try tokenParser.token()
+            if token == .grammar("]") {
+                try tokenParser.advance()
+                break
+            } else {
+                let value = try parseValue(&tokenParser)
+                array.append(value)
+                if try endCollection(&tokenParser, endToken: .grammar("]")) {
+                    break
+                }
+            }
+        }
+        return array
     }
 
+    func endCollection( _ tokenParser: inout TokenParser, endToken: Tokenizer.Token) throws -> Bool {
+        let nextToken = try tokenParser.nextToken()
+        if nextToken == endToken {
+            return true
+        } else if nextToken == .grammar(",") {
+            return false
+        } else if nextToken == .newline {
+            tokenParser.skip(while: .newline)
+            try tokenParser.expect(endToken)
+            return true
+        } else {
+            throw SmithyParserError.unexpectedToken(nextToken)
+        }
+    }
+    
     /// Token parser used internal by Smithy.parse
     struct TokenParser {
         let tokens: [Tokenizer.Token]
@@ -162,6 +198,11 @@ extension Smithy {
         init(_ tokens: [Tokenizer.Token]) {
             self.tokens = tokens
             position = tokens.startIndex
+        }
+        
+        mutating func token() throws -> Tokenizer.Token {
+            guard position != tokens.endIndex else { throw SmithyParserError.overflow }
+            return tokens[position]
         }
         
         mutating func nextToken() throws -> Tokenizer.Token {

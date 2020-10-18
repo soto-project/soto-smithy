@@ -37,6 +37,30 @@ class ParserTests: XCTestCase {
         XCTAssertNoThrow(try model.validate())
         XCTAssertEqual(model.metadata?["test"] as? String, "test string")
     }
+    
+    func testMetadataArrayLoad() throws {
+        let smithy = """
+        namespace soto.example
+        metadata "testArray" = [1,2,3]
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        XCTAssertEqual(model.metadata?["testArray"] as? [Int], [1,2,3])
+    }
+    
+    func testMetadataDictionaryLoad() throws {
+        let smithy = """
+        namespace soto.example
+        metadata "testMap" = {
+            string: "string",
+            integer: "integer"
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        XCTAssertEqual(model.metadata?["testMap"] as? [String:String], ["string":"string", "integer":"integer"])
+    }
+    
     func testListLoad() throws {
         let smithy = """
         namespace soto.example
