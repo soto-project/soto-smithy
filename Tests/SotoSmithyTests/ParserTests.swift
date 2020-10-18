@@ -113,6 +113,22 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(map.value.target, "soto.example#MyStructure")
     }
     
+    func testServiceLoad() throws {
+        let smithy = """
+        namespace smithy.example
+
+        service MyService {
+            version: "2017-02-11",
+            operations: [GetServerTime],
+        }
+        @readonly
+        operation GetServerTime {
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+    }
+    
     func testSimpleTrait() throws {
         let smithy = """
         namespace soto.example
