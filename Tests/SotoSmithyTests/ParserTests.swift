@@ -35,7 +35,7 @@ class ParserTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
-        XCTAssertEqual(model.metadata?["test"]?.value as? String, "test string")
+        XCTAssertEqual(model.metadata?["test"] as? String, "test string")
     }
     func testListLoad() throws {
         let smithy = """
