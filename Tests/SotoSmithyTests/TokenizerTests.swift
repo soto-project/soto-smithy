@@ -32,7 +32,7 @@ class TokenizerTests: XCTestCase {
         XCTAssertEqual(tokens[1], .grammar("("))
         XCTAssertEqual(tokens[2], .token("value"))
         XCTAssertEqual(tokens[3], .grammar(":"))
-        XCTAssertEqual(tokens[4], .number("1"))
+        XCTAssertEqual(tokens[4], .number(1))
         XCTAssertEqual(tokens[5], .grammar(")"))
     }
     
@@ -40,7 +40,7 @@ class TokenizerTests: XCTestCase {
         let string = "@testTrait(\"test string\")"
         let tokens = try Tokenizer().tokenize(string)
         XCTAssertEqual(tokens.count, 4)
-        XCTAssertEqual(tokens[2], .string("\"test string\""))
+        XCTAssertEqual(tokens[2], .string("test string"))
     }
     
     func testNewline() throws {
@@ -62,7 +62,7 @@ class TokenizerTests: XCTestCase {
         let string = #"@testTrait("test \"string\"")"#
         let tokens = try Tokenizer().tokenize(string)
         XCTAssertEqual(tokens.count, 4)
-        XCTAssertEqual(tokens[2], .string(#""test "string"""#))
+        XCTAssertEqual(tokens[2], .string(#"test "string""#))
     }
     
     func testInvalidEscapeCharacter() throws {
@@ -71,6 +71,7 @@ class TokenizerTests: XCTestCase {
             switch error {
             case Tokenizer.Error.unrecognisedEscapeCharacter(let line, let lineNumber, let column):
                 XCTAssertEqual(line, #"@testTrait("test \string\"")"#)
+                XCTAssertEqual(lineNumber, 1)
                 XCTAssertEqual(column, 19)
             default:
                 XCTFail("\(error)")

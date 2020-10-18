@@ -12,12 +12,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Foundation
+
 struct Tokenizer {
     enum Token: Equatable {
         case token(Substring)
         case grammar(Character)
-        case string(Substring)
-        case number(Substring)
+        case string(String)
+        case number(Double)
         case newline
         
     }
@@ -30,9 +32,9 @@ struct Tokenizer {
 
     static var tokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$")
     static var tokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@")
-    static var numberChars = set(from: "0123456789.")
+    static var numberChars = set(from: "0123456789.,")
     static var numberStartChars = set(from: "0123456789")
-    static var grammarChars = set(from: "(){}:[],")
+    static var grammarChars = set(from: "(){}:[],=")
 
     static func set(from string: String) -> Set<Character> {
         return .init(string.map{ $0 })
@@ -56,7 +58,7 @@ struct Tokenizer {
                 tokens.append(.token(token))
             } else if Self.numberStartChars.contains(current) {
                 let token = parser.read(while: Self.numberChars)
-                tokens.append(.number(token))
+                tokens.append(.number(Double(token) ?? 0.0 ))
             } else if current == "\"" {
                 let text = try readString(from: &parser, lineNumber: lineNumber)
                 tokens.append(.string(text))
@@ -68,9 +70,10 @@ struct Tokenizer {
         return tokens
     }
     
-    func readString(from parser: inout Parser<String>, lineNumber: Int) throws -> Substring {
+    func readString(from parser: inout Parser<String>, lineNumber: Int) throws -> String {
         var stringParser = parser
-        var text = try stringParser.read(count: 1)
+        var text = ""
+        try stringParser.advance()
         do {
             repeat {
                 text += try stringParser.read(until: Set(Self.set(from: "\\\"\n")))
@@ -94,7 +97,7 @@ struct Tokenizer {
                     throw Error.unterminatedString(line: position.line, lineNumber: lineNumber, column: position.column)
                 }
             } while try stringParser.current() != "\""
-            text += try stringParser.read(count: 1)
+            try stringParser.advance()
         } catch ParserError.overflow {
             let position = try getCurrentLine(from: parser)
             throw Error.unterminatedString(line: position.line, lineNumber: lineNumber, column: position.column)
