@@ -17,6 +17,31 @@ public struct CustomTrait: Trait {
     public let shapeId: ShapeId
     public var selector: Selector { return CustomTraitSelector(self.shapeId) }
     public var traitName: String { return self.shapeId.description }
+    public var parameters: [String: Any]
+
+    public func validate(using model: Model, shape: Shape) throws {
+        guard self.selector.select(using: model, shape: shape) else {
+            throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
+        }
+        // the selector has already tested for existence of trait shape so can use !
+        let traitShape = model.shape(for: self.shapeId) as! StructureShape
+        // test for required members
+        if let members = traitShape.members {
+            for member in members {
+                if member.value.hasTrait(type: RequiredTrait.self) {
+                    guard parameters[member.key] != nil else {
+                        throw Smithy.ValidationError(reason: "Required parameter \(member.key) in trait \(traitName) is not in trait attached to shape **")
+                    }
+                }
+            }
+        }
+        // test for members existence
+        for parameter in self.parameters {
+            guard traitShape.members?[parameter.key] != nil else {
+                throw Smithy.ValidationError(reason: "Supplied parameter \(parameter.key) in trait attached to shape ** does not exist in \(traitName)")
+            }
+        }
+    }
 }
 
 /// Trait indicating this is a structure that can be referenced as a trait
@@ -42,6 +67,7 @@ struct CustomTraitSelector: Selector {
 
     func select(using model: Model, shape: Shape) -> Bool {
         guard let traitShape = model.shape(for: self.shapeId) else { return false }
+        guard traitShape as? StructureShape != nil else { return false }
         guard let traitSelector = traitShape.trait(type: TraitTrait.self)?.selectorToApply else { return false }
         return traitSelector.select(using: model, shape: shape)
     }

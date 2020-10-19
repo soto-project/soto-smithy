@@ -217,14 +217,25 @@ class ParserTests: XCTestCase {
 
     func testTraitTrait() throws {
         let smithy = """
-        metadata "foo" = {
-            hello: 123,
-            testing: "Hello!",
-            an_array: [10.5],
-            nested-object: {
-                hello-there$: true
-            }, // <-- Trailing comma
+        namespace smithy.example
+
+        /// A trait that has members.
+        @trait(selector: "string")
+        structure structuredTrait {
+            @required
+            lorem: StringShape,
+
+            @required
+            ipsum: StringShape,
+
+            dolor: StringShape,
         }
+
+        // Apply the structuredTrait to the string.
+        @structuredTrait(
+            lorem: "This is a custom trait!",
+            ipsum: "lorem and ipsum are both required values.")
+        string StringShape
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())

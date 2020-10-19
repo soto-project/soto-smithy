@@ -264,7 +264,7 @@ extension Smithy {
         case .token(let token):
             return ["target": fullShapeName(token, namespace: namespace)]
         default:
-            throw SmithyParserError.unexpectedMetadataValue
+            throw SmithyParserError.unexpectedToken(token)
 
         }
     }
@@ -291,6 +291,7 @@ extension Smithy {
     }
     
     func parseParameters(_ tokenParser: inout TokenParser, namespace: Substring?) throws -> Any {
+        tokenParser.skip(while: .newline)
         if case .token = try tokenParser.token() {
             return try parseMappedValues(&tokenParser, endToken: .grammar(")"), namespace: namespace)
         } else {
@@ -339,13 +340,14 @@ extension Smithy {
         if tokenParser.reachedEnd() {
             return value
         }
-        switch try tokenParser.token() {
+        let token2 = try tokenParser.token()
+        switch token2 {
         case .newline:
             try tokenParser.advance()
         case .token:
             break
         default:
-            throw SmithyParserError.unexpectedToken(token)
+            throw SmithyParserError.unexpectedToken(token2)
         }
         return value
     }

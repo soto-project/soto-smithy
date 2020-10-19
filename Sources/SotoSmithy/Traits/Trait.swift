@@ -13,7 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 /// Protocol for Trait in Smithy model
-public protocol Trait: Decodable {
+public protocol Trait {
     /// name of trait
     var traitName: String { get }
     /// Selector defining what shapes this trait can be attached to
@@ -23,12 +23,6 @@ public protocol Trait: Decodable {
 }
 
 extension Trait {
-    public static func decode<Key: CodingKey>(from decoder: Decoder, key: Key) throws -> Self {
-        let container = try decoder.container(keyedBy: Key.self)
-        let value = try container.decode(Self.self, forKey: key)
-        return value
-    }
-
     public var selector: Selector { return AllSelector() }
     public func validate(using model: Model, shape: Shape) throws {
         guard self.selector.select(using: model, shape: shape) else {

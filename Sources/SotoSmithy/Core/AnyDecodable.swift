@@ -13,15 +13,17 @@
 //===----------------------------------------------------------------------===//
 import Foundation
 
-/// Struct used for holding generic metadata values
-public struct MetadataValue {
+/// Inspired from https://github.com/Flight-School/AnyCodable
+/// 
+/// Struct used for holding generic decodable values
+public struct AnyDecodable {
     public let value: Any
     public init(value: Any) {
         self.value = value
     }
 }
 
-extension MetadataValue: Decodable {
+extension AnyDecodable: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if container.decodeNil() {
@@ -36,9 +38,9 @@ extension MetadataValue: Decodable {
             self.init(value: double)
         } else if let string = try? container.decode(String.self) {
             self.init(value: string)
-        } else if let array = try? container.decode([MetadataValue].self) {
+        } else if let array = try? container.decode([AnyDecodable].self) {
             self.init(value: array.map { $0.value })
-        } else if let dictionary = try? container.decode([String: MetadataValue].self) {
+        } else if let dictionary = try? container.decode([String: AnyDecodable].self) {
             self.init(value: dictionary.mapValues { $0.value })
         } else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyDecodable value cannot be decoded")

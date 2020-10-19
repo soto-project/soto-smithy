@@ -22,7 +22,8 @@ public struct TraitList: Codable {
             if let traitType = Self.possibleTraits[key.stringValue] {
                 trait = try traitType.decode(from: decoder, key: key)
             } else {
-                trait = CustomTrait(shapeId: ShapeId(rawValue: key.stringValue))
+                let parameters = try container.decode([String: AnyDecodable].self, forKey: key)
+                trait = CustomTrait(shapeId: ShapeId(rawValue: key.stringValue), parameters: parameters.mapValues{ $0.value })
             }
             traits[trait.traitName] = trait
         }
