@@ -28,19 +28,79 @@ enum SmithyParserError: Error {
 
 extension Smithy {
     
+    /// Parse IDL to create Smithy Model
+    /// - Parameter string: IDL
+    /// - Throws: `SmithyParserError`
+    /// - Returns: Smithy Model
     func parse(_ string: String) throws -> Model {
-        var model: [Substring: Any] = [:]
-        var modelShapes: [Substring: Any] = [:]
-        var metaData: [String: Any] = [:]
-        var traits: [Substring: Any] = [:]
         let tokens = try Tokenizer().tokenize(string)
         var tokenParser = TokenParser(tokens)
-        var namespace: Substring? = nil
 
-        model["smithy"] = "1.0"
-        
+        // IDL is split into three distinct sections: control, metadata and shapes
+        var model = try parseControlSection(&tokenParser)
+        model["metadata"] = try parseMetadataSection(&tokenParser)
+        model["shapes"] = try parserShapesSection(&tokenParser)
+
+        let data = try JSONSerialization.data(withJSONObject: model, options: [])
+        print(String(data: data, encoding: .utf8)!)
+        return try Smithy().decodeAST(from: data)
+    }
+    
+    /// parse control section of IDL
+    func parseControlSection(_ tokenParser: inout TokenParser) throws -> [String: Any] {
+        let model: [String: Any] = ["smithy": "1.0"]
         while !tokenParser.reachedEnd() {
             tokenParser.skip(while: .newline)
+            let token = try tokenParser.token()
+            if case .token(let string) = token {
+                if string == "$version" {
+                    try tokenParser.advance()
+                    // currently we support version "1.0"
+                    try tokenParser.expect(.string("1.0"))
+                } else {
+                    break
+                }
+            } else {
+                throw SmithyParserError.unexpectedToken(token)
+            }
+        }
+        return model
+    }
+    
+    /// Parse metadata section of IDL
+    /// - Returns: Metadata dictionary
+    func parseMetadataSection(_ tokenParser: inout TokenParser) throws -> [String: Any] {
+        var metaData: [String: Any] = [:]
+        while !tokenParser.reachedEnd() {
+            tokenParser.skip(while: .newline)
+            let token = try tokenParser.token()
+            if case .token(let string) = token {
+                if string == "metadata" {
+                    try tokenParser.advance()
+                    let token = try tokenParser.nextToken()
+                    guard case .string(let string) = token else { throw SmithyParserError.badlyDefinedMetadata }
+                    try tokenParser.expect(.grammar("="))
+                    let value = try parseValue(&tokenParser, namespace: nil)
+                    metaData[string] = value
+                } else {
+                    // must have reached end of metadata section
+                    break
+                }
+            } else {
+                throw SmithyParserError.unexpectedToken(token)
+            }
+        }
+        return metaData
+    }
+    
+    /// parse shapes section of IDL
+    /// - Returns: Shapes as a dictionary
+    func parserShapesSection(_ tokenParser: inout TokenParser) throws -> [Substring: Any] {
+        var namespace: Substring? = nil
+        var modelShapes: [Substring: Any] = [:]
+        var traits: [Substring: Any] = [:]
+
+        while !tokenParser.reachedEnd() {
             let token = try tokenParser.nextToken()
             if case .token(let string) = token {
                 if string == "namespace" {
@@ -53,15 +113,9 @@ extension Smithy {
                     guard namespace == nil else { throw SmithyParserError.namespaceAlreadyDefined }
                     namespace = name
                 } else if string == "metadata" {
-                    if traits.count > 0 {
-                        throw SmithyParserError.unattachedTraits
-                    }
-                    let token = try tokenParser.nextToken()
-                    guard case .string(let string) = token else { throw SmithyParserError.badlyDefinedMetadata }
-                    try tokenParser.expect(.grammar("="))
-                    let value = try parseValue(&tokenParser, namespace: namespace)
-                    metaData[string] = value
+                    throw SmithyParserError.unexpectedToken(token)
                 } else if string.first == "@" {
+                    // if trait
                     let traitName = string.dropFirst()
                     let token = try tokenParser.token()
                     if token == .newline {
@@ -71,12 +125,13 @@ extension Smithy {
                         let value = try parseParameters(&tokenParser, namespace: namespace)
                         traits[fullTraitName(traitName, namespace: namespace)] = value
                     } else if case .token = token {
-                        continue
+                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
                     } else {
                         throw SmithyParserError.unexpectedToken(token)
                     }
                     try tokenParser.expect(.newline)
                 } else {
+                    // must be a shape
                     let token = try tokenParser.nextToken()
                     guard case .token(let name) = token else { throw SmithyParserError.missingShapeName }
                     let shapeName = namespace != nil ? "\(namespace!)#\(name)" : name
@@ -95,13 +150,7 @@ extension Smithy {
                 throw SmithyParserError.unexpectedToken(token)
             }
         }
-        if metaData.count > 0 {
-            model["metadata"] = metaData
-        }
-        model["shapes"] = modelShapes
-        let data = try JSONSerialization.data(withJSONObject: model, options: [])
-        print(String(data: data, encoding: .utf8)!)
-        return try Smithy().decodeAST(from: data)
+        return modelShapes
     }
     
     /// Parse shape from tokenized smithy
@@ -119,6 +168,7 @@ extension Smithy {
             let token = try tokenParser.nextToken()
             if case .token(let string) = token {
                 if string.first == "@" {
+                    // if trait
                     let traitName = string.dropFirst()
                     let token = try tokenParser.token()
                     if token == .newline {
@@ -128,12 +178,13 @@ extension Smithy {
                         let value = try parseParameters(&tokenParser, namespace: namespace)
                         traits[fullTraitName(traitName, namespace: namespace)] = value
                     } else if case .token = token {
-                        continue
+                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
                     } else {
                         throw SmithyParserError.unexpectedToken(token)
                     }
                     try tokenParser.expect(.newline)
                 } else {
+                    // assume token is a shape name
                     try tokenParser.expect(.grammar(":"))
                     let value = try parseValue(&tokenParser, namespace: namespace)
                     if traits.count > 0,
@@ -331,21 +382,6 @@ extension Smithy {
                 }
             }
         }
-
-        /*@discardableResult mutating func read(until: Tokenizer.Token, throwOnOverflow: Bool = true) throws -> T.SubSequence {
-            let startIndex = position
-            while !reachedEnd() {
-                let token = try nextToken()
-                if token == until {
-                    return tokens[startIndex..<position]
-                }
-            }
-            if throwOnOverflow {
-                position = startIndex
-                throw SmithyParserError.overflow
-            }
-            return tokens[startIndex..<position]
-        }*/
 
         func reachedEnd() -> Bool {
             return position == tokens.endIndex

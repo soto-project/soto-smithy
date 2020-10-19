@@ -29,8 +29,8 @@ class ParserTests: XCTestCase {
     
     func testMetadataLoad() throws {
         let smithy = """
-        namespace soto.example
         metadata "test" = "test string"
+        namespace soto.example
         string MyString
         """
         let model = try Smithy().parse(smithy)
@@ -40,8 +40,8 @@ class ParserTests: XCTestCase {
     
     func testMetadataArrayLoad() throws {
         let smithy = """
-        namespace soto.example
         metadata "testArray" = [1,2,3]
+        namespace soto.example
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
@@ -50,11 +50,11 @@ class ParserTests: XCTestCase {
     
     func testMetadataDictionaryLoad() throws {
         let smithy = """
-        namespace soto.example
         metadata "testMap" = {
             string: "string",
             integer: "integer"
         }
+        namespace soto.example
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
@@ -185,6 +185,19 @@ class ParserTests: XCTestCase {
     
     func testTraitTrait() throws {
         let smithy = """
+        namespace smithy.example
+
+        @readonly
+        @endpoint(hostPrefix: "{foo}.data.")
+        operation GetStatus {
+            input: GetStatusInput,
+        }
+
+        structure GetStatusInput {
+            @required
+            @hostLabel
+            foo: String
+        }
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
