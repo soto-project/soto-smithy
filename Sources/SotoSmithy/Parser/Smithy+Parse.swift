@@ -18,9 +18,9 @@ enum SmithyParserError: Error {
     case shapesDefinedBeforeNamespace
     case namespaceAlreadyDefined
     case missingNamespace
+    case applyingToShapeThatDoesntExist(String)
     case badlyDefinedMetadata
     case unexpectedMetadataValue
-    case missingShapeName
     case unattachedTraits
     case unexpectedToken(Tokenizer.Token)
     case overflow
@@ -104,6 +104,7 @@ extension Smithy {
             let token = try tokenParser.nextToken()
             if case .token(let string) = token {
                 if string == "namespace" {
+                    // namespace
                     if traits.count > 0 {
                         throw SmithyParserError.unattachedTraits
                     }
@@ -113,27 +114,19 @@ extension Smithy {
                     guard namespace == nil else { throw SmithyParserError.namespaceAlreadyDefined }
                     namespace = name
                 } else if string == "metadata" {
+                    // unexpected metadata. Should have already been read
                     throw SmithyParserError.unexpectedToken(token)
                 } else if string.first == "@" {
                     // if trait
                     let traitName = string.dropFirst()
-                    let token = try tokenParser.token()
-                    if token == .newline {
-                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
-                    } else if token == .grammar("(") {
-                        try tokenParser.advance()
-                        let value = try parseParameters(&tokenParser, namespace: namespace)
-                        traits[fullTraitName(traitName, namespace: namespace)] = value
-                    } else if case .token = token {
-                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
-                    } else {
-                        throw SmithyParserError.unexpectedToken(token)
-                    }
-                    try tokenParser.expect(.newline)
+                    let trait = try parseTrait(&tokenParser, namespace: namespace)
+                    traits[fullTraitName(traitName, namespace: namespace)] = trait
+                } else if string == "apply" {
+                    try parseApply(&tokenParser, shapes: &modelShapes, namespace: namespace)
                 } else {
                     // must be a shape
                     let token = try tokenParser.nextToken()
-                    guard case .token(let name) = token else { throw SmithyParserError.missingShapeName }
+                    guard case .token(let name) = token else { throw SmithyParserError.unexpectedToken(token) }
                     let shapeName = namespace != nil ? "\(namespace!)#\(name)" : name
                     var shape = try parseShape(&tokenParser, type: string, namespace: namespace)
                     if traits.count > 0 {
@@ -172,19 +165,8 @@ extension Smithy {
                 if string.first == "@" {
                     // if trait
                     let traitName = string.dropFirst()
-                    let token = try tokenParser.token()
-                    if token == .newline {
-                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
-                    } else if token == .grammar("(") {
-                        try tokenParser.advance()
-                        let value = try parseParameters(&tokenParser, namespace: namespace)
-                        traits[fullTraitName(traitName, namespace: namespace)] = value
-                    } else if case .token = token {
-                        traits[fullTraitName(traitName, namespace: namespace)] = [:]
-                    } else {
-                        throw SmithyParserError.unexpectedToken(token)
-                    }
-                    try tokenParser.expect(.newline)
+                    let trait = try parseTrait(&tokenParser, namespace: namespace)
+                    traits[fullTraitName(traitName, namespace: namespace)] = trait
                 } else {
                     // assume token is a shape name
                     try tokenParser.expect(.grammar(":"))
@@ -229,6 +211,8 @@ extension Smithy {
         return shape
     }
     
+    /// Return full shape name given name. If name has no namespace search for shape in available namespaces
+    /// otherwise prefix with current namespace
     func fullShapeName(_ name: Substring, namespace: Substring?) -> Substring {
         // if name has no namespace check if it is a prelude object
         let shapeId = ShapeId(rawValue: String(name))
@@ -242,6 +226,8 @@ extension Smithy {
         return name
     }
     
+    /// Return full trait name. If name has no namespace search for shape in available namespaces
+    /// otherwise prefix with current namespace
     func fullTraitName(_ name: Substring, namespace: Substring?) -> Substring {
         // if name has no namespace check if it is a prelude object
         let traitId = ShapeId(rawValue: String(name))
@@ -255,6 +241,7 @@ extension Smithy {
         return name
     }
     
+    /// parse a value. This could be a string, number, array, dictionary or shape id
     func parseValue(_ tokenParser: inout TokenParser, namespace: Substring?) throws -> Any {
         let token = try tokenParser.nextToken()
         switch token {
@@ -328,7 +315,43 @@ extension Smithy {
         return array
     }
 
-    func endCollection( _ tokenParser: inout TokenParser, endToken: Tokenizer.Token) throws -> Bool {
+    func parseTrait(_ tokenParser: inout TokenParser, namespace: Substring?) throws -> Any {
+        let token = try tokenParser.token()
+        let value: Any
+        if token == .newline {
+            value = [:]
+        } else if token == .grammar("(") {
+            try tokenParser.advance()
+            value = try parseParameters(&tokenParser, namespace: namespace)
+        } else if case .token = token {
+            value = [:]
+        } else {
+            throw SmithyParserError.unexpectedToken(token)
+        }
+        if tokenParser.reachedEnd() {
+            return value
+        }
+        switch try tokenParser.token() {
+        case .newline:
+            try tokenParser.advance()
+        case .token:
+            break
+        default:
+            throw SmithyParserError.unexpectedToken(token)
+        }
+        return value
+    }
+    
+    func parseApply(_ tokenParser: inout TokenParser, shapes: inout [Substring: Any], namespace: Substring?) throws {
+        let shapeToken = try tokenParser.nextToken()
+        guard case .token(let _) = shapeToken else {throw SmithyParserError.unexpectedToken(shapeToken) }
+        let traitToken = try tokenParser.nextToken()
+        guard case .token(let trait) = traitToken else {throw SmithyParserError.unexpectedToken(traitToken) }
+        guard trait.first == "@" else {throw SmithyParserError.unexpectedToken(traitToken) }
+        _ = try parseTrait(&tokenParser, namespace: namespace)
+    }
+    
+    func endCollection(_ tokenParser: inout TokenParser, endToken: Tokenizer.Token) throws -> Bool {
         let nextToken = try tokenParser.nextToken()
         if nextToken == endToken {
             return true

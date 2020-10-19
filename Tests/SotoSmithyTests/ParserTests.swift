@@ -173,7 +173,7 @@ class ParserTests: XCTestCase {
         let smithy = """
         namespace soto.example
         structure MyString {
-            @required
+            @required @sensitive
             value: String
         }
         """
@@ -203,6 +203,18 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(myStringValueDoc.value, "string value")
     }
     
+    func testApply() throws {
+        let smithy = """
+        namespace soto.example
+        
+        string MyString
+        apply MyString @required
+        apply MyString @documentation("test")
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+    }
+
     func testTraitTrait() throws {
         let smithy = """
         namespace smithy.example
