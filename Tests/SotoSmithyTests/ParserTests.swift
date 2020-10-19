@@ -217,18 +217,13 @@ class ParserTests: XCTestCase {
 
     func testTraitTrait() throws {
         let smithy = """
-        namespace smithy.example
-
-        @readonly
-        @endpoint(hostPrefix: "{foo}.data.")
-        operation GetStatus {
-            input: GetStatusInput,
-        }
-
-        structure GetStatusInput {
-            @required
-            @hostLabel
-            foo: String
+        metadata "foo" = {
+            hello: 123,
+            testing: "Hello!",
+            an_array: [10.5],
+            nested-object: {
+                hello-there$: true
+            }, // <-- Trailing comma
         }
         """
         let model = try Smithy().parse(smithy)

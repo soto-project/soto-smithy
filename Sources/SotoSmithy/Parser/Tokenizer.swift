@@ -32,7 +32,7 @@ struct Tokenizer {
         case unterminatedString(line: String, lineNumber: Int, column: Int)
     }
 
-    static var tokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$")
+    static var tokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-")
     static var tokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@")
     static var numberChars = set(from: "0123456789.")
     static var numberStartChars = set(from: "0123456789")

@@ -78,7 +78,15 @@ extension Smithy {
                 if string == "metadata" {
                     try tokenParser.advance()
                     let token = try tokenParser.nextToken()
-                    guard case .string(let string) = token else { throw SmithyParserError.badlyDefinedMetadata }
+                    let string: String
+                    switch token {
+                    case .string(let text):
+                        string = text
+                    case .token(let token):
+                        string = String(token)
+                    default:
+                        throw SmithyParserError.badlyDefinedMetadata
+                    }
                     try tokenParser.expect(.grammar("="))
                     let value = try parseValue(&tokenParser, namespace: nil)
                     metaData[string] = value
