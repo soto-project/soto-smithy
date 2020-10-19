@@ -20,12 +20,14 @@ struct Tokenizer {
         case grammar(Character)
         case string(String)
         case number(Double)
+        case documentationComment(Substring)
         case newline
         
     }
     
     enum Error: Swift.Error {
         case unrecognisedCharacter(line: String, lineNumber: Int, column: Int)
+        case unexpectedCharacter(line: String, lineNumber: Int, column: Int)
         case unrecognisedEscapeCharacter(line: String, lineNumber: Int, column: Int)
         case unterminatedString(line: String, lineNumber: Int, column: Int)
     }
@@ -62,6 +64,10 @@ struct Tokenizer {
             } else if current == "\"" {
                 let text = try readString(from: &parser, lineNumber: lineNumber)
                 tokens.append(.string(text))
+            } else if current == "/" {
+                if let comment = try readDocumentationComment(from: &parser, lineNumber: lineNumber) {
+                    tokens.append(.documentationComment(comment))
+                }
             } else {
                 let position = try getCurrentLine(from: parser)
                 throw Error.unrecognisedCharacter(line: position.line, lineNumber: lineNumber, column: position.column)
@@ -104,6 +110,22 @@ struct Tokenizer {
         }
         parser = stringParser
         return text
+    }
+    
+    func readDocumentationComment(from parser: inout Parser<String>, lineNumber: Int) throws -> Substring? {
+        try parser.advance()
+        guard try parser.read("/") else {
+            let position = try getCurrentLine(from: parser)
+            throw Error.unexpectedCharacter(line: position.line, lineNumber: lineNumber, column: position.column)
+        }
+        let documentationComment = try parser.read("/")
+        parser.read(while: Self.set(from: " \t"))
+        let text = try parser.read(until: "\n", throwOnOverflow: false)
+        // skip newline
+        if try parser.current() == "\n" {
+            try parser.advance()
+        }
+        return documentationComment ? text : nil
     }
     
     func getCurrentLine(from parser: Parser<String>) throws -> (line: String, column: Int) {

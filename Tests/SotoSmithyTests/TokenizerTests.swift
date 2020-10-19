@@ -17,11 +17,11 @@ import XCTest
 
 class TokenizerTests: XCTestCase {
     func testTokens() throws {
-        let string = "namespace smithy.example"
+        let string = "namespace soto.example"
         let tokens = try Tokenizer().tokenize(string)
         XCTAssertEqual(tokens.count, 2)
         XCTAssertEqual(tokens[0], .token("namespace"))
-        XCTAssertEqual(tokens[1], .token("smithy.example"))
+        XCTAssertEqual(tokens[1], .token("soto.example"))
     }
 
     func testGrammar() throws {
@@ -45,7 +45,7 @@ class TokenizerTests: XCTestCase {
     
     func testNewline() throws {
         let string = """
-        namespace smith.example
+        namespace soto.example
         @testTrait("test string)
         """
         XCTAssertThrowsError(_ = try Tokenizer().tokenize(string)) { error in
@@ -77,5 +77,25 @@ class TokenizerTests: XCTestCase {
                 XCTFail("\(error)")
             }
         }
+    }
+    
+    func testComment() throws {
+        let string = """
+        namespace soto.example
+        // my string
+        string MyString
+        """
+        let tokens = try Tokenizer().tokenize(string)
+        XCTAssertEqual(tokens[3], .token("string"))
+    }
+    
+    func testDocumentationComment() throws {
+        let string = """
+        namespace soto.example
+        /// my string
+        string MyString
+        """
+        let tokens = try Tokenizer().tokenize(string)
+        XCTAssertEqual(tokens[3], .documentationComment("my string"))
     }
 }

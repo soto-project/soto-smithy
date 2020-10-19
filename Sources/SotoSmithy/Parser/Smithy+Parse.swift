@@ -142,6 +142,8 @@ extension Smithy {
                     traits = [:]
                     modelShapes[shapeName] = shape
                 }
+            } else if case .documentationComment(let comment) = token {
+                traits["smithy.api#documentation"] = comment
             } else if token == .newline{
                 if traits.count > 0 {
                     throw SmithyParserError.unattachedTraits
@@ -200,6 +202,8 @@ extension Smithy {
                         break
                     }
                 }
+            } else if case .documentationComment(let comment) = token {
+                traits["smithy.api#documentation"] = comment
             } else if token == .newline {
                 if traits.count > 0 {
                     throw SmithyParserError.unattachedTraits

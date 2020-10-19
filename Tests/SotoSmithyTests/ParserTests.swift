@@ -183,6 +183,26 @@ class ParserTests: XCTestCase {
         XCTAssertNotNil(shape.trait(type: RequiredTrait.self))
     }
     
+    func testDocumentationComment() throws {
+        let smithy = """
+        namespace soto.example
+        /// my string
+        structure MyString {
+            /// string value
+            @required
+            value: String
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let myString = try XCTUnwrap(model.shape(for: "soto.example#MyString"))
+        let myStringDoc = try XCTUnwrap(myString.trait(type: DocumentationTrait.self))
+        XCTAssertEqual(myStringDoc.value, "my string")
+        let myStringValue = try XCTUnwrap(model.shape(for: "soto.example#MyString$value"))
+        let myStringValueDoc = try XCTUnwrap(myStringValue.trait(type: DocumentationTrait.self))
+        XCTAssertEqual(myStringValueDoc.value, "string value")
+    }
+    
     func testTraitTrait() throws {
         let smithy = """
         namespace smithy.example
