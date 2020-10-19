@@ -67,7 +67,7 @@ struct Tokenizer {
         return tokens
     }
     
-    func readQuotedText(from parser: inout Parser<String>) throws -> String {
+    func readQuotedText(from parser: inout Parser) throws -> String {
         var stringParser = parser
         var text = ""
         try stringParser.advance()
@@ -109,12 +109,12 @@ struct Tokenizer {
         return text
     }
 
-    func readBlockText(from parser: inout Parser<String>) throws -> String {
+    func readBlockText(from parser: inout Parser) throws -> String {
         return ""
     }
 
 
-    func readDocumentationComment(from parser: inout Parser<String>) throws -> Substring? {
+    func readDocumentationComment(from parser: inout Parser) throws -> Substring? {
         try parser.advance()
         guard try parser.read("/") else {
             throw Error.unexpectedCharacter(parser)
@@ -137,11 +137,11 @@ struct Tokenizer {
             case unterminatedString
         }
         let error: ErrorType
-        let context: Parser<String>.Context
+        let context: Parser.Context
 
-        static func unrecognisedCharacter(_ parser: Parser<String>) -> Self { .init(error: .unrecognisedCharacter, context: parser.getContext()) }
-        static func unexpectedCharacter(_ parser: Parser<String>) -> Self { .init(error: .unexpectedCharacter, context: parser.getContext()) }
-        static func unrecognisedEscapeCharacter(_ parser: Parser<String>) -> Self { .init(error: .unrecognisedEscapeCharacter, context: parser.getContext()) }
-        static func unterminatedString(_ parser: Parser<String>) -> Self { .init(error: .unterminatedString, context: parser.getContext()) }
+        static func unrecognisedCharacter(_ parser: Parser) -> Self { .init(error: .unrecognisedCharacter, context: parser.getContext()) }
+        static func unexpectedCharacter(_ parser: Parser) -> Self { .init(error: .unexpectedCharacter, context: parser.getContext()) }
+        static func unrecognisedEscapeCharacter(_ parser: Parser) -> Self { .init(error: .unrecognisedEscapeCharacter, context: parser.getContext()) }
+        static func unterminatedString(_ parser: Parser) -> Self { .init(error: .unterminatedString, context: parser.getContext()) }
     }
 }

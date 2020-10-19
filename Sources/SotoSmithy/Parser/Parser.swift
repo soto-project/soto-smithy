@@ -14,36 +14,35 @@
 
 import Foundation
 
-public enum ParserError : Error {
+enum ParserError : Error {
     case overflow
-    case unexpected
     case emptyString
 }
 
 /// Reader object for parsing String buffers
-public struct Parser<S: StringProtocol> {
+struct Parser {
     /// internal storage used to store String
     private class Storage {
-        init(_ buffer: S) {
+        init(_ buffer: String) {
             self.buffer = buffer
         }
-        let buffer: S
+        let buffer: String
     }
 
     private let _storage: Storage
     
     /// Create a Reader object
     /// - Parameter string: String to parse
-    public init(_ string: S) {
+    init(_ string: String) {
         self._storage = Storage(string)
         self.position = string.startIndex
     }
     
-    var buffer: S { return _storage.buffer }
-    private(set) var position: S.Index
+    var buffer: String { return _storage.buffer }
+    private(set) var position: String.Index
 }
 
-public extension Parser {
+extension Parser {
     
     /// Return current character
     /// - Throws: .overflow
@@ -100,7 +99,7 @@ public extension Parser {
     /// - Parameter count: Number of characters to read
     /// - Throws: .overflow
     /// - Returns: The string read from the buffer
-    mutating func read(count: Int) throws -> S.SubSequence {
+    mutating func read(count: Int) throws -> Substring {
         guard buffer.distance(from: position, to: buffer.endIndex) >= count else { throw ParserError.overflow }
         let end = buffer.index(position, offsetBy: count)
         let subString = buffer[position..<end]
@@ -112,7 +111,7 @@ public extension Parser {
     /// - Parameter until: Character to read until
     /// - Throws: .overflow if we hit the end of the buffer before reading character
     /// - Returns: String read from buffer
-    @discardableResult mutating func read(until: Character, throwOnOverflow: Bool = true) throws -> S.SubSequence {
+    @discardableResult mutating func read(until: Character, throwOnOverflow: Bool = true) throws -> Substring {
         let startIndex = position
         while !reachedEnd() {
             if _current() == until {
@@ -131,7 +130,7 @@ public extension Parser {
     /// - Parameter until: String to check for
     /// - Throws: .overflow, .emptyString
     /// - Returns: String read from buffer
-    @discardableResult mutating func read(until: String, throwOnOverflow: Bool = true) throws -> S.SubSequence {
+    @discardableResult mutating func read(until: String, throwOnOverflow: Bool = true) throws -> Substring {
         guard until.count > 0 else { throw ParserError.emptyString }
         let startIndex = position
         var untilIndex = until.startIndex
@@ -161,7 +160,7 @@ public extension Parser {
     /// - Parameter keyPath: keyPath to check
     /// - Throws: .overflow
     /// - Returns: String read from buffer
-    @discardableResult mutating func read(until keyPath: KeyPath<Character, Bool>, throwOnOverflow: Bool = true) throws -> S.SubSequence {
+    @discardableResult mutating func read(until keyPath: KeyPath<Character, Bool>, throwOnOverflow: Bool = true) throws -> Substring {
         let startIndex = position
         while !reachedEnd() {
             if _current()[keyPath: keyPath] {
@@ -180,7 +179,7 @@ public extension Parser {
     /// - Parameter characterSet: Character set to check against
     /// - Throws: .overflow
     /// - Returns: String read from buffer
-    @discardableResult mutating func read(until characterSet: Set<Character>, throwOnOverflow: Bool = true) throws -> S.SubSequence {
+    @discardableResult mutating func read(until characterSet: Set<Character>, throwOnOverflow: Bool = true) throws -> Substring {
         let startIndex = position
         while !reachedEnd() {
             if characterSet.contains(_current()) {
@@ -197,7 +196,7 @@ public extension Parser {
     
     /// Read from buffer from current position until the end of the buffer
     /// - Returns: String read from buffer
-    @discardableResult mutating func readUntilTheEnd() -> S.SubSequence {
+    @discardableResult mutating func readUntilTheEnd() -> Substring {
         let startIndex = position
         position = buffer.endIndex
         return buffer[startIndex..<position]
@@ -219,7 +218,7 @@ public extension Parser {
     /// Read while keyPath on character at current position returns true is the one supplied
     /// - Parameter while: keyPath to check
     /// - Returns: String read from buffer
-    @discardableResult mutating func read(while keyPath: KeyPath<Character, Bool>) -> S.SubSequence {
+    @discardableResult mutating func read(while keyPath: KeyPath<Character, Bool>) -> Substring {
         let startIndex = position
         while !reachedEnd(),
             _current()[keyPath: keyPath] {
@@ -231,36 +230,13 @@ public extension Parser {
     /// Read while character at current position is in supplied set
     /// - Parameter while: character set to check
     /// - Returns: String read from buffer
-    @discardableResult mutating func read(while characterSet: Set<Character>) -> S.SubSequence {
+    @discardableResult mutating func read(while characterSet: Set<Character>) -> Substring {
         let startIndex = position
         while !reachedEnd(),
             characterSet.contains(_current()) {
             _advance()
         }
         return buffer[startIndex..<position]
-    }
-    
-    mutating func scan(format: String) throws -> [S.SubSequence] {
-        var result: [S.SubSequence] = []
-        var formatReader = Parser<String>(format)
-        let text = try formatReader.read(until: "%%", throwOnOverflow: false)
-        if text.count > 0 {
-            guard try read(String(text)) else { throw ParserError.unexpected }
-        }
-        
-        while !formatReader.reachedEnd() {
-            formatReader._advance(by: 2)
-            let text = try formatReader.read(until: "%%", throwOnOverflow: false)
-            let resultText: S.SubSequence
-            if text.count > 0 {
-                resultText = try read(until: String(text))
-            } else {
-                resultText = readUntilTheEnd()
-            }
-            _advance(by: text.count)
-            result.append(resultText)
-        }
-        return result
     }
     
     /// Return whether we have reached the end of the buffer
@@ -309,7 +285,7 @@ extension Parser {
 }
 
 /// Public versions of internal functions which include tests for overflow
-public extension Parser {
+extension Parser {
     /// Return the character at the current position
     /// - Throws: .overflow
     /// - Returns: Character
