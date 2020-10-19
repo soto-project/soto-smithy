@@ -122,7 +122,7 @@ extension Smithy {
                     let trait = try parseTrait(&tokenParser, namespace: namespace)
                     traits[fullTraitName(traitName, namespace: namespace)] = trait
                 } else if string == "apply" {
-                    try parseApply(&tokenParser, shapes: &modelShapes, namespace: namespace)
+                    _ = try parseApply(&tokenParser, shapes: &modelShapes, namespace: namespace)
                 } else {
                     // must be a shape
                     let token = try tokenParser.nextToken()
@@ -342,13 +342,16 @@ extension Smithy {
         return value
     }
     
-    func parseApply(_ tokenParser: inout TokenParser, shapes: inout [Substring: Any], namespace: Substring?) throws {
+    func parseApply(_ tokenParser: inout TokenParser, shapes: inout [Substring: Any], namespace: Substring?) throws -> (Substring, Substring, Any) {
         let shapeToken = try tokenParser.nextToken()
-        guard case .token(let _) = shapeToken else {throw SmithyParserError.unexpectedToken(shapeToken) }
+        guard case .token(let shape) = shapeToken else {throw SmithyParserError.unexpectedToken(shapeToken) }
         let traitToken = try tokenParser.nextToken()
-        guard case .token(let trait) = traitToken else {throw SmithyParserError.unexpectedToken(traitToken) }
-        guard trait.first == "@" else {throw SmithyParserError.unexpectedToken(traitToken) }
-        _ = try parseTrait(&tokenParser, namespace: namespace)
+        guard case .token(let traitName) = traitToken else {throw SmithyParserError.unexpectedToken(traitToken) }
+        guard traitName.first == "@" else {throw SmithyParserError.unexpectedToken(traitToken) }
+        let fullTraitName = self.fullTraitName(traitName.dropFirst(), namespace: namespace)
+        let trait = try parseTrait(&tokenParser, namespace: namespace)
+    
+        return (shape, fullTraitName, trait)
     }
     
     func endCollection(_ tokenParser: inout TokenParser, endToken: Tokenizer.Token) throws -> Bool {
