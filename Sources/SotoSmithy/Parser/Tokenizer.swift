@@ -136,12 +136,12 @@ struct Tokenizer {
             case unrecognisedEscapeCharacter
             case unterminatedString
         }
-        let error: ErrorType
+        let errorType: ErrorType
         let context: Parser.Context
 
-        static func unrecognisedCharacter(_ parser: Parser) -> Self { .init(error: .unrecognisedCharacter, context: parser.getContext()) }
-        static func unexpectedCharacter(_ parser: Parser) -> Self { .init(error: .unexpectedCharacter, context: parser.getContext()) }
-        static func unrecognisedEscapeCharacter(_ parser: Parser) -> Self { .init(error: .unrecognisedEscapeCharacter, context: parser.getContext()) }
-        static func unterminatedString(_ parser: Parser) -> Self { .init(error: .unterminatedString, context: parser.getContext()) }
+        static func unrecognisedCharacter(_ parser: Parser) -> Self { .init(errorType: .unrecognisedCharacter, context: parser.getContext()) }
+        static func unexpectedCharacter(_ parser: Parser) -> Self { .init(errorType: .unexpectedCharacter, context: parser.getContext()) }
+        static func unrecognisedEscapeCharacter(_ parser: Parser) -> Self { .init(errorType: .unrecognisedEscapeCharacter, context: parser.getContext()) }
+        static func unterminatedString(_ parser: Parser) -> Self { .init(errorType: .unterminatedString, context: parser.getContext()) }
     }
 }

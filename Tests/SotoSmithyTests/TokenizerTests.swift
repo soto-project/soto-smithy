@@ -50,7 +50,7 @@ class TokenizerTests: XCTestCase {
         """
         XCTAssertThrowsError(_ = try Tokenizer().tokenize(string)) { error in
             switch error {
-            case let error as Tokenizer.Error where error.error == .unterminatedString:
+            case let error as Tokenizer.Error where error.errorType == .unterminatedString:
                 XCTAssertEqual(error.context.lineNumber, 2)
             default:
                 XCTFail("\(error)")
@@ -69,7 +69,7 @@ class TokenizerTests: XCTestCase {
         let string = #"@testTrait("test \string\"")"#
         XCTAssertThrowsError(_ = try Tokenizer().tokenize(string)) { error in
             switch error {
-            case let error as Tokenizer.Error where error.error == .unrecognisedEscapeCharacter:
+            case let error as Tokenizer.Error where error.errorType == .unrecognisedEscapeCharacter:
                 XCTAssertEqual(error.context.line, #"@testTrait("test \string\"")"#)
                 XCTAssertEqual(error.context.lineNumber, 1)
                 XCTAssertEqual(error.context.columnNumber, 19)
