@@ -127,10 +127,10 @@ public struct Smithy {
         }
     }
     
-    /// Decode Smithy model
-    /// - Parameter data: Data holding Smithy model in JSON format
+    /// Decode Smithy JSON AST
+    /// - Parameter data: Data holding Smithy model in JSON AST format
     /// - Returns: Smithy model
-    public func decode(from data: Data) throws -> Model {
+    public func decodeAST(from data: Data) throws -> Model {
         try JSONDecoder().decode(Model.self, from: data)
     }
     

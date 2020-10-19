@@ -20,7 +20,7 @@ class AWSTraitTests: XCTestCase {
     func testJson(_ json: String) {
         Smithy.registerAWSTraits()
         var model: Model?
-        XCTAssertNoThrow(model = try Smithy().decode(from: Data(json.utf8)))
+        XCTAssertNoThrow(model = try Smithy().decodeAST(from: Data(json.utf8)))
         XCTAssertNoThrow(try model?.validate())
     }
 

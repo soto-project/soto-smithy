@@ -15,13 +15,23 @@
 /// Class for holding Smithy Model
 public class Model: Decodable {
     public let version: String
-    public let metadata: [String: MetadataValue]?
+    public let metadata: [String: Any]?
     public var shapes: [ShapeId: Shape]
 
+    init() {
+        self.version = "1.0"
+        self.metadata = nil
+        self.shapes = [:]
+    }
+    
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.version = try container.decode(String.self, forKey: .version)
-        self.metadata = try container.decodeIfPresent([String: MetadataValue].self, forKey: .metadata)
+        if let metadata = try container.decodeIfPresent([String: MetadataValue].self, forKey: .metadata) {
+            self.metadata = metadata.mapValues{ $0.value }
+        } else {
+            self.metadata = nil
+        }
         var shapes = Smithy.preludeShapes
         if let decodedShapes = try container.decodeIfPresent([String: DecodableShape].self, forKey: .shapes) {
             for shape in decodedShapes {

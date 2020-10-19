@@ -33,7 +33,7 @@ class TraitTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         try model.add(trait: RequiredTrait(), to: "smithy.example#Structure")
         XCTAssertNotNil(model.shape(for: "smithy.example#Structure")?.trait(type: RequiredTrait.self))
@@ -48,7 +48,7 @@ class TraitTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssertThrowsError(try model.add(trait: RequiredTrait(), to: "smithy.example#NotName")) { error in
             XCTAssertTrue(error is Smithy.ShapeDoesNotExistError)
@@ -72,7 +72,7 @@ class TraitTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         try model.add(trait: RequiredTrait(), to: "smithy.example#Structure$name")
         XCTAssertNotNil(model.shape(for: "smithy.example#Structure$name")?.trait(type: RequiredTrait.self))
@@ -92,7 +92,7 @@ class TraitTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssertNotNil(model.shape(for: "smithy.example#Name")?.trait(type: PatternTrait.self))
         try model.remove(trait: PatternTrait.self, from: "smithy.example#Name")
@@ -119,7 +119,7 @@ class TraitTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
         XCTAssertNotNil(model.shape(for: "smithy.example#Structure$name")?.trait(type: XmlNameTrait.self))
         try model.remove(trait: XmlNameTrait.self, from: "smithy.example#Structure$name")
@@ -151,7 +151,7 @@ class TraitTests: XCTestCase {
             }
         }
         """
-        let model = try Smithy().decode(from: Data(json.utf8))
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
     }
 
