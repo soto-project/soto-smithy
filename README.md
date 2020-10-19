@@ -1,6 +1,6 @@
 # Soto Smithy
 
-Library for loading AWS [Smithy](https://awslabs.github.io/smithy/index.html) files and their JSON AST models. Smithy defines services and documentation for any protocol.
+Library for loading AWS [Smithy](https://awslabs.github.io/smithy/index.html) files and their JSON AST models. The Smithy interface definition language (IDL) defines services and documentation for any protocol.
 
 ## Smithy IDL
 
