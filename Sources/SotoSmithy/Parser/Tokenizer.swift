@@ -24,13 +24,6 @@ struct Tokenizer {
         case newline
         
     }
-    
-    enum Error: Swift.Error {
-        case unrecognisedCharacter(line: String, lineNumber: Int, column: Int)
-        case unexpectedCharacter(line: String, lineNumber: Int, column: Int)
-        case unrecognisedEscapeCharacter(line: String, lineNumber: Int, column: Int)
-        case unterminatedString(line: String, lineNumber: Int, column: Int)
-    }
 
     static var tokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-")
     static var tokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@")
@@ -45,14 +38,13 @@ struct Tokenizer {
     func tokenize(_ smithy: String) throws -> [Token] {
         var parser = Parser(smithy)
         var tokens: [Token] = []
-        var lineNumber: Int = 1
+
         while !parser.reachedEnd() {
             parser.read(while: Self.set(from: " \t"))
             let current = try parser.current()
             if Self.grammarChars.contains(current) {
                 tokens.append(.grammar(try parser.character()))
             } else if current.isNewline {
-                lineNumber += 1
                 try parser.advance()
                 tokens.append(.newline)
             } else if Self.tokenStartChars.contains(current) {
@@ -62,25 +54,33 @@ struct Tokenizer {
                 let token = parser.read(while: Self.numberChars)
                 tokens.append(.number(Double(token) ?? 0.0 ))
             } else if current == "\"" {
-                let text = try readString(from: &parser, lineNumber: lineNumber)
+                let text = try readQuotedText(from: &parser)
                 tokens.append(.string(text))
             } else if current == "/" {
-                if let comment = try readDocumentationComment(from: &parser, lineNumber: lineNumber) {
+                if let comment = try readDocumentationComment(from: &parser) {
                     tokens.append(.documentationComment(comment))
                 }
             } else {
-                let position = try getCurrentLine(from: parser)
-                throw Error.unrecognisedCharacter(line: position.line, lineNumber: lineNumber, column: position.column)
+                throw Error.unrecognisedCharacter(parser)
             }
         }
         return tokens
     }
     
-    func readString(from parser: inout Parser<String>, lineNumber: Int) throws -> String {
+    func readQuotedText(from parser: inout Parser<String>) throws -> String {
         var stringParser = parser
         var text = ""
         try stringParser.advance()
         do {
+            // check for """
+            if try stringParser.current() == "\"" {
+                try stringParser.advance()
+                if !stringParser.reachedEnd(), try stringParser.current() == "\"" {
+                    return try readBlockText(from: &stringParser)
+                }
+                parser = stringParser
+                return ""
+            }
             repeat {
                 text += try stringParser.read(until: Set(Self.set(from: "\\\"\n")))
                 let current = try stringParser.current()
@@ -95,28 +95,29 @@ struct Tokenizer {
                     case "\"":
                         text += "\""
                     default:
-                        let position = try getCurrentLine(from: stringParser)
-                        throw Error.unrecognisedEscapeCharacter(line: position.line, lineNumber: lineNumber, column: position.column)
+                        throw Error.unrecognisedEscapeCharacter(stringParser)
                     }
                 } else if current == "\n" {
-                    let position = try getCurrentLine(from: parser)
-                    throw Error.unterminatedString(line: position.line, lineNumber: lineNumber, column: position.column)
+                    throw Error.unterminatedString(parser)
                 }
             } while try stringParser.current() != "\""
             try stringParser.advance()
         } catch ParserError.overflow {
-            let position = try getCurrentLine(from: parser)
-            throw Error.unterminatedString(line: position.line, lineNumber: lineNumber, column: position.column)
+            throw Error.unterminatedString(parser)
         }
         parser = stringParser
         return text
     }
-    
-    func readDocumentationComment(from parser: inout Parser<String>, lineNumber: Int) throws -> Substring? {
+
+    func readBlockText(from parser: inout Parser<String>) throws -> String {
+        return ""
+    }
+
+
+    func readDocumentationComment(from parser: inout Parser<String>) throws -> Substring? {
         try parser.advance()
         guard try parser.read("/") else {
-            let position = try getCurrentLine(from: parser)
-            throw Error.unexpectedCharacter(line: position.line, lineNumber: lineNumber, column: position.column)
+            throw Error.unexpectedCharacter(parser)
         }
         let documentationComment = try parser.read("/")
         parser.read(while: Self.set(from: " \t"))
@@ -128,20 +129,19 @@ struct Tokenizer {
         return documentationComment ? text : nil
     }
     
-    func getCurrentLine(from parser: Parser<String>) throws -> (line: String, column: Int) {
-        var parser = parser
-        var column = 0
-        while !parser.atStart() {
-            try parser.retreat()
-            if try parser.current() == "\n" {
-                break
-            }
-            column += 1
+    struct Error: Swift.Error {
+        enum ErrorType {
+            case unrecognisedCharacter
+            case unexpectedCharacter
+            case unrecognisedEscapeCharacter
+            case unterminatedString
         }
-        if try parser.current() == "\n" {
-            try parser.advance()
-        }
-        let line = try parser.read(until: Character("\n"), throwOnOverflow: false)
-        return (line: String(line), column: column)
+        let error: ErrorType
+        let context: Parser<String>.Context
+
+        static func unrecognisedCharacter(_ parser: Parser<String>) -> Self { .init(error: .unrecognisedCharacter, context: parser.getContext()) }
+        static func unexpectedCharacter(_ parser: Parser<String>) -> Self { .init(error: .unexpectedCharacter, context: parser.getContext()) }
+        static func unrecognisedEscapeCharacter(_ parser: Parser<String>) -> Self { .init(error: .unrecognisedEscapeCharacter, context: parser.getContext()) }
+        static func unterminatedString(_ parser: Parser<String>) -> Self { .init(error: .unterminatedString, context: parser.getContext()) }
     }
 }

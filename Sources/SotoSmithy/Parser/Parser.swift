@@ -39,8 +39,8 @@ public struct Parser<S: StringProtocol> {
         self.position = string.startIndex
     }
     
-    private var buffer: S { return _storage.buffer }
-    private var position: S.Index
+    var buffer: S { return _storage.buffer }
+    private(set) var position: S.Index
 }
 
 public extension Parser {
@@ -273,6 +273,38 @@ public extension Parser {
     /// - Returns: Are we are the start
     func atStart() -> Bool {
         return position == buffer.startIndex
+    }
+}
+
+extension Parser {
+    struct Context {
+        let line: String
+        let lineNumber: Int
+        let columnNumber: Int
+    }
+
+    /// Return context of current position (line, lineNumber, columnNumber)
+    func getContext() -> Context {
+        var parser = self
+        var columnNumber = 0
+        while !parser.atStart() {
+            try? parser.retreat()
+            if (try? parser.current()) == "\n" {
+                break
+            }
+            columnNumber += 1
+        }
+        if (try? parser.current()) == "\n" {
+            try? parser.advance()
+        }
+        // read line from parser
+        let line = try! parser.read(until: Character("\n"), throwOnOverflow: false)
+        // count new lines up to this current position
+        let buffer = parser.buffer
+        let textBefore = buffer[buffer.startIndex..<position]
+        let lineNumber = textBefore.filter{ $0.isNewline }.count + 1
+
+        return Context(line: String(line), lineNumber: lineNumber, columnNumber: columnNumber)
     }
 }
 
