@@ -51,7 +51,7 @@ class TokenizerTests: XCTestCase {
         XCTAssertThrowsError(_ = try Tokenizer().tokenize(string)) { error in
             switch error {
             case let error as Tokenizer.Error where error.errorType == .unterminatedString:
-                XCTAssertEqual(error.context.lineNumber, 2)
+                XCTAssertEqual(error.context?.lineNumber, 2)
             default:
                 XCTFail("\(error)")
             }
@@ -70,9 +70,9 @@ class TokenizerTests: XCTestCase {
         XCTAssertThrowsError(_ = try Tokenizer().tokenize(string)) { error in
             switch error {
             case let error as Tokenizer.Error where error.errorType == .unrecognisedEscapeCharacter:
-                XCTAssertEqual(error.context.line, #"@testTrait("test \string\"")"#)
-                XCTAssertEqual(error.context.lineNumber, 1)
-                XCTAssertEqual(error.context.columnNumber, 19)
+                XCTAssertEqual(error.context?.line, #"@testTrait("test \string\"")"#)
+                XCTAssertEqual(error.context?.lineNumber, 1)
+                XCTAssertEqual(error.context?.columnNumber, 19)
             default:
                 XCTFail("\(error)")
             }
@@ -102,7 +102,7 @@ class TokenizerTests: XCTestCase {
     func testBlockTextError(text: String) {
         XCTAssertThrowsError(_ = try Tokenizer().tokenize(text)) { error in
             switch error {
-            case let error as Tokenizer.Error where error.errorType == .multilineError:
+            case let error as Tokenizer.Error where error.errorType == .corruptTextBlock:
                 break
             default:
                 XCTFail("\(error)")

@@ -61,7 +61,7 @@ struct Tokenizer {
                     tokens.append(.documentationComment(comment))
                 }
             } else {
-                throw Error.unrecognisedCharacter(parser)
+                throw Error.unexpectedCharacter(parser)
             }
         }
         return tokens
@@ -115,7 +115,7 @@ struct Tokenizer {
         var text = ""
         
         let newlineToken = try stringParser.character()
-        guard newlineToken == "\n" else { throw Error.multilineError(stringParser) }
+        guard newlineToken == "\n" else { throw Error.corruptTextBlock(stringParser) }
         
         do {
             while true {
@@ -157,14 +157,14 @@ struct Tokenizer {
         let lastLine = lines.last!
         let numSpaces = lastLine.count
         try lastLine.forEach {
-            guard $0 == " " else { throw Error.multilineError(parser) }
+            guard $0 == " " else { throw Error.corruptTextBlock(parser) }
         }
         // remove indentation
         let linesNoIndent = try lines.dropLast().map { line -> Substring.SubSequence in
             if line.count == 0 {
                 return ""
             }
-            guard line.starts(with: lastLine) else { throw Error.multilineError(parser) }
+            guard line.starts(with: lastLine) else { throw Error.corruptTextBlock(parser) }
             return line.dropFirst(numSpaces)
         }
         // construct string (merge any string ending with "\" with the next line
@@ -193,21 +193,32 @@ struct Tokenizer {
         return documentationComment ? text : nil
     }
     
-    struct Error: Swift.Error {
+    struct Error: SmithyError {
         enum ErrorType {
-            case unrecognisedCharacter
             case unexpectedCharacter
             case unrecognisedEscapeCharacter
             case unterminatedString
-            case multilineError
+            case corruptTextBlock
         }
         let errorType: ErrorType
-        let context: Parser.Context
+        let context: SmithyErrorContext?
 
-        static func unrecognisedCharacter(_ parser: Parser) -> Self { .init(errorType: .unrecognisedCharacter, context: parser.getContext()) }
-        static func unexpectedCharacter(_ parser: Parser) -> Self { .init(errorType: .unexpectedCharacter, context: parser.getContext()) }
-        static func unrecognisedEscapeCharacter(_ parser: Parser) -> Self { .init(errorType: .unrecognisedEscapeCharacter, context: parser.getContext()) }
-        static func unterminatedString(_ parser: Parser) -> Self { .init(errorType: .unterminatedString, context: parser.getContext()) }
-        static func multilineError(_ parser: Parser) -> Self { .init(errorType: .multilineError, context: parser.getContext()) }
+        static func unexpectedCharacter(_ parser: Parser) -> Self { .init(errorType: .unexpectedCharacter, context: .init(parser)) }
+        static func unrecognisedEscapeCharacter(_ parser: Parser) -> Self { .init(errorType: .unrecognisedEscapeCharacter, context: .init(parser)) }
+        static func unterminatedString(_ parser: Parser) -> Self { .init(errorType: .unterminatedString, context: .init(parser)) }
+        static func corruptTextBlock(_ parser: Parser) -> Self { .init(errorType: .corruptTextBlock, context: .init(parser)) }
+        
+        var reason: String {
+            switch errorType {
+            case .unexpectedCharacter:
+                return "Unexpected character"
+            case .unrecognisedEscapeCharacter:
+                return "Unrecognised escape character"
+            case .unterminatedString:
+                return "Unterminated string"
+            case .corruptTextBlock:
+                return "Invalid text block"
+            }
+        }
     }
 }
