@@ -17,11 +17,11 @@ public struct ShapeId: Equatable, Hashable, RawRepresentable {
     /// Raw string value
     public let rawValue: String
 
-    public init(rawValue: String) {
-        self.rawValue = rawValue
+    public init<S: StringProtocol>(rawValue: S) {
+        self.rawValue = "\(rawValue)"
     }
 
-    public init(namespace: String, shapeName: String) {
+    public init<S: StringProtocol>(namespace: S, shapeName: S) {
         self.rawValue = "\(namespace)#\(shapeName)"
     }
 
