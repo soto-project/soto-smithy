@@ -99,15 +99,55 @@ class TokenizerTests: XCTestCase {
         XCTAssertEqual(tokens[3], .documentationComment("my string"))
     }
 
+    func testBlockTextError(text: String) {
+        XCTAssertThrowsError(_ = try Tokenizer().tokenize(text)) { error in
+            switch error {
+            case let error as Tokenizer.Error where error.errorType == .multilineError:
+                break
+            default:
+                XCTFail("\(error)")
+            }
+        }
+    }
+    
     func testBlockText() throws {
         let string = """
         @trait(\"""
-        this is good
-        isn't it
+        block text
+
+        new line
         \"""
         string MyString
         """
         let tokens = try Tokenizer().tokenize(string)
-        XCTAssertEqual(tokens[3], .documentationComment("my string"))
+        XCTAssertEqual(tokens[2], .string("block text\n\nnew line"))
+        let string2 = """
+        @trait(\"""
+          block
+          text
+
+          new line
+          \"""
+        string MyString
+        """
+        let tokens2 = try Tokenizer().tokenize(string2)
+        XCTAssertEqual(tokens2[2], .string("block text\n\nnew line"))
+        
+        testBlockTextError(text:"""
+        @trait(\"""
+         new line
+          \"""
+        string MyString
+        """)
+        testBlockTextError(text:"""
+        @trait(\"""new line
+          \"""
+        string MyString
+        """)
+        testBlockTextError(text:"""
+        @trait(\"""
+          new line\"""
+        string MyString
+        """)
     }
 }
