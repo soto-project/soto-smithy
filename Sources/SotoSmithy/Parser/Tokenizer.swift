@@ -132,7 +132,7 @@ struct Tokenizer {
                     case "\"":
                         text += "\""
                     case "\n":
-                        break
+                        text += "\\\n"
                     default:
                         throw Error.unrecognisedEscapeCharacter(stringParser)
                     }
@@ -167,7 +167,14 @@ struct Tokenizer {
             guard line.starts(with: lastLine) else { throw Error.multilineError(parser) }
             return line.dropFirst(numSpaces)
         }
-        return linesNoIndent.joined(separator: "\n")
+        // construct string (merge any string ending with "\" with the next line
+        return String(linesNoIndent.reduce("") {
+            if $0.last == "\\" {
+                return "\($0.dropLast())\($1)"
+            } else {
+                return "\($0)\n\($1)"
+            }
+        }.dropFirst())
     }
 
 
