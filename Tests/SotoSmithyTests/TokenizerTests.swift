@@ -98,4 +98,16 @@ class TokenizerTests: XCTestCase {
         let tokens = try Tokenizer().tokenize(string)
         XCTAssertEqual(tokens[3], .documentationComment("my string"))
     }
+
+    func testBlockText() throws {
+        let string = """
+        @trait(\"""
+        this is good
+        isn't it
+        \"""
+        string MyString
+        """
+        let tokens = try Tokenizer().tokenize(string)
+        XCTAssertEqual(tokens[3], .documentationComment("my string"))
+    }
 }
