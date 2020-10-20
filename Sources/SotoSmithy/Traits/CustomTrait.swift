@@ -20,6 +20,9 @@ public struct CustomTrait: Trait {
     public var parameters: [String: Any]
 
     public func validate(using model: Model, shape: Shape) throws {
+        guard model.shape(for: self.shapeId) != nil else {
+            throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** does not exist")
+        }
         guard self.selector.select(using: model, shape: shape) else {
             throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
         }
