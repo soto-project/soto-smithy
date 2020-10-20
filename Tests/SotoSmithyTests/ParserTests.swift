@@ -13,6 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 @testable import SotoSmithy
+@testable import SotoSmithyAWS
 import XCTest
 
 class ParserTests: XCTestCase {
@@ -211,6 +212,21 @@ class ParserTests: XCTestCase {
         apply MyString @required
         apply MyString @documentation("test")
         """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+    }
+
+    func testUse() throws {
+        let smithy = """
+        namespace soto.example
+        use aws.api#service
+        @service(sdkId: "my-service", arnNamespace: "*")
+        service MyService {
+            version: "2020-10-10",
+            operations: []
+        }
+        """
+        Smithy.registerAWSTraits()
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
     }

@@ -104,8 +104,8 @@ extension Smithy {
     
     /// parse shapes section of IDL
     /// - Returns: Shapes as a dictionary
-    func parserShapesSection(_ state: ParserState) throws -> [Substring: Any] {
-        var modelShapes: [Substring: Any] = [:]
+    func parserShapesSection(_ state: ParserState) throws -> [String: Any] {
+        var modelShapes: [String: Any] = [:]
         var traits: [String: Any] = [:]
 
         while !state.parser.reachedEnd() {
@@ -118,15 +118,16 @@ extension Smithy {
                     }
                     let token = try state.parser.nextToken()
                     guard case .token(let name) = token else { throw SmithyParserError.missingNamespace }
-                    guard modelShapes["shapes"] == nil else { throw SmithyParserError.shapesDefinedTooSoon }
+                    guard modelShapes.count == 0 else { throw SmithyParserError.shapesDefinedTooSoon }
                     guard state.namespace == nil else { throw SmithyParserError.namespaceAlreadyDefined }
                     state.namespace = name
                 } else if string == "use" {
                     if traits.count > 0 {
                         throw SmithyParserError.unattachedTraits
                     }
+                    let token = try state.parser.nextToken()
                     guard case .token(let name) = token else { throw SmithyParserError.missingShapeId }
-                    guard modelShapes["shapes"] == nil else { throw SmithyParserError.shapesDefinedTooSoon }
+                    guard modelShapes.count == 0 else { throw SmithyParserError.shapesDefinedTooSoon }
                     let shapeId = ShapeId(rawValue: String(name))
                     state.use[shapeId.shapeName] = shapeId
                 } else if string == "metadata" {
@@ -138,18 +139,19 @@ extension Smithy {
                     let trait = try parseTrait(state)
                     traits[fullTraitName(traitName, state: state).rawValue] = trait
                 } else if string == "apply" {
-                    _ = try parseApply(state, shapes: &modelShapes)
+                    _ = try parseApply(state, shapes: modelShapes)
                 } else {
                     // must be a shape
                     let token = try state.parser.nextToken()
                     guard case .token(let name) = token else { throw SmithyParserError.unexpectedToken(token) }
-                    let shapeName = (state.namespace != nil ? "\(state.namespace!)#\(name)" : name)
+                    let shapeId = ShapeId(namespace: state.namespace, shapeName: name)
                     var shape = try parseShape(state, type: string)
+                    // attached already parsed traits and clear trait map for next shape
                     if traits.count > 0 {
                         shape["traits"] = traits
                     }
                     traits = [:]
-                    modelShapes[shapeName] = shape
+                    modelShapes[shapeId.rawValue] = shape
                 }
             } else if case .documentationComment(let comment) = token {
                 traits["smithy.api#documentation"] = comment
@@ -330,7 +332,7 @@ extension Smithy {
         return value
     }
     
-    func parseApply(_ state: ParserState, shapes: inout [Substring: Any]) throws -> (Substring, ShapeId, Any) {
+    func parseApply(_ state: ParserState, shapes: [String: Any]) throws -> (Substring, ShapeId, Any) {
         let shapeToken = try state.parser.nextToken()
         guard case .token(let shape) = shapeToken else {throw SmithyParserError.unexpectedToken(shapeToken) }
         let traitToken = try state.parser.nextToken()
@@ -366,6 +368,8 @@ extension Smithy {
             let smithyShapeId = ShapeId(namespace: "smithy.api", shapeName: name)
             if Self.preludeShapes[smithyShapeId] != nil {
                 return smithyShapeId
+            } else if let shapeId = state.use[String(name)] {
+                return shapeId
             } else if let namespace = state.namespace {
                 return ShapeId(namespace: namespace, shapeName: name)
             }
@@ -382,6 +386,8 @@ extension Smithy {
             let smithyShapeId = ShapeId(namespace: "smithy.api", shapeName: name)
             if TraitList.possibleTraits[smithyShapeId] != nil {
                 return smithyShapeId
+            } else if let shapeId = state.use[String(name)] {
+                return shapeId
             } else if let namespace = state.namespace {
                 return ShapeId(namespace: namespace, shapeName: name)
             }

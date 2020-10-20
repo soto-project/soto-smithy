@@ -21,8 +21,8 @@ public struct ShapeId: Equatable, Hashable, RawRepresentable {
         self.rawValue = "\(rawValue)"
     }
 
-    public init<S: StringProtocol>(namespace: S, shapeName: S) {
-        self.rawValue = "\(namespace)#\(shapeName)"
+    public init<S: StringProtocol>(namespace: S?, shapeName: S) {
+        self.rawValue = "\(namespace.map{ "\($0)#" } ?? "")\(shapeName)"
     }
 
     /// namespace
