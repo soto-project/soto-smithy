@@ -16,7 +16,7 @@
 public struct CustomTrait: Trait {
     public let shapeId: ShapeId
     public var selector: Selector { return CustomTraitSelector(self.shapeId) }
-    public var traitName: String { return self.shapeId.description }
+    public var traitName: ShapeId { return self.shapeId }
     public var parameters: [String: Any]
 
     public func validate(using model: Model, shape: Shape) throws {
@@ -46,7 +46,7 @@ public struct CustomTrait: Trait {
 
 /// Trait indicating this is a structure that can be referenced as a trait
 public struct TraitTrait: StaticTrait {
-    public static var staticName = "smithy.api#trait"
+    public static var staticName: ShapeId = "smithy.api#trait"
     public var selectorToApply: Selector
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

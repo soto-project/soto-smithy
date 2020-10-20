@@ -15,27 +15,27 @@
 /// A meta-trait that marks a trait as an authentication scheme. Traits that are marked with this trait are applied to
 /// service shapes to indicate how a client can authenticate with the service.
 public struct AuthDefinitionTrait: StaticTrait {
-    public static let staticName = "smithy.api#authDefinition"
+    public static let staticName: ShapeId = "smithy.api#authDefinition"
     public init() {}
 }
 
 /// Indicates that a service supports HTTP Basic Authentication as defined in RFC 2617.
 public struct HttpBasicAuthTrait: StaticTrait {
-    public static let staticName = "smithy.api#httpBasicAuth"
+    public static let staticName: ShapeId = "smithy.api#httpBasicAuth"
     public var selector: Selector { TypeSelector<ServiceShape>() }
     public init() {}
 }
 
 /// Indicates that a service supports HTTP Digest Authentication as defined in RFC 2617.
 public struct HttpDigestAuthTrait: StaticTrait {
-    public static let staticName = "smithy.api#httpDigestAuth"
+    public static let staticName: ShapeId = "smithy.api#httpDigestAuth"
     public var selector: Selector { TypeSelector<ServiceShape>() }
     public init() {}
 }
 
 /// Indicates that a service supports HTTP Bearer Authentication as defined in RFC 6750.
 public struct HttpBearerAuthTrait: StaticTrait {
-    public static let staticName = "smithy.api#httpBearerAuth"
+    public static let staticName: ShapeId = "smithy.api#httpBearerAuth"
     public var selector: Selector { TypeSelector<ServiceShape>() }
     public init() {}
 }
@@ -43,7 +43,7 @@ public struct HttpBearerAuthTrait: StaticTrait {
 /// Indicates that a service supports HTTP-specific authentication using an API key sent in a header or query
 /// string parameter.
 public struct HttpApiKeyAuthTrait: StaticTrait {
-    public static let staticName = "smithy.api#httpApiKeyAuth"
+    public static let staticName: ShapeId = "smithy.api#httpApiKeyAuth"
     public var selector: Selector { TypeSelector<ServiceShape>() }
     public let name: String
     public let `in`: String
@@ -52,7 +52,7 @@ public struct HttpApiKeyAuthTrait: StaticTrait {
 /// Indicates that an operation MAY be invoked without authentication, regardless of any authentication traits applied
 /// to the operation.
 public struct OptionalAuthTrait: StaticTrait {
-    public static let staticName = "smithy.api#optionalAuth"
+    public static let staticName: ShapeId = "smithy.api#optionalAuth"
     public var selector: Selector { TypeSelector<OperationShape>() }
     public init() {}
 }
@@ -62,7 +62,7 @@ public struct OptionalAuthTrait: StaticTrait {
 /// operation, it defines the list of all authentication schemes supported by the operation, overriding any auth trait
 /// specified on a service.
 public struct AuthTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#auth"
+    public static let staticName: ShapeId = "smithy.api#auth"
     public var selector: Selector { OrSelector(TypeSelector<ServiceShape>(), TypeSelector<OperationShape>()) }
     public typealias Value = [String]
     public let value: Value

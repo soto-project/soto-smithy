@@ -15,7 +15,7 @@
 /// Protocol for Trait in Smithy model
 public protocol Trait {
     /// name of trait
-    var traitName: String { get }
+    var traitName: ShapeId { get }
     /// Selector defining what shapes this trait can be attached to
     var selector: Selector { get }
     /// Validate this trait and whether it is attached to the correct model

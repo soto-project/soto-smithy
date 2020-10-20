@@ -16,10 +16,10 @@
 public struct TraitList: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        var traits: [String: Trait] = [:]
+        var traits: [ShapeId: Trait] = [:]
         for key in container.allKeys {
             let trait: Trait
-            if let traitType = Self.possibleTraits[key.stringValue] {
+            if let traitType = Self.possibleTraits[ShapeId(rawValue: key.stringValue)] {
                 trait = try traitType.decode(from: decoder, key: key)
             } else {
                 let parameters = try container.decode([String: AnyDecodable].self, forKey: key)
@@ -51,7 +51,7 @@ public struct TraitList: Codable {
     /// Return trait with name from list if it exists
     /// - Parameter named: Trait nam
     /// - Returns: Trait if found
-    public func trait(named: String) -> Trait? {
+    public func trait(named: ShapeId) -> Trait? {
         return self.traits[named]
     }
 
@@ -69,7 +69,7 @@ public struct TraitList: Codable {
 
     /// Remove trait of type from list
     /// - Parameter trait: trait type to remove
-    public mutating func removeTrait(named: String) {
+    public mutating func removeTrait(named: ShapeId) {
         self.traits[named] = nil
     }
 
@@ -86,16 +86,16 @@ public struct TraitList: Codable {
     }
 
     init(traits traitsArray: [Trait]) {
-        var traits: [String: Trait] = [:]
+        var traits: [ShapeId: Trait] = [:]
         traitsArray.forEach {
             traits[$0.traitName] = $0
         }
         self.traits = traits
     }
 
-    static var possibleTraits: [String: StaticTrait.Type] = [:]
+    static var possibleTraits: [ShapeId: StaticTrait.Type] = [:]
 
-    private var traits: [String: Trait]
+    private var traits: [ShapeId: Trait]
 
     private struct CodingKeys: CodingKey {
         var stringValue: String
@@ -120,7 +120,7 @@ extension TraitList: ExpressibleByArrayLiteral {
 
 extension TraitList: Sequence {
     public typealias Element = Trait
-    public typealias Iterator = Dictionary<String, Trait>.Values.Iterator
+    public typealias Iterator = Dictionary<ShapeId, Trait>.Values.Iterator
 
     public func makeIterator() -> Iterator {
         return self.traits.values.makeIterator()

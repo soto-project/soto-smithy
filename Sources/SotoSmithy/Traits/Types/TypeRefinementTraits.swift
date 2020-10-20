@@ -18,7 +18,7 @@
 /// Boolean, byte, short, integer, long, float, and double shapes are only considered boxed if they are marked with
 /// the box trait. All other shapes are always considered boxed.
 public struct BoxTrait: StaticTrait {
-    public static let staticName = "smithy.api#box"
+    public static let staticName: ShapeId = "smithy.api#box"
     public var selector: Selector { OrTargetSelector(
         OrSelector(
             TypeSelector<BooleanShape>(),
@@ -36,7 +36,7 @@ public struct BoxTrait: StaticTrait {
 /// Indicates that a structure shape represents an error. All shapes referenced by the errors list of an operation MUST
 /// be targeted with this trait.
 public struct ErrorTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#error"
+    public static let staticName: ShapeId = "smithy.api#error"
     public var selector: Selector { TypeSelector<StructureShape>() }
     public enum ErrorType: String, Codable {
         case client

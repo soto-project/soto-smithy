@@ -19,7 +19,7 @@
 ///
 /// When applied to a union, it indicates that shape represents an event stream.
 public struct StreamingTrait: StaticTrait {
-    public static let staticName = "smithy.api#streaming"
+    public static let staticName: ShapeId = "smithy.api#streaming"
     public var selector: Selector { OrSelector(TypeSelector<BlobShape>(), TypeSelector<UnionShape>()) }
     public init() {}
 }
@@ -30,14 +30,14 @@ public struct StreamingTrait: StaticTrait {
 /// prior to a client or server sending the payload of a message. This can be useful for services that need to
 /// determine if a request will be accepted based on its size or where to store data based on the size of the stream.
 public struct RequiresLengthTrait: StaticTrait {
-    public static let staticName = "smithy.api#requiresLength"
+    public static let staticName: ShapeId = "smithy.api#requiresLength"
     public var selector: Selector { TraitSelector<StreamingTrait>() }
     public init() {}
 }
 
 /// Binds a member of a structure to be serialized as an event header when sent through an event stream.
 public struct EventHeaderTrait: StaticTrait {
-    public static let staticName = "smithy.api#eventHeader"
+    public static let staticName: ShapeId = "smithy.api#eventHeader"
     public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<BooleanShape>(),
         TypeSelector<ByteShape>(),
@@ -53,7 +53,7 @@ public struct EventHeaderTrait: StaticTrait {
 
 /// Binds a member of a structure to be serialized as the payload of an event sent through an event stream.
 public struct EventPayloadTrait: StaticTrait {
-    public static let staticName = "smithy.api#eventPayload"
+    public static let staticName: ShapeId = "smithy.api#eventPayload"
     public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<BlobShape>(),
         TypeSelector<StringShape>(),

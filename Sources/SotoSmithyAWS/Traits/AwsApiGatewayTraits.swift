@@ -16,7 +16,7 @@ import SotoSmithy
 
 /// Specifies the source of the caller identifier that will be used to throttle API methods that require a key.
 public struct AwsApiGatewayApiKeySourceTrait: SingleValueTrait {
-    public static let staticName = "aws.apigateway#apiKeySource"
+    public static let staticName: ShapeId = "aws.apigateway#apiKeySource"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
     public enum KeySource: String, Codable {
         case header = "HEADER"
@@ -30,7 +30,7 @@ public struct AwsApiGatewayApiKeySourceTrait: SingleValueTrait {
 
 /// Lambda authorizers to attach to the authentication schemes defined on this service.
 public struct AwsApiGatewayAuthorizersTrait: SingleValueTrait {
-    public static let staticName = "aws.apigateway#authorizers"
+    public static let staticName: ShapeId = "aws.apigateway#authorizers"
     // need selector to test for trait inside "aws-protocols" namespace
     public var selector: Selector { return AndSelector(TypeSelector<ServiceShape>()) }
     public struct Authorizer: Codable {
@@ -52,7 +52,7 @@ public struct AwsApiGatewayAuthorizersTrait: SingleValueTrait {
 /// Applies a Lambda authorizer to a service, resource, or operation. Authorizers are resolved hierarchically: an
 /// operation inherits the effective authorizer applied to a parent resource or operation.
 public struct AwsApiGatewayAuthorizerTrait: SingleValueTrait {
-    public static let staticName = "aws.apigateway#authorizer"
+    public static let staticName: ShapeId = "aws.apigateway#authorizer"
     public var selector: Selector { return OrSelector(TypeSelector<ServiceShape>(), TypeSelector<ResourceShape>(), TypeSelector<OperationShape>()) }
     public let value: String
     public init(value: Value) {
@@ -62,7 +62,7 @@ public struct AwsApiGatewayAuthorizerTrait: SingleValueTrait {
 
 /// Opts-in to Amazon API Gateway request validation for a service or operation.
 public struct AwsApiGatewayRequestValidatorTrait: SingleValueTrait {
-    public static let staticName = "aws.apigateway#requestValidator"
+    public static let staticName: ShapeId = "aws.apigateway#requestValidator"
     public var selector: Selector { return OrSelector(TypeSelector<ServiceShape>(), TypeSelector<OperationShape>()) }
     public enum Validator: String, Codable {
         case full
@@ -77,7 +77,7 @@ public struct AwsApiGatewayRequestValidatorTrait: SingleValueTrait {
 
 /// Defines an API Gateway integration that integrates with an actual backend.
 public struct AwsApiGatewayIntegrationTrait: StaticTrait {
-    public static let staticName = "aws.apigateway#integration"
+    public static let staticName: ShapeId = "aws.apigateway#integration"
     public var selector: Selector { return OrSelector(TypeSelector<ServiceShape>(), TypeSelector<ResourceShape>(), TypeSelector<OperationShape>()) }
     public enum IntegrationType: String, Codable {
         case http
@@ -118,7 +118,7 @@ public struct AwsApiGatewayIntegrationTrait: StaticTrait {
 
 /// Defines an API Gateway integration that returns a mock response.
 public struct AwsApiGatewayMockIntegrationTrait: StaticTrait {
-    public static let staticName = "aws.apigateway#mockIntegration"
+    public static let staticName: ShapeId = "aws.apigateway#mockIntegration"
     public var selector: Selector { return OrSelector(TypeSelector<ServiceShape>(), TypeSelector<ResourceShape>(), TypeSelector<OperationShape>()) }
     public let passThroughBehavior: String?
     public let requestParameters: [String:[String:String]]?

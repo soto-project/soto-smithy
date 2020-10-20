@@ -15,7 +15,7 @@
 /// The suppress trait is used to suppress validation events(s) for a specific shape. Each value in the suppress
 /// trait is a validation event ID to suppress for the shape.
 public struct SuppressTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#suppress"
+    public static let staticName: ShapeId = "smithy.api#suppress"
     public typealias Value = [String]
     public let value: Value
     public init(value: Value) {

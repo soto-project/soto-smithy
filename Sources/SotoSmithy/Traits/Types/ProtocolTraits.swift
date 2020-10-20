@@ -16,14 +16,14 @@
 /// service shapes to define the protocols supported by a service. A client MUST understand at least one of the
 /// protocols in order to successfully communicate with the service.
 public struct ProtocolDefinitionTrait: StaticTrait {
-    public static let staticName = "smithy.api#protocolDefinition"
+    public static let staticName: ShapeId = "smithy.api#protocolDefinition"
     public init() {}
 }
 
 /// Allows a serialized object property name in a JSON document to differ from a structure member name used in
 /// the model
 public struct JsonNameTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#jsonName"
+    public static let staticName: ShapeId = "smithy.api#jsonName"
     public var selector: Selector { TypeSelector<MemberShape>() }
     public var value: String
     public init(value: String) {
@@ -34,7 +34,7 @@ public struct JsonNameTrait: SingleValueTrait {
 /// Describes the contents of a blob or string shape using a design-time media type as defined by RFC 6838 (for
 /// example, application/json).
 public struct MediaTypeTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#mediaType"
+    public static let staticName: ShapeId = "smithy.api#mediaType"
     public var selector: Selector { OrSelector(TypeSelector<BlobShape>(), TypeSelector<StringShape>()) }
     public var value: String
     public init(value: String) {
@@ -44,7 +44,7 @@ public struct MediaTypeTrait: SingleValueTrait {
 
 /// Defines a custom timestamp serialization format.
 public struct TimestampFormatTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#timestampFormat"
+    public static let staticName: ShapeId = "smithy.api#timestampFormat"
     public var selector: Selector { OrTargetSelector(TypeSelector<TimestampShape>()) }
     public enum TimestampFormat: String, Codable {
         case datetime = "date-time"

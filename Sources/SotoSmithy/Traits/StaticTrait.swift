@@ -15,7 +15,7 @@
 /// Protocol for traits defined in code
 public protocol StaticTrait: Trait, Decodable {
     /// name of trait
-    static var staticName: String { get }
+    static var staticName: ShapeId { get }
 }
 
 extension StaticTrait {
@@ -25,6 +25,6 @@ extension StaticTrait {
         return value
     }
 
-    public var traitName: String { return Self.staticName }
+    public var traitName: ShapeId { return Self.staticName }
     static var traitSelector: Selector { TraitSelector<Self>() }
 }

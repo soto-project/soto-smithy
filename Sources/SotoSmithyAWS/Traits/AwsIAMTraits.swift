@@ -16,7 +16,7 @@ import SotoSmithy
 
 /// A brief description of what granting the user permission to invoke an operation would entail.
 public struct AwsIAMActionPermissionDescriptionTrait: SingleValueTrait {
-    public static let staticName = "aws.iam#actionPermissionDescription"
+    public static let staticName: ShapeId = "aws.iam#actionPermissionDescription"
     public var selector: Selector { return TypeSelector<OperationShape>() }
     public let value: String
     public init(value: String) {
@@ -26,7 +26,7 @@ public struct AwsIAMActionPermissionDescriptionTrait: SingleValueTrait {
 
 /// Applies condition keys, by name, to a resource or operation.
 public struct AwsIAMConditionKeysTrait: SingleValueTrait {
-    public static let staticName = "aws.iam#conditionKeys"
+    public static let staticName: ShapeId = "aws.iam#conditionKeys"
     public var selector: Selector { return OrSelector(TypeSelector<OperationShape>(), TypeSelector<ResourceShape>()) }
     public let value: [String]
     public init(value: [String]) {
@@ -36,7 +36,7 @@ public struct AwsIAMConditionKeysTrait: SingleValueTrait {
 
 /// Defines the set of condition keys that appear within a service in addition to inferred and global condition keys.
 public struct AwsIAMDefineConditionKeysTrait: SingleValueTrait {
-    public static let staticName = "aws.iam#defineConditionKeys"
+    public static let staticName: ShapeId = "aws.iam#defineConditionKeys"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
     public enum KeyType: String, Codable {
         case arn = "ARN"
@@ -67,13 +67,13 @@ public struct AwsIAMDefineConditionKeysTrait: SingleValueTrait {
 
 /// Declares that the condition keys of a resource should not be inferred.
 public struct AwsDisableConditionKeyInferenceTrait: StaticTrait {
-    public static let staticName = "aws.iam#disableConditionKeyInference"
+    public static let staticName: ShapeId = "aws.iam#disableConditionKeyInference"
     public var selector: Selector { return TypeSelector<ResourceShape>() }
 }
 
 /// Other actions that the invoker must be authorized to perform when executing the targeted operation.
 public struct AwsIAMRequiredActionsTrait: SingleValueTrait {
-    public static let staticName = "aws.iam#requiredActions"
+    public static let staticName: ShapeId = "aws.iam#requiredActions"
     public var selector: Selector { return TypeSelector<OperationShape>() }
     public let value: [String]
     public init(value: [String]) {

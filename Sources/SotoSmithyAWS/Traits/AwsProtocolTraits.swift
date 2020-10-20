@@ -22,44 +22,44 @@ import SotoSmithy
 /// that serialize payloads as JSON and utilize features of HTTP like configurable HTTP methods, URIs, and
 /// status codes.
 public struct AwsProtocolsRestJson1Trait: StaticTrait {
-    public static let staticName = "aws.protocols#restJson1"
+    public static let staticName: ShapeId = "aws.protocols#restJson1"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
 /// Adds support for an HTTP protocol that sends POST requests and responses with JSON documents.
 public struct AwsProtocolsAwsJson1_1Trait: StaticTrait {
-    public static let staticName = "aws.protocols#awsJson1_1"
+    public static let staticName: ShapeId = "aws.protocols#awsJson1_1"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
 /// Adds support for an HTTP protocol that sends POST requests and responses with JSON documents.
 public struct AwsProtocolsAwsJson1_0Trait: StaticTrait {
-    public static let staticName = "aws.protocols#awsJson1_0"
+    public static let staticName: ShapeId = "aws.protocols#awsJson1_0"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
 /// Adds support for an HTTP protocol that sends requests in the query string and responses in XML documents.
 public struct AwsProtocolsAwsQueryTrait: StaticTrait {
-    public static let staticName = "aws.protocols#awsQuery"
+    public static let staticName: ShapeId = "aws.protocols#awsQuery"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
 /// Adds support for an HTTP protocol that sends requests in the query string OR in a x-form-url-encoded body
 ///  and responses in XML documents. This protocol is an Amazon EC2-specific extension of the awsQuery protocol.
 public struct AwsProtocolsEc2QueryTrait: StaticTrait {
-    public static let staticName = "aws.protocols#ec2Query"
+    public static let staticName: ShapeId = "aws.protocols#ec2Query"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
 /// Adds support for an HTTP-based protocol that sends XML requests and responses.
 public struct AwsProtocolsRestXmlTrait: StaticTrait {
-    public static let staticName = "aws.protocols#restXml"
+    public static let staticName: ShapeId = "aws.protocols#restXml"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
 /// Allows a serialized query key to differ from a structure member name when used in the model.
 public struct AwsProtocolsEc2QueryNameTrait: SingleValueTrait {
-    public static let staticName = "aws.protocols#ec2QueryName"
+    public static let staticName: ShapeId = "aws.protocols#ec2QueryName"
     public var selector: Selector { return TypeSelector<MemberShape>() }
     public var value: String
     public init(value: String) {

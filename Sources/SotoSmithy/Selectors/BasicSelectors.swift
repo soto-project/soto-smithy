@@ -106,9 +106,9 @@ public struct TraitSelector<T: StaticTrait>: Selector {
 
 /// Return true if shape has a trait with name
 public struct TraitNameSelector: Selector {
-    let name: String
+    let name: ShapeId
 
-    public init(_ name: String) {
+    public init(_ name: ShapeId) {
         self.name = name
     }
 

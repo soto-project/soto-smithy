@@ -83,10 +83,10 @@ enum SelectorParser {
         if traitShapeId.namespace == nil {
             traitShapeId = ShapeId(namespace: "smithy.api", shapeName: traitShapeId.shapeName)
         }
-        if let trait = TraitList.possibleTraits[traitShapeId.rawValue] {
+        if let trait = TraitList.possibleTraits[traitShapeId] {
             return trait.traitSelector
         } else {
-            return TraitNameSelector(traitShapeId.rawValue)
+            return TraitNameSelector(traitShapeId)
         }
     }
 }

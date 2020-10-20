@@ -61,7 +61,7 @@ extension Shape {
     /// Get trait with name that is attached to shape
     /// - Parameter named: Name of trait we are looking for
     /// - Returns: Trait if it exists
-    public func trait(named: String) -> Trait? {
+    public func trait(named: ShapeId) -> Trait? {
         return traits?.trait(named: named)
     }
     
@@ -81,7 +81,7 @@ extension Shape {
     
     /// Remove trait of type from shape
     /// - Parameter trait: Trait type to remove
-    public func removeTrait(named: String) {
+    public func removeTrait(named: ShapeId) {
         self.traits?.removeTrait(named: named)
     }
     

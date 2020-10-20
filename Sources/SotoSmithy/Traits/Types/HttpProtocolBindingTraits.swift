@@ -14,7 +14,7 @@
 
 /// Configures the HTTP bindings of an operation.
 public struct HttpTrait: StaticTrait {
-    public static let staticName = "smithy.api#http"
+    public static let staticName: ShapeId = "smithy.api#http"
     public var selector: Selector { TypeSelector<OperationShape>() }
     public let method: String
     public let uri: String
@@ -23,7 +23,7 @@ public struct HttpTrait: StaticTrait {
 
 /// Defines an HTTP response code for an operation error.
 public struct HttpErrorTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#httpError"
+    public static let staticName: ShapeId = "smithy.api#httpError"
     public var selector: Selector { AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>()) }
     public typealias Value = Int
     public var value: Int
@@ -34,7 +34,7 @@ public struct HttpErrorTrait: SingleValueTrait {
 
 /// Binds a structure member to an HTTP header.
 public struct HttpHeaderTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#httpHeader"
+    public static let staticName: ShapeId = "smithy.api#httpHeader"
     public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<BooleanShape>(),
         NumberSelector(),
@@ -52,7 +52,7 @@ public struct HttpHeaderTrait: SingleValueTrait {
 
 /// Binds an operation input structure member to an HTTP label.
 public struct HttpLabelTrait: StaticTrait {
-    public static let staticName = "smithy.api#httpLabel"
+    public static let staticName: ShapeId = "smithy.api#httpLabel"
     public var selector: Selector { AndSelector(
         TargetSelector(OrSelector(
             TypeSelector<BooleanShape>(),
@@ -67,7 +67,7 @@ public struct HttpLabelTrait: StaticTrait {
 
 /// Binds a single structure member to the body of an HTTP request.
 public struct HttpPayloadTrait: StaticTrait {
-    public static let staticName = "smithy.api#httpPayload"
+    public static let staticName: ShapeId = "smithy.api#httpPayload"
     public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<StringShape>(),
         TypeSelector<BlobShape>(),
@@ -80,7 +80,7 @@ public struct HttpPayloadTrait: StaticTrait {
 
 /// Binds a map of key-value pairs to prefixed HTTP headers.
 public struct HttpPrefixHeadersTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#httpPrefixHeaders"
+    public static let staticName: ShapeId = "smithy.api#httpPrefixHeaders"
     public var selector: Selector { TargetSelector(TypeSelector<MapShape>()) }
     public var value: String
     public init(value: String) {
@@ -90,7 +90,7 @@ public struct HttpPrefixHeadersTrait: SingleValueTrait {
 
 /// Binds an operation input structure member to a query string parameter.
 public struct HttpQueryTrait: SingleValueTrait {
-    public static let staticName = "smithy.api#httpQuery"
+    public static let staticName: ShapeId = "smithy.api#httpQuery"
     public var selector: Selector { TargetSelector(OrSelector(
         TypeSelector<BooleanShape>(),
         NumberSelector(),
@@ -108,14 +108,14 @@ public struct HttpQueryTrait: SingleValueTrait {
 
 /// Indicates that the structure member represents an HTTP response status code.
 public struct HttpResponseCodeTrait: StaticTrait {
-    public static let staticName = "smithy.api#httpResponseCode"
+    public static let staticName: ShapeId = "smithy.api#httpResponseCode"
     public var selector: Selector { TargetSelector(TypeSelector<IntegerShape>()) }
     public init() {}
 }
 
 /// Defines how a service supports cross-origin resource sharing
 public struct HttpCorsTrait: StaticTrait {
-    public static let staticName = "smithy.api#cors"
+    public static let staticName: ShapeId = "smithy.api#cors"
     public var selector: Selector { TypeSelector<ServiceShape>() }
     public let origin: String?
     public let maxAge: Int?
