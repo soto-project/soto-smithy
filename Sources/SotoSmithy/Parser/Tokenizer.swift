@@ -187,7 +187,7 @@ struct Tokenizer {
         parser.read(while: Self.set(from: " \t"))
         let text = try parser.read(until: "\n", throwOnOverflow: false)
         // skip newline
-        if try parser.current() == "\n" {
+        if !parser.reachedEnd(), try parser.current() == "\n" {
             try parser.advance()
         }
         return documentationComment ? text : nil

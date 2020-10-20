@@ -30,19 +30,18 @@ class ParserTests: XCTestCase {
     
     func testMetadataLoad() throws {
         let smithy = """
-        metadata "test" = "test string"
-        namespace soto.example
-        string MyString
+        metadata "test" = "test string" // with speech marks
+        metadata greeting = "hello" // without speech marks
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
         XCTAssertEqual(model.metadata?["test"] as? String, "test string")
+        XCTAssertEqual(model.metadata?["greeting"] as? String, "hello")
     }
     
     func testMetadataArrayLoad() throws {
         let smithy = """
         metadata "testArray" = [1,2,3]
-        namespace soto.example
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
@@ -53,7 +52,7 @@ class ParserTests: XCTestCase {
         let smithy = """
         metadata "testMap" = {
             string: "string",
-            integer: "integer"
+            "integer": "integer"
         }
         namespace soto.example
         """
@@ -62,6 +61,30 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(model.metadata?["testMap"] as? [String:String], ["string":"string", "integer":"integer"])
     }
     
+    func testComplexMetadata() throws {
+        let smithy = """
+        metadata foo = {
+            hello: 123,
+            "foo": "456",
+            testing: \"""
+                Hello!
+                \""",
+            an_array: [10.5],
+            nested-object: {
+                hello-there$: true
+            }, // <-- Trailing comma
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let foo = try XCTUnwrap(model.metadata?["foo"] as? [String: Any])
+        XCTAssertEqual(foo["hello"] as? Int, 123)
+        XCTAssertEqual(foo["foo"] as? String, "456")
+        XCTAssertEqual(foo["testing"] as? String, "Hello!")
+        XCTAssertEqual(foo["an_array"] as? [Double], [10.5])
+        XCTAssertEqual(foo["nested-object"] as? [String: Bool], ["hello-there$": true])
+    }
+
     func testListLoad() throws {
         let smithy = """
         namespace soto.example

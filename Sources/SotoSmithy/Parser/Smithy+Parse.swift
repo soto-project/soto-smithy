@@ -71,6 +71,9 @@ extension Smithy {
     /// Parse metadata section of IDL
     /// - Returns: Metadata dictionary
     func parseMetadataSection(_ state: ParserState) throws -> [String: Any] {
+        state.loadingMetadata = true
+        defer { state.loadingMetadata = false }
+        
         var metaData: [String: Any] = [:]
         while !state.parser.reachedEnd() {
             state.parser.skip(while: .newline)
@@ -241,8 +244,13 @@ extension Smithy {
             return try parseDictionary(state)
         case .grammar("["):
             return try parseArray(state)
-        case .token(let token):
-            return ["target": fullShapeName(token, state: state).rawValue]
+        case .token(let string):
+            if state.loadingMetadata {
+                if let boolean = Bool(String(string)) { return boolean }
+                throw SmithyParserError.unexpectedToken(token)
+            } else {
+                return ["target": fullShapeName(string, state: state).rawValue]
+            }
         default:
             throw SmithyParserError.unexpectedToken(token)
 
@@ -260,6 +268,14 @@ extension Smithy {
                 try state.parser.expect(.grammar(":"))
                 let value = try parseValue(state)
                 dictionary[key] = value
+                if try endCollection(&state.parser, endToken: endToken) {
+                    break
+                }
+                // dictionaries can have strings for keys when loading metadata
+            } else if case .string(let key) = token, state.loadingMetadata {
+                try state.parser.expect(.grammar(":"))
+                let value = try parseValue(state)
+                dictionary[Substring(key)] = value
                 if try endCollection(&state.parser, endToken: endToken) {
                     break
                 }
@@ -401,11 +417,13 @@ extension Smithy {
         var parser: TokenParser
         var namespace: Substring?
         var use: [String: ShapeId]
+        var loadingMetadata: Bool
         
         init(parser: TokenParser) {
             self.parser = parser
             self.namespace = nil
             self.use = [:]
+            self.loadingMetadata = false
         }
     }
     
