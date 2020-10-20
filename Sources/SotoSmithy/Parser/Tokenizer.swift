@@ -110,7 +110,42 @@ struct Tokenizer {
     }
 
     func readBlockText(from parser: inout Parser) throws -> String {
-        return ""
+        var stringParser = parser
+        try stringParser.advance()
+        var text = ""
+        while !stringParser.reachedEnd() {
+            text += try stringParser.read(until: Set(Self.set(from: "\\\"\n")))
+            let current = try stringParser.current()
+            if current == "\\" {
+                try stringParser.advance()
+                let escapeCharacter = try stringParser.character()
+                switch escapeCharacter {
+                case "n":
+                    text += "\n"
+                case "t":
+                    text += "\t"
+                case "\"":
+                    text += "\""
+                case "\n":
+                    break
+                default:
+                    throw Error.unrecognisedEscapeCharacter(stringParser)
+                }
+            } else if current == "\"" {
+                let quoteCount = stringParser.read(while: "\"")
+                if quoteCount == 1 {
+                    text += "\""
+                } else if quoteCount == 2 {
+                    text += "\"\""
+                } else if quoteCount == 3 {
+                    break
+                } else {
+                    throw Error.unexpectedCharacter(stringParser)
+                }
+            }
+        }
+        parser = stringParser
+        return text
     }
 
 
