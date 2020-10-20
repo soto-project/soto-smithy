@@ -69,6 +69,7 @@ struct Tokenizer {
     
     func readQuotedText(from parser: inout Parser) throws -> String {
         var stringParser = parser
+        defer { parser = stringParser }
         var text = ""
         try stringParser.advance()
         do {
@@ -78,7 +79,6 @@ struct Tokenizer {
                 if !stringParser.reachedEnd(), try stringParser.current() == "\"" {
                     return try readBlockText(from: &stringParser)
                 }
-                parser = stringParser
                 return ""
             }
             repeat {
@@ -105,47 +105,69 @@ struct Tokenizer {
         } catch ParserError.overflow {
             throw Error.unterminatedString(parser)
         }
-        parser = stringParser
         return text
     }
 
     func readBlockText(from parser: inout Parser) throws -> String {
         var stringParser = parser
+        defer { parser = stringParser }
         try stringParser.advance()
         var text = ""
-        while !stringParser.reachedEnd() {
-            text += try stringParser.read(until: Set(Self.set(from: "\\\"\n")))
-            let current = try stringParser.current()
-            if current == "\\" {
-                try stringParser.advance()
-                let escapeCharacter = try stringParser.character()
-                switch escapeCharacter {
-                case "n":
-                    text += "\n"
-                case "t":
-                    text += "\t"
-                case "\"":
-                    text += "\""
-                case "\n":
-                    break
-                default:
-                    throw Error.unrecognisedEscapeCharacter(stringParser)
-                }
-            } else if current == "\"" {
-                let quoteCount = stringParser.read(while: "\"")
-                if quoteCount == 1 {
-                    text += "\""
-                } else if quoteCount == 2 {
-                    text += "\"\""
-                } else if quoteCount == 3 {
-                    break
-                } else {
-                    throw Error.unexpectedCharacter(stringParser)
+        
+        let newlineToken = try stringParser.character()
+        guard newlineToken == "\n" else { throw Error.multilineError(stringParser) }
+        
+        do {
+            while true {
+                text += try stringParser.read(until: Set(Self.set(from: "\\\"")))
+                let current = try stringParser.current()
+                if current == "\\" {
+                    try stringParser.advance()
+                    let escapeCharacter = try stringParser.character()
+                    switch escapeCharacter {
+                    case "n":
+                        text += "\n"
+                    case "t":
+                        text += "\t"
+                    case "\"":
+                        text += "\""
+                    case "\n":
+                        break
+                    default:
+                        throw Error.unrecognisedEscapeCharacter(stringParser)
+                    }
+                } else if current == "\"" {
+                    let quoteCount = stringParser.read(while: "\"")
+                    if quoteCount == 1 {
+                        text += "\""
+                    } else if quoteCount == 2 {
+                        text += "\"\""
+                    } else if quoteCount == 3 {
+                        break
+                    } else {
+                        throw Error.unexpectedCharacter(stringParser)
+                    }
                 }
             }
+        } catch ParserError.overflow {
+            throw Error.unterminatedString(parser)
         }
-        parser = stringParser
-        return text
+        
+        let lines = text.split(separator: "\n", omittingEmptySubsequences: false)
+        let lastLine = lines.last!
+        let numSpaces = lastLine.count
+        try lastLine.forEach {
+            guard $0 == " " else { throw Error.multilineError(parser) }
+        }
+        // remove indentation
+        let linesNoIndent = try lines.dropLast().map { line -> Substring.SubSequence in
+            if line.count == 0 {
+                return ""
+            }
+            guard line.starts(with: lastLine) else { throw Error.multilineError(parser) }
+            return line.dropFirst(numSpaces)
+        }
+        return linesNoIndent.joined(separator: "\n")
     }
 
 
@@ -170,6 +192,7 @@ struct Tokenizer {
             case unexpectedCharacter
             case unrecognisedEscapeCharacter
             case unterminatedString
+            case multilineError
         }
         let errorType: ErrorType
         let context: Parser.Context
@@ -178,5 +201,6 @@ struct Tokenizer {
         static func unexpectedCharacter(_ parser: Parser) -> Self { .init(errorType: .unexpectedCharacter, context: parser.getContext()) }
         static func unrecognisedEscapeCharacter(_ parser: Parser) -> Self { .init(errorType: .unrecognisedEscapeCharacter, context: parser.getContext()) }
         static func unterminatedString(_ parser: Parser) -> Self { .init(errorType: .unterminatedString, context: parser.getContext()) }
+        static func multilineError(_ parser: Parser) -> Self { .init(errorType: .multilineError, context: parser.getContext()) }
     }
 }
