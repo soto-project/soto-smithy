@@ -110,29 +110,7 @@ class TokenizerTests: XCTestCase {
         }
     }
     
-    func testBlockText() throws {
-        let string = """
-        @trait(\"""
-        block text
-
-        new line
-        \"""
-        string MyString
-        """
-        let tokens = try Tokenizer().tokenize(string)
-        XCTAssertEqual(tokens[2], .string("block text\n\nnew line"))
-        let string2 = """
-        @trait(\"""
-          block
-          text
-
-          new line
-          \"""
-        string MyString
-        """
-        let tokens2 = try Tokenizer().tokenize(string2)
-        XCTAssertEqual(tokens2[2], .string("block text\n\nnew line"))
-        
+    func testBlockTextErrors() {
         testBlockTextError(text:"""
         @trait(\"""
          new line
@@ -149,5 +127,34 @@ class TokenizerTests: XCTestCase {
           new line\"""
         string MyString
         """)
+    }
+
+    func testBlockText() throws {
+        let string = """
+        @trait(\"""
+        block text
+
+        new line
+        \"""
+        string MyString
+        """
+        let tokens = try Tokenizer().tokenize(string)
+        XCTAssertEqual(tokens[2], .string("block text\n\nnew line"))
+        let string2 = """
+        @trait(\"""
+          block \\
+          text
+
+          new line
+          \"""
+        string MyString
+        """
+        let tokens2 = try Tokenizer().tokenize(string2)
+        XCTAssertEqual(tokens2[2], .string("block text\n\nnew line"))
+        let test = """
+            hello \
+            goodbye
+            """
+        print(test)
     }
 }
