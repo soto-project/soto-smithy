@@ -14,15 +14,32 @@
 
 import Foundation
 
+
 struct Tokenizer {
-    enum Token: Equatable {
-        case token(Substring)
-        case grammar(Character)
-        case string(String)
-        case number(Double)
-        case documentationComment(Substring)
-        case newline
+    struct Token {
+        enum TokenType: Equatable {
+            case token(Substring)
+            case grammar(Character)
+            case string(String)
+            case number(Double)
+            case documentationComment(Substring)
+            case newline
+        }
+        let type: TokenType
+        let position: String.Index
+
+        init(_ type: TokenType, position: String.Index) {
+            self.type = type
+            self.position = position
+        }
         
+        static func == (lhs: Self, rhs: Tokenizer.Token.TokenType) -> Bool {
+            return lhs.type == rhs
+        }
+        
+        static func != (lhs: Self, rhs: Tokenizer.Token.TokenType) -> Bool {
+            return lhs.type != rhs
+        }
     }
 
     static var tokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-")
@@ -42,23 +59,24 @@ struct Tokenizer {
         while !parser.reachedEnd() {
             parser.read(while: Self.set(from: " \t"))
             let current = try parser.current()
+            let position = parser.position
             if Self.grammarChars.contains(current) {
-                tokens.append(.grammar(try parser.character()))
+                tokens.append(.init(.grammar(try parser.character()), position: position))
             } else if current.isNewline {
                 try parser.advance()
-                tokens.append(.newline)
+                tokens.append(.init(.newline, position: position))
             } else if Self.tokenStartChars.contains(current) {
                 let token = parser.read(while: Self.tokenChars)
-                tokens.append(.token(token))
+                tokens.append(.init(.token(token), position: position))
             } else if Self.numberStartChars.contains(current) {
                 let token = parser.read(while: Self.numberChars)
-                tokens.append(.number(Double(token) ?? 0.0 ))
+                tokens.append(.init(.number(Double(token) ?? 0.0 ), position: position))
             } else if current == "\"" {
                 let text = try readQuotedText(from: &parser)
-                tokens.append(.string(text))
+                tokens.append(.init(.string(text), position: position))
             } else if current == "/" {
                 if let comment = try readDocumentationComment(from: &parser) {
-                    tokens.append(.documentationComment(comment))
+                    tokens.append(.init(.documentationComment(comment), position: position))
                 }
             } else {
                 throw Error.unexpectedCharacter(parser)

@@ -207,9 +207,9 @@ extension Parser {
         // count new lines up to this current position
         let buffer = parser.buffer
         let textBefore = buffer[buffer.startIndex..<position]
-        let lineNumber = textBefore.filter{ $0.isNewline }.count + 1
+        let lineNumber = textBefore.filter{ $0.isNewline }.count
 
-        return Context(line: String(line), lineNumber: lineNumber, columnNumber: columnNumber)
+        return Context(line: String(line), lineNumber: lineNumber + 1, columnNumber: columnNumber + 1)
     }
 }
 

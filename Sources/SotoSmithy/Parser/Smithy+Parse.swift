@@ -23,11 +23,23 @@ extension Smithy {
     func parse(_ string: String) throws -> Model {
         let state = try ParserState(string)
 
-        // IDL is split into three distinct sections: control, metadata and shapes
-        var model = try parseControlSection(state)
-        model["metadata"] = try parseMetadataSection(state)
-        model["shapes"] = try parserShapesSection(state)
-
+        var model: [String: Any]
+        do {
+            // IDL is split into three distinct sections: control, metadata and shapes
+            model = try parseControlSection(state)
+            model["metadata"] = try parseMetadataSection(state)
+            model["shapes"] = try parserShapesSection(state)
+        } catch let error as ParserError {
+            // if returned error without context attempt to fill in context from current parser state
+            if error.context == nil {
+                try? state.parser.retreat()
+                guard let token = try? state.parser.token() else { throw error }
+                throw ParserError(error.reason, context: SmithyErrorContext(state.text, position: token.position))
+            } else {
+                throw error
+            }
+        }
+        
         let data = try JSONSerialization.data(withJSONObject: model, options: [])
         print(String(data: data, encoding: .utf8)!)
         return try Smithy().decodeAST(from: data)
@@ -39,7 +51,7 @@ extension Smithy {
         while !state.parser.reachedEnd() {
             state.parser.skip(while: .newline)
             let token = try state.parser.token()
-            if case .token(let string) = token {
+            if case .token(let string) = token.type {
                 if string == "$version" {
                     try state.parser.advance()
                     // currently we support version "1.0"
@@ -64,12 +76,12 @@ extension Smithy {
         while !state.parser.reachedEnd() {
             state.parser.skip(while: .newline)
             let token = try state.parser.token()
-            if case .token(let string) = token {
+            if case .token(let string) = token.type {
                 if string == "metadata" {
                     try state.parser.advance()
                     let token = try state.parser.nextToken()
                     let string: String
-                    switch token {
+                    switch token.type {
                     case .string(let text):
                         string = text
                     case .token(let token):
@@ -96,43 +108,51 @@ extension Smithy {
     func parserShapesSection(_ state: ParserState) throws -> [String: Any] {
         var modelShapes: [String: Any] = [:]
         var traits: [String: Any] = [:]
+        var traitPosition: Int? = nil
 
         while !state.parser.reachedEnd() {
             let token = try state.parser.nextToken()
-            if case .token(let string) = token {
+            if case .token(let string) = token.type {
                 if string == "namespace" {
                     // namespace
                     if traits.count > 0 {
+                        if let position = traitPosition { state.parser.position = position }
                         throw ParserError.unattachedTraits()
                     }
                     let token = try state.parser.nextToken()
-                    guard case .token(let name) = token else { throw ParserError("Expected namespace name") }
-                    guard modelShapes.count == 0 else { throw ParserError("Shapes defined before namespace has been set") }
-                    guard state.namespace == nil else { throw ParserError("File contains two namespace definitions") }
+                    guard case .token(let name) = token.type else { throw ParserError("Expected namespace name", state: state) }
+                    guard state.namespace == nil else { throw ParserError("File contains two namespace definitions", state: state) }
+                    guard modelShapes.count == 0 else { throw ParserError("Shapes defined before namespace has been set", state: state) }
                     state.namespace = name
+                // use shapeId
                 } else if string == "use" {
                     if traits.count > 0 {
+                        if let position = traitPosition { state.parser.position = position }
                         throw ParserError.unattachedTraits()
                     }
                     let token = try state.parser.nextToken()
-                    guard case .token(let name) = token else { throw ParserError("Expected shape id after \"use\" statement") }
-                    guard modelShapes.count == 0 else { throw ParserError("Shapes defined before \"use\" statement") }
+                    guard case .token(let name) = token.type else { throw ParserError("Expected shape id after \"use\" statement", state: state) }
+                    guard modelShapes.count == 0 else { throw ParserError("Shapes defined before \"use\" statement", state: state) }
                     let shapeId = ShapeId(rawValue: String(name))
                     state.use[shapeId.shapeName] = shapeId
+                // unexpected metadata. Should have already been read
                 } else if string == "metadata" {
-                    // unexpected metadata. Should have already been read
                     throw ParserError.unexpectedToken(token)
+                // if trait
                 } else if string.first == "@" {
-                    // if trait
+                    // record position of first trait
+                    if traitPosition == nil {
+                        traitPosition = state.parser.position
+                    }
                     let traitName = string.dropFirst()
                     let trait = try parseTrait(state)
                     traits[fullTraitName(traitName, state: state).rawValue] = trait
                 } else if string == "apply" {
                     _ = try parseApply(state, shapes: modelShapes)
+                // otherwise must be a shape
                 } else {
-                    // must be a shape
                     let token = try state.parser.nextToken()
-                    guard case .token(let name) = token else { throw ParserError.unexpectedToken(token) }
+                    guard case .token(let name) = token.type else { throw ParserError.unexpectedToken(token) }
                     let shapeId = ShapeId(namespace: state.namespace, shapeName: name)
                     var shape = try parseShape(state, type: string)
                     // attached already parsed traits and clear trait map for next shape
@@ -140,12 +160,14 @@ extension Smithy {
                         shape["traits"] = traits
                     }
                     traits = [:]
+                    traitPosition = nil
                     modelShapes[shapeId.rawValue] = shape
                 }
-            } else if case .documentationComment(let comment) = token {
+            } else if case .documentationComment(let comment) = token.type {
                 traits["smithy.api#documentation"] = comment
             } else if token == .newline{
                 if traits.count > 0 {
+                    if let position = traitPosition { state.parser.position = position }
                     throw ParserError.unattachedTraits()
                 }
             } else {
@@ -165,17 +187,22 @@ extension Smithy {
         guard next == .grammar("{") else { throw ParserError.unexpectedToken(next) }
         
         var members: [Substring: Any] = [:]
+        var traitPosition: Int? = nil
         
         while !state.parser.reachedEnd() {
             let token = try state.parser.nextToken()
-            if case .token(let string) = token {
+            if case .token(let string) = token.type {
+                // if trait
                 if string.first == "@" {
-                    // if trait
+                    // record position of first trait
+                    if traitPosition == nil {
+                        traitPosition = state.parser.position
+                    }
                     let traitName = string.dropFirst()
                     let trait = try parseTrait(state)
                     traits[fullTraitName(traitName, state: state).rawValue] = trait
+                // otherwise assume token is a shape name
                 } else {
-                    // assume token is a shape name
                     try state.parser.expect(.grammar(":"))
                     let value = try parseValue(state)
                     if traits.count > 0,
@@ -187,18 +214,21 @@ extension Smithy {
                         members[string] = value
                     }
                     traits = [:]
-                    if try endCollection(&state.parser, endToken: .grammar("}")) {
+                    traitPosition = nil
+                    if try endCollection(state, endToken: .grammar("}")) {
                         break
                     }
                 }
-            } else if case .documentationComment(let comment) = token {
+            } else if case .documentationComment(let comment) = token.type {
                 traits["smithy.api#documentation"] = comment
             } else if token == .newline {
                 if traits.count > 0 {
+                    if let position = traitPosition { state.parser.position = position }
                     throw ParserError.unattachedTraits()
                 }
             } else if token == .grammar("}"){
                 if traits.count > 0 {
+                    if let position = traitPosition { state.parser.position = position }
                     throw ParserError.unattachedTraits()
                 }
                 // closed curly bracket so we are done
@@ -221,7 +251,7 @@ extension Smithy {
     /// parse a value. This could be a string, number, array, dictionary or shape id
     func parseValue(_ state: ParserState) throws -> Any {
         let token = try state.parser.nextToken()
-        switch token {
+        switch token.type {
         case .string(let string):
             return string
         case .number(let number):
@@ -243,26 +273,26 @@ extension Smithy {
         }
     }
     
-    func parseMappedValues(_ state: ParserState, endToken: Tokenizer.Token) throws -> [Substring: Any] {
+    func parseMappedValues(_ state: ParserState, endToken: Tokenizer.Token.TokenType) throws -> [Substring: Any] {
         var dictionary: [Substring: Any] = [:]
         while !state.parser.reachedEnd() {
             state.parser.skip(while: .newline)
             let token = try state.parser.nextToken()
-            if token == endToken {
+            if token.type == endToken {
                 break
-            } else if case .token(let key) = token {
+            } else if case .token(let key) = token.type {
                 try state.parser.expect(.grammar(":"))
                 let value = try parseValue(state)
                 dictionary[key] = value
-                if try endCollection(&state.parser, endToken: endToken) {
+                if try endCollection(state, endToken: endToken) {
                     break
                 }
                 // dictionaries can have strings for keys when loading metadata
-            } else if case .string(let key) = token, state.loadingMetadata {
+            } else if case .string(let key) = token.type, state.loadingMetadata {
                 try state.parser.expect(.grammar(":"))
                 let value = try parseValue(state)
                 dictionary[Substring(key)] = value
-                if try endCollection(&state.parser, endToken: endToken) {
+                if try endCollection(state, endToken: endToken) {
                     break
                 }
             } else {
@@ -274,7 +304,7 @@ extension Smithy {
     
     func parseParameters(_ state: ParserState) throws -> Any {
         state.parser.skip(while: .newline)
-        if case .token = try state.parser.token() {
+        if case .token = try state.parser.token().type {
             return try parseMappedValues(state, endToken: .grammar(")"))
         } else {
             let value = try parseValue(state)
@@ -298,7 +328,7 @@ extension Smithy {
             } else {
                 let value = try parseValue(state)
                 array.append(value)
-                if try endCollection(&state.parser, endToken: .grammar("]")) {
+                if try endCollection(state, endToken: .grammar("]")) {
                     break
                 }
             }
@@ -314,7 +344,7 @@ extension Smithy {
         } else if token == .grammar("(") {
             try state.parser.advance()
             value = try parseParameters(state)
-        } else if case .token = token {
+        } else if case .token = token.type {
             value = [:]
         } else {
             throw ParserError.unexpectedToken(token)
@@ -323,7 +353,7 @@ extension Smithy {
             return value
         }
         let token2 = try state.parser.token()
-        switch token2 {
+        switch token2.type {
         case .newline:
             try state.parser.advance()
         case .token:
@@ -336,25 +366,25 @@ extension Smithy {
     
     func parseApply(_ state: ParserState, shapes: [String: Any]) throws -> (Substring, ShapeId, Any) {
         let shapeToken = try state.parser.nextToken()
-        guard case .token(let shape) = shapeToken else {throw ParserError.unexpectedToken(shapeToken) }
+        guard case .token(let shape) = shapeToken.type else { throw ParserError.unexpectedToken(shapeToken) }
         let traitToken = try state.parser.nextToken()
-        guard case .token(let traitName) = traitToken else {throw ParserError.unexpectedToken(traitToken) }
-        guard traitName.first == "@" else {throw ParserError.unexpectedToken(traitToken) }
+        guard case .token(let traitName) = traitToken.type else { throw ParserError.unexpectedToken(traitToken) }
+        guard traitName.first == "@" else { throw ParserError.unexpectedToken(traitToken) }
         let fullTraitName = self.fullTraitName(traitName.dropFirst(), state: state)
         let trait = try parseTrait(state)
     
         return (shape, fullTraitName, trait)
     }
     
-    func endCollection(_ tokenParser: inout TokenParser, endToken: Tokenizer.Token) throws -> Bool {
-        let nextToken = try tokenParser.nextToken()
-        if nextToken == endToken {
+    func endCollection(_ state: ParserState, endToken: Tokenizer.Token.TokenType) throws -> Bool {
+        let nextToken = try state.parser.nextToken()
+        if nextToken.type == endToken {
             return true
         } else if nextToken == .grammar(",") {
             return false
         } else if nextToken == .newline {
-            tokenParser.skip(while: .newline)
-            try tokenParser.expect(endToken)
+            state.parser.skip(while: .newline)
+            try state.parser.expect(endToken)
             return true
         } else {
             throw ParserError.unexpectedToken(nextToken)
@@ -420,13 +450,26 @@ extension Smithy {
         public let reason: String
         public let context: SmithyErrorContext?
 
-        init(_ reason: String) {
+        init(_ reason: String, context: SmithyErrorContext? = nil) {
             self.reason = reason
-            self.context = nil
+            self.context = context
+        }
+        
+        init(_ reason: String, state: ParserState) {
+            self.reason = reason
+            do {
+                var parser = state.parser
+                if parser.reachedEnd() {
+                    try parser.retreat()
+                }
+                self.context = SmithyErrorContext(state.text, position: try parser.token().position)
+            } catch {
+                self.context = nil
+            }
         }
         
         static func unexpectedToken(_ token: Tokenizer.Token) -> Self { return .init("Unexpected token \(token)") }
-        static func overflow() -> Self { return .init("File ended unexpectedly") }
+        static var overflow: Self { return .init("File ended unexpectedly") }
         static func unattachedTraits() -> Self { return .init("Traits not attached to a shape") }
     }
 
@@ -441,29 +484,34 @@ extension Smithy {
         }
         
         func token() throws -> Tokenizer.Token {
-            guard position != tokens.endIndex else { throw ParserError.overflow() }
+            guard position != tokens.endIndex else { throw ParserError.overflow }
             return tokens[position]
         }
         
         mutating func nextToken() throws -> Tokenizer.Token {
-            guard position != tokens.endIndex else { throw ParserError.overflow() }
+            guard position != tokens.endIndex else { throw ParserError.overflow }
             let token = tokens[position]
             position += 1
             return token
         }
         
         mutating func advance() throws {
-            guard position != tokens.endIndex else { throw ParserError.overflow() }
+            guard position != tokens.endIndex else { throw ParserError.overflow }
             position += 1
         }
         
-        mutating func expect(_ token: Tokenizer.Token) throws {
-            guard position != tokens.endIndex else { throw ParserError.overflow() }
-            guard token == tokens[position] else { throw ParserError.unexpectedToken(token) }
+        mutating func retreat() throws {
+            guard position != tokens.startIndex else { throw ParserError.overflow }
+            position -= 1
+        }
+        
+        mutating func expect(_ token: Tokenizer.Token.TokenType) throws {
+            guard position != tokens.endIndex else { throw ParserError.overflow }
+            guard tokens[position] == token else { throw ParserError.unexpectedToken(tokens[position]) }
             position += 1
         }
 
-        mutating func skip(while token: Tokenizer.Token) {
+        mutating func skip(while token: Tokenizer.Token.TokenType) {
             while !reachedEnd() {
                 let nextToken = tokens[position]
                 position += 1
