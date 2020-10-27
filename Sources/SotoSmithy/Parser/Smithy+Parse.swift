@@ -148,7 +148,11 @@ extension Smithy {
                     let trait = try parseTrait(state)
                     traits[fullTraitName(traitName, state: state).rawValue] = trait
                 } else if string == "apply" {
-                    _ = try parseApply(state, shapes: modelShapes)
+                    let apply = try parseApply(state, shapes: modelShapes)
+                    let shapeId = fullShapeName(apply.shape, state: state)
+                    guard modelShapes[shapeId.rawValue] != nil else { throw ParserError("Apply referencing non-existent Shape ID", state: state) }
+                    let mergeDictionary: [String: Any] = [shapeId.rawValue: ["traits": [apply.trait.rawValue: apply.value]]]
+                    modelShapes = mergeDictionaries(modelShapes, mergeDictionary)
                 // otherwise must be a shape
                 } else {
                     let token = try state.parser.nextToken()
@@ -178,8 +182,8 @@ extension Smithy {
     }
     
     /// Parse shape from tokenized smithy
-    func parseShape(_ state: ParserState, type: Substring) throws -> [Substring: Any] {
-        var shape: [Substring: Any] = ["type": type]
+    func parseShape(_ state: ParserState, type: Substring) throws -> [String: Any] {
+        var shape: [String: Any] = ["type": type]
         var traits: [String: Any] = [:]
         guard !state.parser.reachedEnd() else { return shape }
         let next = try state.parser.nextToken()
@@ -242,7 +246,7 @@ extension Smithy {
             shape["members"] = members
         } else {
             for entry in members {
-                shape[entry.key] = entry.value
+                shape[String(entry.key)] = entry.value
             }
         }
         return shape
@@ -373,7 +377,7 @@ extension Smithy {
         return value
     }
     
-    func parseApply(_ state: ParserState, shapes: [String: Any]) throws -> (Substring, ShapeId, Any) {
+    func parseApply(_ state: ParserState, shapes: [String: Any]) throws -> (shape: Substring, trait: ShapeId, value: Any) {
         let shapeToken = try state.parser.nextToken()
         guard case .token(let shape) = shapeToken.type else { throw ParserError.unexpectedToken(shapeToken) }
         let traitToken = try state.parser.nextToken()
@@ -435,7 +439,19 @@ extension Smithy {
         }
         return traitId
     }
-    
+
+    /// Used by Apply when applying traits to already defined shapes
+    func mergeDictionaries<S: StringProtocol>(_ lhs: [S: Any], _ rhs: [S: Any]) -> [S: Any] {
+        return lhs.merging(rhs) { lhs, rhs in
+            if let lhsDict = lhs as? [String: Any], let rhsDict = rhs as? [String: Any] {
+                return mergeDictionaries(lhsDict, rhsDict)
+            } else if let lhsDict = lhs as? [Substring: Any], let rhsDict = rhs as? [Substring: Any] {
+                return mergeDictionaries(lhsDict, rhsDict)
+            }
+            return lhs
+        }
+    }
+
     /// Parser state passed around during parsing of Smithy.
     /// Needs to be a class so state is passed up to calling functions
     class ParserState {
@@ -456,7 +472,8 @@ extension Smithy {
             self.parsingTrait = false
         }
     }
-    
+
+    /// Parser error
     public struct ParserError: SmithyError {
         public let reason: String
         public let context: SmithyErrorContext?

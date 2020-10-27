@@ -234,11 +234,12 @@ class ParserTests: XCTestCase {
         namespace soto.example
         
         string MyString
-        apply MyString @required
         apply MyString @documentation("test")
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
+        let myStringValue = try XCTUnwrap(model.shape(for: "soto.example#MyString"))
+        XCTAssertTrue(myStringValue.hasTrait(type: DocumentationTrait.self))
     }
 
     func testUse() throws {
@@ -316,5 +317,42 @@ class ParserTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
+    }
+
+    func testApplyExamplesTrait() throws {
+        let smithy = """
+        @readonly
+        operation MyOperation {
+            input: MyOperationInput,
+            output: MyOperationOutput
+        }
+
+        apply MyOperation @examples([
+            {
+                title: "Invoke MyOperation",
+                input: {
+                    tags: ["foo", "baz", "bar"],
+                },
+                output: {
+                    status: "PENDING",
+                }
+            },
+            {
+                title: "Another example for MyOperation",
+                input: {
+                    foo: "baz",
+                },
+                output: {
+                    status: "PENDING",
+                }
+            },
+        ])
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let myOperation = try XCTUnwrap(model.shape(for: "MyOperation"))
+        let exampleTrait = try XCTUnwrap(myOperation.trait(type: ExamplesTrait.self))
+        XCTAssertEqual(exampleTrait.value[0].input["tags"][1].string, "baz")
+        XCTAssertTrue(myOperation.hasTrait(type: ReadonlyTrait.self))
     }
 }
