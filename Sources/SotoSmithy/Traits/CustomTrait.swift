@@ -20,29 +20,52 @@ public struct CustomTrait: Trait {
     public var parameters: Document
 
     public func validate(using model: Model, shape: Shape) throws {
-        guard model.shape(for: self.shapeId) != nil else {
+        guard let traitShape = model.shape(for: self.shapeId) else {
             throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** does not exist")
         }
         guard self.selector.select(using: model, shape: shape) else {
             throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
         }
-        // the selector has already tested for existence of trait shape so can use !
-        let traitShape = model.shape(for: self.shapeId) as! StructureShape
-        // test for required members
-        if let members = traitShape.members {
-            for member in members {
-                if member.value.hasTrait(type: RequiredTrait.self) {
-                    guard parameters[member.key].value != nil else {
-                        throw Smithy.ValidationError(reason: "Required parameter \(member.key) in trait \(traitName) is not in trait attached to shape **")
+
+        if parameters.string != nil {
+            guard traitShape is StringShape else {
+                throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** parameters are invalid")
+            }
+        } else if parameters.double != nil {
+            guard traitShape is DoubleShape || traitShape is FloatShape else {
+                throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** parameters are invalid")
+            }
+        } else if parameters.int != nil {
+            guard traitShape is IntegerShape  else {
+                throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** parameters are invalid")
+            }
+        } else if parameters.array != nil {
+            guard traitShape is ListShape else {
+                throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** parameters are invalid")
+            }
+        } else if parameters.dictionary != nil {
+            if let collectionShape = traitShape as? CollectionShape {
+                // test for required members
+                if let members = collectionShape.members {
+                    for member in members {
+                        if member.value.hasTrait(type: RequiredTrait.self) {
+                            guard parameters[member.key].value != nil else {
+                                throw Smithy.ValidationError(reason: "Required parameter \(member.key) in trait \(traitName) is not in trait attached to shape **")
+                            }
+                        }
                     }
                 }
-            }
-        }
-        // test for members existence
-        if let parameterDictionary = self.parameters.dictionary {
-            for parameter in parameterDictionary {
-                guard traitShape.members?[parameter.key] != nil else {
-                    throw Smithy.ValidationError(reason: "Supplied parameter \(parameter.key) in trait attached to shape ** does not exist in \(traitName)")
+                // test for members existence
+                if let parameterDictionary = self.parameters.dictionary {
+                    for parameter in parameterDictionary {
+                        guard collectionShape.members?[parameter.key] != nil else {
+                            throw Smithy.ValidationError(reason: "Supplied parameter \(parameter.key) in trait attached to shape ** does not exist in \(traitName)")
+                        }
+                    }
+                }
+            } else {
+                guard traitShape is MapShape else {
+                    throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** parameters are invalid")
                 }
             }
         }
@@ -52,10 +75,13 @@ public struct CustomTrait: Trait {
 /// Trait indicating this is a structure that can be referenced as a trait
 public struct TraitTrait: StaticTrait {
     public static var staticName: ShapeId = "smithy.api#trait"
-    public var selectorToApply: Selector
+    public var selectorToApply: Selector?
+    public var conflicts: [ShapeId]?
+    public var structurallyExclusive: String?
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.selectorToApply = try container.decode(DecodableSelector.self, forKey: .selector).selector
+        self.selectorToApply = try container.decodeIfPresent(DecodableSelector.self, forKey: .selector)?.selector
     }
     private enum CodingKeys: String, CodingKey {
         case selector
@@ -72,9 +98,11 @@ struct CustomTraitSelector: Selector {
 
     func select(using model: Model, shape: Shape) -> Bool {
         guard let traitShape = model.shape(for: self.shapeId) else { return false }
-        guard traitShape as? StructureShape != nil else { return false }
-        guard let traitSelector = traitShape.trait(type: TraitTrait.self)?.selectorToApply else { return false }
-        return traitSelector.select(using: model, shape: shape)
+        guard let traitShapeTrait = traitShape.trait(type: TraitTrait.self) else { return false }
+        if let traitSelector = traitShapeTrait.selectorToApply {
+            return traitSelector.select(using: model, shape: shape)
+        }
+        return true
     }
 }
 

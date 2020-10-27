@@ -272,11 +272,14 @@ class ParserTests: XCTestCase {
 
             dolor: StringShape,
         }
+        @trait
+        string stringTrait
 
         // Apply the structuredTrait to the string.
         @structuredTrait(
             lorem: "This is a custom trait!",
             ipsum: "lorem and ipsum are both required values.")
+        @stringTrait("test")
         string StringShape
         """
         let model = try Smithy().parse(smithy)
