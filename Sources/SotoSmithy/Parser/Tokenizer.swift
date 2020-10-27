@@ -59,16 +59,27 @@ struct Tokenizer {
         }
     }
 
-    static var tokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-")
-    static var tokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@")
     static var numberChars = set(from: "0123456789.")
     static var numberStartChars = set(from: "0123456789")
-    static var grammarChars = set(from: "(){}:[],=")
+
+    static var defaultGrammarChars = set(from: "(){}:[],=")
+    static var defaultTokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-")
+    static var defaultTokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@")
+
+    let tokenChars: Set<Character>
+    let tokenStartChars: Set<Character>
+    let grammarChars: Set<Character>
+
+    init(tokenChars: String? = nil, tokenStartChars: String? = nil, grammarChars: String? = nil) {
+        self.tokenChars = tokenChars.map { Self.set(from: $0)} ?? Self.defaultTokenChars
+        self.tokenStartChars = tokenStartChars.map { Self.set(from: $0)} ?? Self.defaultTokenStartChars
+        self.grammarChars = grammarChars.map { Self.set(from: $0)} ?? Self.defaultGrammarChars
+    }
 
     static func set(from string: String) -> Set<Character> {
         return .init(string.map{ $0 })
     }
-    
+
     func tokenize(_ smithy: String) throws -> [Token] {
         var parser = Parser(smithy)
         var tokens: [Token] = []
@@ -77,13 +88,13 @@ struct Tokenizer {
             parser.read(while: Self.set(from: " \t"))
             let current = try parser.current()
             let position = parser.position
-            if Self.grammarChars.contains(current) {
+            if grammarChars.contains(current) {
                 tokens.append(.init(.grammar(try parser.character()), position: position))
             } else if current.isNewline {
                 try parser.advance()
                 tokens.append(.init(.newline, position: position))
-            } else if Self.tokenStartChars.contains(current) {
-                let token = parser.read(while: Self.tokenChars)
+            } else if tokenStartChars.contains(current) {
+                let token = parser.read(while: tokenChars)
                 tokens.append(.init(.token(token), position: position))
             } else if Self.numberStartChars.contains(current) {
                 let token = parser.read(while: Self.numberChars)
