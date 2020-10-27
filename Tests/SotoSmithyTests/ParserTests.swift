@@ -358,4 +358,24 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(exampleTrait.value[0].input["tags"][1].string, "baz")
         XCTAssertTrue(myOperation.hasTrait(type: ReadonlyTrait.self))
     }
+
+    func testProtocolDefinitionTrait() throws {
+        let smithy = """
+        namespace soto.example
+
+        @protocolDefinition(noInlineDocumentSupport: true)
+        @trait(selector: "service")
+        structure jsonExample {}
+
+        @jsonExample
+        service WeatherService {
+            version: "2017-02-11",
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let jsonExample = try XCTUnwrap(model.shape(for: "soto.example#jsonExample"))
+        let trait = try XCTUnwrap(jsonExample.trait(type: ProtocolDefinitionTrait.self))
+        XCTAssertEqual(trait.noInlineDocumentSupport, true)
+    }
 }

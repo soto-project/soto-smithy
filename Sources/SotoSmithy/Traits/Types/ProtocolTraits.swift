@@ -17,7 +17,9 @@
 /// protocols in order to successfully communicate with the service.
 public struct ProtocolDefinitionTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#protocolDefinition"
-    public init() {}
+    public var selector: Selector { TraitSelector<TraitTrait>() }
+    public let traits: [ShapeId]?
+    public let noInlineDocumentSupport: Bool?
 }
 
 /// Allows a serialized object property name in a JSON document to differ from a structure member name used in
@@ -25,7 +27,7 @@ public struct ProtocolDefinitionTrait: StaticTrait {
 public struct JsonNameTrait: SingleValueTrait {
     public static let staticName: ShapeId = "smithy.api#jsonName"
     public var selector: Selector { TypeSelector<MemberShape>() }
-    public var value: String
+    public let value: String
     public init(value: String) {
         self.value = value
     }
