@@ -15,27 +15,57 @@
 /// Parse Selector IDL https://awslabs.github.io/smithy/1.0/spec/core/selectors.html
 /// Currently supports a very limited selection of Selectors: shape type and has trait
 enum SelectorParser {
+    static let tokenizer = Tokenizer(
+        tokenChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-:*",
+        tokenStartChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:*",
+        grammarChars: "()|[]>"
+    )
     /// parse Smithy selector IDL string
     /// - Parameter string: Selector IDL to parse
     /// - Throws: Smithy.UnrecognisedSelectorError
     /// - Returns: Selector generated from IDL
     static func parse(from string: String) throws -> Selector {
-        var selectors: [Selector] = []
-        var stringPosition: String.Index = string.startIndex
-        while let next = nextSelector(string, startIndex: stringPosition) {
-            let selector: Selector?
-            if next.prefix(6) == "[trait" {
-                selector = traitSelector(from: next)
-            } else {
-                selector = typeSelector(from: String(next))
-            }
-            guard let selector2 = selector else { throw Smithy.UnrecognisedSelectorError(value: String(next)) }
-            selectors.append(selector2)
-            stringPosition = next.endIndex
+        let tokens = try tokenizer.tokenize(string)
+        var parser = TokenParser(tokens)
+
+        if let selector = try? parse(parser: &parser) {
+            return selector
         }
+        throw Smithy.UnrecognisedSelectorError(value: string)
+    }
+
+    static func parse(until: Tokenizer.Token.TokenType? = nil, parser: inout TokenParser) throws -> Selector? {
+        var selectors: [Selector] = []
+
+        while !parser.reachedEnd() {
+            parser.skip(while: .newline)
+            let token = try parser.nextToken()
+            guard token.type != until else { break }
+
+            var selector: Selector? = nil
+            switch token.type {
+            case .token(let text):
+                switch text {
+                case ":not":
+                    try parser.expect(.grammar("("))
+                    guard let notSelector = try parse(until: .grammar(")"), parser: &parser) else { return nil }
+                    selector = NotSelector(notSelector)
+                default:
+                    selector = typeSelector(from: text)
+                }
+            case .grammar(let char):
+                guard char == "[" else { break }
+                selector = try parseAttribute(&parser)
+            default:
+                break
+            }
+            guard let selector2 = selector else { return nil }
+            selectors.append(selector2)
+        }
+
         switch selectors.count {
         case 0:
-            throw Smithy.UnrecognisedSelectorError(value: string)
+            return nil
         case 1:
             return selectors[0]
         default:
@@ -43,43 +73,43 @@ enum SelectorParser {
         }
     }
 
-    /// Get next selector in a string
-    static func nextSelector(_ string: String, startIndex: String.Index) -> Substring? {
-        guard startIndex != string.endIndex else { return nil }
-        var startIndex = startIndex
-        // skip whitespace
-        while string[startIndex].isWhitespace || string[startIndex].isNewline {
-            startIndex = string.index(after: startIndex)
-            // if reached end then return nothing
-            guard startIndex != string.endIndex else { return nil }
+    static func parseAttribute(_ parser: inout TokenParser) throws -> Selector? {
+        let token = try parser.nextToken()
+        switch token.type {
+        case .token("trait"):
+            return try parseTraitAttribute(&parser)
+        default:
+            return nil
         }
+    }
 
-        var endIndex = startIndex
-        while endIndex != string.endIndex, !string[endIndex].isWhitespace, !string[endIndex].isNewline {
-            endIndex = string.index(after: endIndex)
-        }
+    static func parseTraitAttribute(_ parser: inout TokenParser) throws -> Selector? {
+        try parser.expect(.grammar("|"))
+        let traitToken = try parser.nextToken()
+        guard case .token(let name) = traitToken.type else { return nil }
+        let selector: Selector? = traitSelector(from: name)
 
-        return string[startIndex..<endIndex]
+        // parse until attribute end
+        while try parser.nextToken() != .grammar("]") {}
+        return selector
     }
 
     /// get TypeSelector from string
-    static func typeSelector(from string: String) -> Selector? {
+    static func typeSelector(from string: Substring) -> Selector? {
         switch string {
         case "*": return AllSelector()
         case "number": return NumberSelector()
         case "simpleType": return SimpleTypeSelector()
         case "collection": return CollectionSelector()
         default:
-            let shape = Model.possibleShapes[string]
+            let shape = Model.possibleShapes[String(string)]
             return shape?.typeSelector
         }
     }
 
     /// get TraitSelector from string
     static func traitSelector(from string: Substring) -> Selector? {
-        let traitStart = string.dropFirst(7) // drop [trait|
-        guard let traitEnd = traitStart.firstIndex(where: { $0 == "|" || $0 == "]" }) else { return nil }
-        var traitShapeId = ShapeId(rawValue: String(traitStart[traitStart.startIndex..<traitEnd]))
+        var traitShapeId = ShapeId(rawValue: string)
         if traitShapeId.namespace == nil {
             traitShapeId = ShapeId(namespace: "smithy.api", shapeName: traitShapeId.shapeName)
         }

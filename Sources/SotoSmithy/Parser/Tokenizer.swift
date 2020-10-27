@@ -12,8 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-import Foundation
-
+//import Foundation
 
 struct Tokenizer {
     struct Token: CustomStringConvertible {
@@ -148,7 +147,7 @@ struct Tokenizer {
                 }
             } while try stringParser.current() != "\""
             try stringParser.advance()
-        } catch ParserError.overflow {
+        } catch Parser.Error.overflow {
             throw Error.unterminatedString(parser)
         }
         return text
@@ -195,7 +194,7 @@ struct Tokenizer {
                     }
                 }
             }
-        } catch ParserError.overflow {
+        } catch Parser.Error.overflow {
             throw Error.unterminatedString(parser)
         }
         

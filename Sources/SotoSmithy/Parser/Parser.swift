@@ -14,12 +14,12 @@
 
 import Foundation
 
-enum ParserError : Error {
-    case overflow
-}
-
 /// Reader object for parsing String buffers
 struct Parser {
+    enum Error: Swift.Error {
+        case overflow
+    }
+
     /// internal storage used to store String
     private class Storage {
         init(_ buffer: String) {
@@ -47,7 +47,7 @@ extension Parser {
     /// - Throws: .overflow
     /// - Returns: Current character
     mutating func character() throws -> Character {
-        guard !reachedEnd() else { throw ParserError.overflow }
+        guard !reachedEnd() else { throw Parser.Error.overflow }
         let c = unsafeCurrent()
         unsafeAdvance()
         return c
@@ -78,7 +78,7 @@ extension Parser {
     /// - Throws: .overflow
     /// - Returns: The string read from the buffer
     mutating func read(count: Int) throws -> Substring {
-        guard buffer.distance(from: position, to: buffer.endIndex) >= count else { throw ParserError.overflow }
+        guard buffer.distance(from: position, to: buffer.endIndex) >= count else { throw Parser.Error.overflow }
         let end = buffer.index(position, offsetBy: count)
         let subString = buffer[position..<end]
         unsafeAdvance(by: count)
@@ -99,7 +99,7 @@ extension Parser {
         }
         if throwOnOverflow {
             unsafeSetPosition(startIndex)
-            throw ParserError.overflow
+            throw Parser.Error.overflow
         }
         return buffer[startIndex..<position]
     }
@@ -118,7 +118,7 @@ extension Parser {
         }
         if throwOnOverflow {
             unsafeSetPosition(startIndex)
-            throw ParserError.overflow
+            throw Parser.Error.overflow
         }
         return buffer[startIndex..<position]
     }
@@ -219,21 +219,21 @@ extension Parser {
     /// - Throws: .overflow
     /// - Returns: Character
     func current() throws -> Character {
-        guard !reachedEnd() else { throw ParserError.overflow }
+        guard !reachedEnd() else { throw Parser.Error.overflow }
         return unsafeCurrent()
     }
     
     /// Move forward one character
     /// - Throws: .overflow
     mutating func advance() throws {
-        guard !reachedEnd() else { throw ParserError.overflow }
+        guard !reachedEnd() else { throw Parser.Error.overflow }
         return unsafeAdvance()
     }
     
     /// Move back one character
     /// - Throws: .overflow
     mutating func retreat() throws {
-        guard position != buffer.startIndex else { throw ParserError.overflow }
+        guard position != buffer.startIndex else { throw Parser.Error.overflow }
         return unsafeRetreat()
     }
     
@@ -241,7 +241,7 @@ extension Parser {
     /// - Parameter amount: number of characters to move forward
     /// - Throws: .overflow
     mutating func advance(by amount: Int) throws {
-        guard buffer.distance(from: position, to: buffer.endIndex) >= amount else { throw ParserError.overflow }
+        guard buffer.distance(from: position, to: buffer.endIndex) >= amount else { throw Parser.Error.overflow }
         return unsafeAdvance(by: amount)
     }
     
@@ -249,12 +249,12 @@ extension Parser {
     /// - Parameter amount: number of characters to move back
     /// - Throws: .overflow
     mutating func retreat(by amount: Int) throws {
-        guard buffer.distance(from: buffer.startIndex, to: position) >= amount else { throw ParserError.overflow }
+        guard buffer.distance(from: buffer.startIndex, to: position) >= amount else { throw Parser.Error.overflow }
         return unsafeRetreat(by: amount)
     }
     
     mutating func setPosition(_ position: String.Index) throws {
-        guard position <= buffer.endIndex else { throw ParserError.overflow }
+        guard position <= buffer.endIndex else { throw Parser.Error.overflow }
         unsafeSetPosition(position)
     }
 }
