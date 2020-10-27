@@ -15,15 +15,15 @@ import Foundation
 
 /// Inspired from https://github.com/Flight-School/AnyCodable
 /// 
-/// Struct used for holding generic decodable values
-public struct AnyDecodable {
+/// Struct used for holding generic schemaless values
+public struct Document {
     public let value: Any
     public init(value: Any) {
         self.value = value
     }
 }
 
-extension AnyDecodable: Decodable {
+extension Document: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if container.decodeNil() {
@@ -38,9 +38,9 @@ extension AnyDecodable: Decodable {
             self.init(value: double)
         } else if let string = try? container.decode(String.self) {
             self.init(value: string)
-        } else if let array = try? container.decode([AnyDecodable].self) {
+        } else if let array = try? container.decode([Document].self) {
             self.init(value: array.map { $0.value })
-        } else if let dictionary = try? container.decode([String: AnyDecodable].self) {
+        } else if let dictionary = try? container.decode([String: Document].self) {
             self.init(value: dictionary.mapValues { $0.value })
         } else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyDecodable value cannot be decoded")

@@ -27,7 +27,7 @@ public class Model: Decodable {
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.version = try container.decode(String.self, forKey: .version)
-        if let metadata = try container.decodeIfPresent([String: AnyDecodable].self, forKey: .metadata) {
+        if let metadata = try container.decodeIfPresent([String: Document].self, forKey: .metadata) {
             self.metadata = metadata.mapValues{ $0.value }
         } else {
             self.metadata = nil

@@ -121,7 +121,10 @@ public struct Smithy {
                 // suppress trait
                 SuppressTrait.self,
                 // trait trait
-                TraitTrait.self
+                TraitTrait.self,
+                // http compliance test traits
+                HttpRequestTestsTrait.self,
+                HttpResponseTestsTrait.self
             )
             Self.registeredShapes = true
         }

@@ -308,4 +308,65 @@ class TraitTests: XCTestCase {
         let documentationTrait = traitList.trait(type: TimestampFormatTrait.self)
         XCTAssertEqual(documentationTrait?.value, .httpDate)
     }
+
+    func testHttpRequestTestsTrait() throws {
+        let json = """
+        {
+            "smithy": "1.0",
+            "shapes": {
+                "smithy.example#SayHello": {
+                    "type": "operation",
+                    "input": {
+                        "target": "smithy.example#SayHelloInput"
+                    },
+                    "traits": {
+                        "smithy.api#http": {
+                            "method": "POST",
+                            "uri": "/",
+                            "code": 200
+                        },
+                        "smithy.test#httpRequestTests": [
+                            {
+                                "id": "say_hello",
+                                "protocol": "smithy.example#exampleProtocol",
+                                "method": "POST",
+                                "uri": "/",
+                                "headers": {
+                                    "X-Greeting": "Hi"
+                                },
+                                "queryParams": [
+                                    "Hi=Hello%20there"
+                                ],
+                                "body": "{\\"name\\": \\"Teddy\\"}",
+                                "bodyMediaType": "application/json",
+                                "params": {
+                                    "greeting": "Hi",
+                                    "name": "Teddy",
+                                    "query": "Hello there"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "smithy.example#SayHelloInput": {
+                    "type": "structure",
+                    "members": {
+                        "greeting": {
+                            "target": "smithy.api#String",
+                            "traits": {
+                                "smithy.api#httpHeader": "X-Greeting"
+                            }
+                        },
+                        "name": {
+                            "target": "smithy.api#String"
+                        }
+                    }
+                }
+            }
+        }
+        """
+        let model = try Smithy().decodeAST(from: Data(json.utf8))
+        let shape = try XCTUnwrap(model.shape(for: "smithy.example#SayHello"))
+        let httpRequestTestsTrait = try XCTUnwrap(shape.trait(type: HttpRequestTestsTrait.self))
+    }
 }
