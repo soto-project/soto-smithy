@@ -41,7 +41,6 @@ extension Smithy {
         }
         
         let data = try JSONSerialization.data(withJSONObject: model, options: [])
-        print(String(data: data, encoding: .utf8)!)
         return try Smithy().decodeAST(from: data)
     }
     

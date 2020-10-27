@@ -21,13 +21,16 @@ public struct CustomTrait: Trait {
 
     public func validate(using model: Model, shape: Shape) throws {
         guard let traitShape = model.shape(for: self.shapeId) else {
-            throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** does not exist")
+            throw Smithy.ValidationError(reason: "Trait \(traitName) applied to shape ** does not exist")
         }
         guard self.selector.select(using: model, shape: shape) else {
             throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
         }
 
-        if parameters.string != nil {
+        guard parameters.isShape(traitShape, model: model) else {
+            throw Smithy.ValidationError(reason: "Trait \(traitName) applied to shape ** has invalid parameters")
+        }
+        /*if parameters.string != nil {
             guard traitShape is StringShape else {
                 throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** parameters are invalid")
             }
@@ -68,7 +71,7 @@ public struct CustomTrait: Trait {
                     throw Smithy.ValidationError(reason: "Custom trait \(traitName) applied to shape ** parameters are invalid")
                 }
             }
-        }
+        }*/
     }
 }
 

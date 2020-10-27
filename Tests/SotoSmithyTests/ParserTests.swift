@@ -265,22 +265,33 @@ class ParserTests: XCTestCase {
         @trait(selector: "string")
         structure structuredTrait {
             @required
-            lorem: StringShape,
+            lorem: String,
 
             @required
-            ipsum: StringShape,
+            ipsum: String,
 
-            dolor: StringShape,
+            dolor: MyMap,
         }
         @trait
         string stringTrait
 
+        list MyList {
+            member: Integer
+        }
+
+        map MyMap {
+            key: String,
+            value: MyList
+        }
+
         // Apply the structuredTrait to the string.
         @structuredTrait(
             lorem: "This is a custom trait!",
-            ipsum: "lorem and ipsum are both required values.")
+            ipsum: "lorem and ipsum are both required values.",
+            dolor: {"first": [1,2], "second": [3,4]}
+        )
         @stringTrait("test")
-        string StringShape
+        string MyStringShape
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())

@@ -74,3 +74,49 @@ extension Document: Decodable {
         }
     }
 }
+
+extension Document {
+    func isShape(_ shape: Shape, model: Model) -> Bool {
+        if self.string != nil {
+            guard shape is StringShape else { return false }
+        } else if self.bool != nil {
+            guard shape is BooleanShape else { return false }
+        } else if self.double != nil {
+            guard shape is DoubleShape || shape is FloatShape else { return false }
+        } else if self.int != nil {
+            guard shape is IntegerShape else { return false }
+        } else if let array = self.array {
+            guard let arrayShape = shape as? ListShape else { return false }
+            guard let memberShape = model.shape(for: arrayShape.member.target) else { return false }
+            for value in array {
+                guard Document(value: value).isShape(memberShape, model: model) else { return false }
+            }
+        } else if let dictionary = self.dictionary {
+            if let collectionShape = shape as? CollectionShape {
+                // test for required members
+                if let members = collectionShape.members {
+                    for member in members {
+                        if member.value.hasTrait(type: RequiredTrait.self) {
+                            guard dictionary[member.key] != nil else { return false }
+                        }
+                    }
+                }
+                // test for members existence
+                for parameter in dictionary {
+                    guard let member = collectionShape.members?[parameter.key] else { return false }
+                    guard let memberShape = model.shape(for: member.target) else { return false }
+                    guard Document(value: parameter.value).isShape(memberShape, model: model) else { return false }
+                }
+            } else if let mapShape = shape as? MapShape {
+                guard let valueShape = model.shape(for: mapShape.value.target) else { return false }
+                for entry in dictionary {
+                    guard Document(value: entry.value).isShape(valueShape, model: model) else { return false }
+                }
+
+            } else {
+                return false
+            }
+        }
+        return true
+    }
+}
