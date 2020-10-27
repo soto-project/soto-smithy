@@ -265,12 +265,13 @@ extension Smithy {
         case .grammar("["):
             return try parseArray(state)
         case .token(let string):
+            // is it a boolean
+            if let boolean = Bool(String(string)) { return boolean }
             // Tokens ie strings without speech marks are treated differently based on what we are parsing
             // A token inside metadata can only be a true/false boolean. If we are parsing a trait then convert
             // it to a the full shape name for the string. Otherwise we are in a shape and we should convert this
             // to a dictionary with a single value "target" which is the full shape name 
             if state.parsingMetadata {
-                if let boolean = Bool(String(string)) { return boolean }
                 throw ParserError.unexpectedToken(token)
             } else if state.parsingTrait {
                 return fullShapeName(string, state: state).rawValue
