@@ -35,8 +35,8 @@ class ParserTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
-        XCTAssertEqual(model.metadata?["test"] as? String, "test string")
-        XCTAssertEqual(model.metadata?["greeting"] as? String, "hello")
+        XCTAssertEqual(model.metadata["test"].string, "test string")
+        XCTAssertEqual(model.metadata["greeting"].string, "hello")
     }
     
     func testMetadataArrayLoad() throws {
@@ -45,7 +45,9 @@ class ParserTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
-        XCTAssertEqual(model.metadata?["testArray"] as? [Int], [1,2,3])
+        XCTAssertEqual(model.metadata["testArray"][0].int, 1)
+        XCTAssertEqual(model.metadata["testArray"][1].int, 2)
+        XCTAssertEqual(model.metadata["testArray"][2].int, 3)
     }
     
     func testMetadataDictionaryLoad() throws {
@@ -58,7 +60,8 @@ class ParserTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
-        XCTAssertEqual(model.metadata?["testMap"] as? [String:String], ["string":"string", "integer":"integer"])
+        XCTAssertEqual(model.metadata["testMap"]["string"].string, "string")
+        XCTAssertEqual(model.metadata["testMap"]["integer"].string, "integer")
     }
     
     func testComplexMetadata() throws {
@@ -77,12 +80,11 @@ class ParserTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
-        let foo = try XCTUnwrap(model.metadata?["foo"] as? [String: Any])
-        XCTAssertEqual(foo["hello"] as? Int, 123)
-        XCTAssertEqual(foo["foo"] as? String, "456")
-        XCTAssertEqual(foo["testing"] as? String, "Hello!")
-        XCTAssertEqual(foo["an_array"] as? [Double], [10.5])
-        XCTAssertEqual(foo["nested-object"] as? [String: Bool], ["hello-there$": true])
+        XCTAssertEqual(model.metadata["foo"]["hello"].int, 123)
+        XCTAssertEqual(model.metadata["foo"]["foo"].string, "456")
+        XCTAssertEqual(model.metadata["foo"]["testing"].string, "Hello!")
+        XCTAssertEqual(model.metadata["foo"]["an_array"][0].double, 10.5)
+        XCTAssertEqual(model.metadata["foo"]["nested-object"]["hello-there$"].bool, true)
     }
 
     func testListLoad() throws {

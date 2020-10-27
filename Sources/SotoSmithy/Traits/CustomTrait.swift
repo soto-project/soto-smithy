@@ -17,7 +17,7 @@ public struct CustomTrait: Trait {
     public let shapeId: ShapeId
     public var selector: Selector { return CustomTraitSelector(self.shapeId) }
     public var traitName: ShapeId { return self.shapeId }
-    public var parameters: [String: Any]
+    public var parameters: Document
 
     public func validate(using model: Model, shape: Shape) throws {
         guard model.shape(for: self.shapeId) != nil else {
@@ -32,16 +32,18 @@ public struct CustomTrait: Trait {
         if let members = traitShape.members {
             for member in members {
                 if member.value.hasTrait(type: RequiredTrait.self) {
-                    guard parameters[member.key] != nil else {
+                    guard parameters[member.key].value != nil else {
                         throw Smithy.ValidationError(reason: "Required parameter \(member.key) in trait \(traitName) is not in trait attached to shape **")
                     }
                 }
             }
         }
         // test for members existence
-        for parameter in self.parameters {
-            guard traitShape.members?[parameter.key] != nil else {
-                throw Smithy.ValidationError(reason: "Supplied parameter \(parameter.key) in trait attached to shape ** does not exist in \(traitName)")
+        if let parameterDictionary = self.parameters.dictionary {
+            for parameter in parameterDictionary {
+                guard traitShape.members?[parameter.key] != nil else {
+                    throw Smithy.ValidationError(reason: "Supplied parameter \(parameter.key) in trait attached to shape ** does not exist in \(traitName)")
+                }
             }
         }
     }
