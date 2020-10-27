@@ -58,7 +58,7 @@ class SelectorTests: XCTestCase {
         """
         let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
-        XCTAssertEqual(try model.select(from: "[trait:deprecated]").count, 1)
+        XCTAssertEqual(try model.select(from: "[trait|deprecated]").count, 1)
     }
 
     func testCustomTraitType() throws {
@@ -79,7 +79,7 @@ class SelectorTests: XCTestCase {
         """
         let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
-        XCTAssertEqual(try model.select(from: "[trait:smithy.example#StringDimensions]").count, 1)
+        XCTAssertEqual(try model.select(from: "[trait|smithy.example#StringDimensions]").count, 1)
     }
 
     func testShapeSelectorParsing() throws {

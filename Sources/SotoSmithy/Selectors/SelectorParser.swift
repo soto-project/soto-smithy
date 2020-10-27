@@ -16,9 +16,9 @@
 /// Currently supports a very limited selection of Selectors: shape type and has trait
 enum SelectorParser {
     static let tokenizer = Tokenizer(
-        tokenChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-:*",
-        tokenStartChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:*",
-        grammarChars: "()|[]>"
+        tokenChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-*",
+        tokenStartChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*",
+        grammarChars: "()|[]>:"
     )
     /// parse Smithy selector IDL string
     /// - Parameter string: Selector IDL to parse
@@ -45,17 +45,22 @@ enum SelectorParser {
             var selector: Selector? = nil
             switch token.type {
             case .token(let text):
-                switch text {
-                case ":not":
+                selector = typeSelector(from: text)
+
+            case .grammar("["):
+                selector = try parseAttribute(&parser)
+
+            case .grammar(":"):
+                let functionTrait = try parser.nextToken()
+                switch functionTrait.type {
+                case .token("not"):
                     try parser.expect(.grammar("("))
                     guard let notSelector = try parse(until: .grammar(")"), parser: &parser) else { return nil }
                     selector = NotSelector(notSelector)
                 default:
-                    selector = typeSelector(from: text)
+                    return nil
                 }
-            case .grammar(let char):
-                guard char == "[" else { break }
-                selector = try parseAttribute(&parser)
+
             default:
                 break
             }
