@@ -119,4 +119,12 @@ class SelectorTests: XCTestCase {
         XCTAssertTrue(andSelector.selectors[0] is TypeSelector<ServiceShape>)
         XCTAssertTrue(andSelector.selectors[1] is TraitSelector<XmlNamespaceTrait>)
     }
+
+    func testIsSelectorParsing() throws {
+        _ = Smithy()
+        let selector = try SelectorParser.parse(from: ":is([trait|required], operation)")
+        let andSelector = try XCTUnwrap(selector as? OrSelector)
+        XCTAssertTrue(andSelector.selectors[0] is TraitSelector<RequiredTrait>)
+        XCTAssertTrue(andSelector.selectors[1] is TypeSelector<OperationShape>)
+    }
 }

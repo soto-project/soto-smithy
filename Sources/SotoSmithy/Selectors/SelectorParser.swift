@@ -18,54 +18,37 @@ enum SelectorParser {
     static let tokenizer = Tokenizer(
         tokenChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-*",
         tokenStartChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*",
-        grammarChars: "()|[]>:"
+        grammarChars: "()|[]>:,"
     )
     /// parse Smithy selector IDL string
     /// - Parameter string: Selector IDL to parse
     /// - Throws: Smithy.UnrecognisedSelectorError
     /// - Returns: Selector generated from IDL
     static func parse(from string: String) throws -> Selector {
-        let tokens = try tokenizer.tokenize(string)
-        var parser = TokenParser(tokens)
+        do {
+            let tokens = try tokenizer.tokenize(string)
+            var parser = TokenParser(tokens)
 
-        if let selector = try? parse(parser: &parser) {
-            return selector
-        }
+            if let selector = try parseSelectors(parser: &parser) {
+                return selector
+            }
+        } catch {}
         throw Smithy.UnrecognisedSelectorError(value: string)
     }
 
-    static func parse(until: Tokenizer.Token.TokenType? = nil, parser: inout TokenParser) throws -> Selector? {
+    static func parseSelectors(until: Tokenizer.Token.TokenType? = nil, parser: inout TokenParser) throws -> Selector? {
         var selectors: [Selector] = []
 
         while !parser.reachedEnd() {
             parser.skip(while: .newline)
-            let token = try parser.nextToken()
-            guard token.type != until else { break }
-
-            var selector: Selector? = nil
-            switch token.type {
-            case .token(let text):
-                selector = typeSelector(from: text)
-
-            case .grammar("["):
-                selector = try parseAttribute(&parser)
-
-            case .grammar(":"):
-                let functionTrait = try parser.nextToken()
-                switch functionTrait.type {
-                case .token("not"):
-                    try parser.expect(.grammar("("))
-                    guard let notSelector = try parse(until: .grammar(")"), parser: &parser) else { return nil }
-                    selector = NotSelector(notSelector)
-                default:
-                    return nil
-                }
-
-            default:
+            let token = try parser.token()
+            guard token.type != until else {
+                try parser.advance()
                 break
             }
-            guard let selector2 = selector else { return nil }
-            selectors.append(selector2)
+
+            guard let selector = try parseSelector(&parser) else { return nil }
+            selectors.append(selector)
         }
 
         switch selectors.count {
@@ -75,6 +58,61 @@ enum SelectorParser {
             return selectors[0]
         default:
             return AndSelector(selectors)
+        }
+    }
+
+    static func parseIsSelectors(_ parser: inout TokenParser) throws -> Selector? {
+        var selectors: [Selector] = []
+
+        while !parser.reachedEnd() {
+            parser.skip(while: .newline)
+
+            guard let selector = try parseSelector(&parser) else { return nil }
+            selectors.append(selector)
+
+            let token = try parser.token()
+            guard token.type != .grammar(")") else {
+                try parser.advance()
+                break
+            }
+            try parser.expect(.grammar(","))
+        }
+
+        switch selectors.count {
+        case 0:
+            return nil
+        case 1:
+            return selectors[0]
+        default:
+            return OrSelector(selectors)
+        }
+    }
+
+    static func parseSelector(_ parser: inout TokenParser) throws -> Selector? {
+        let token = try parser.nextToken()
+        switch token.type {
+        case .token(let text):
+            return typeSelector(from: text)
+
+        case .grammar("["):
+            return try parseAttribute(&parser)
+
+        case .grammar(":"):
+            let functionTrait = try parser.nextToken()
+            switch functionTrait.type {
+            case .token("not"):
+                try parser.expect(.grammar("("))
+                guard let notSelector = try parseSelectors(until: .grammar(")"), parser: &parser) else { return nil }
+                return NotSelector(notSelector)
+            case .token("is"):
+                try parser.expect(.grammar("("))
+                return try parseIsSelectors(&parser)
+            default:
+                return nil
+            }
+
+        default:
+            return nil
         }
     }
 
