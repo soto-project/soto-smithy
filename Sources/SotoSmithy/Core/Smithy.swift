@@ -124,7 +124,11 @@ public struct Smithy {
                 TraitTrait.self,
                 // http compliance test traits
                 HttpRequestTestsTrait.self,
-                HttpResponseTestsTrait.self
+                HttpResponseTestsTrait.self,
+                // mqtt binding traits
+                MqttPublishTrait.self,
+                MqttSubscribeTrait.self,
+                MqttTopicLabelTrait.self
             )
             Self.registeredShapes = true
         }

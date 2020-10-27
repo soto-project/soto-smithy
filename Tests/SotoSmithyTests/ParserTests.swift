@@ -378,4 +378,39 @@ class ParserTests: XCTestCase {
         let trait = try XCTUnwrap(jsonExample.trait(type: ProtocolDefinitionTrait.self))
         XCTAssertEqual(trait.noInlineDocumentSupport, true)
     }
+
+    func testMqttProtocolTraits() throws {
+        let smithy = """
+        use smithy.mqtt#subscribe
+        use smithy.mqtt#topicLabel
+
+        @subscribe("events/{id}")
+        operation SubscribeForEvents {
+            input: SubscribeForEventsInput,
+            output: SubscribeForEventsOutput
+        }
+
+        structure SubscribeForEventsInput {
+            @required
+            @topicLabel
+            id: String,
+        }
+
+        structure SubscribeForEventsOutput {
+            events: EventStream,
+        }
+
+        @streaming
+        union EventStream {
+            message: Event,
+        }
+
+        structure Event {
+            message: String,
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+
+    }
 }
