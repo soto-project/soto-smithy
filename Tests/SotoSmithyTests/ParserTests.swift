@@ -279,4 +279,40 @@ class ParserTests: XCTestCase {
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
     }
+    
+    func testHttpResponseTestsTrait() throws {
+        let smithy = """
+        namespace smithy.example
+
+        use smithy.test#httpResponseTests
+
+        @protocolDefinition
+        @trait(selector: "service")
+        structure exampleProtocol {}
+
+        @http(method: "POST", uri: "/")
+        @httpResponseTests([
+            {
+                id: "say_goodbye",
+                protocol: exampleProtocol,
+                params: {farewell: "Bye"},
+                code: 200,
+                headers: {
+                    "X-Farewell": "Bye",
+                    "Content-Length": "0"
+                }
+            }
+        ])
+        operation SayGoodbye {
+            output: SayGoodbyeOutput
+        }
+
+        structure SayGoodbyeOutput {
+            @httpHeader("X-Farewell")
+            farewell: String,
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+    }
 }
