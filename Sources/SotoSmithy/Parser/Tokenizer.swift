@@ -16,7 +16,7 @@ import Foundation
 
 
 struct Tokenizer {
-    struct Token {
+    struct Token: CustomStringConvertible {
         enum TokenType: Equatable {
             case token(Substring)
             case grammar(Character)
@@ -39,6 +39,23 @@ struct Tokenizer {
         
         static func != (lhs: Self, rhs: Tokenizer.Token.TokenType) -> Bool {
             return lhs.type != rhs
+        }
+
+        var description: String {
+            switch self.type {
+            case .token(let string):
+                return ".token(\(string))"
+            case .grammar(let char):
+                return ".grammar(\(char))"
+            case .string(let string):
+                return ".string(\"\(string)\")"
+            case .number(let number):
+                return ".number(\(number))"
+            case .documentationComment(let string):
+                return ".comment(\(string))"
+            case .newline:
+                return ".newline"
+            }
         }
     }
 
