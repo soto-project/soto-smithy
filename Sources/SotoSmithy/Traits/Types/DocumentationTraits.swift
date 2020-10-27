@@ -33,11 +33,11 @@ public struct DocumentationTrait: SingleValueTrait {
 public struct ExamplesTrait: SingleValueTrait {
     public static let staticName: ShapeId = "smithy.api#examples"
     public var selector: Selector { TypeSelector<OperationShape>() }
-    public struct Example: Codable {
+    public struct Example: Decodable {
         public let title: String
         public let documentation: String?
-        public let input: String
-        public let output: String
+        public let input: Document
+        public let output: Document
     }
 
     public typealias Value = [Example]
