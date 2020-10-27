@@ -314,6 +314,15 @@ class TraitTests: XCTestCase {
         {
             "smithy": "1.0",
             "shapes": {
+                "smithy.example#jsonExample": {
+                    "type": "structure",
+                    "traits": {
+                        "smithy.api#protocolDefinition": {},
+                        "smithy.api#trait": {
+                            "selector": "service"
+                        }
+                    }
+                },
                 "smithy.example#SayHello": {
                     "type": "operation",
                     "input": {
@@ -328,7 +337,7 @@ class TraitTests: XCTestCase {
                         "smithy.test#httpRequestTests": [
                             {
                                 "id": "say_hello",
-                                "protocol": "smithy.example#exampleProtocol",
+                                "protocol": "smithy.example#jsonExample",
                                 "method": "POST",
                                 "uri": "/",
                                 "headers": {
@@ -366,7 +375,9 @@ class TraitTests: XCTestCase {
         }
         """
         let model = try Smithy().decodeAST(from: Data(json.utf8))
+        try model.validate()
         let shape = try XCTUnwrap(model.shape(for: "smithy.example#SayHello"))
         let httpRequestTestsTrait = try XCTUnwrap(shape.trait(type: HttpRequestTestsTrait.self))
+        XCTAssertEqual(httpRequestTestsTrait.value.first?.id, "say_hello")
     }
 }

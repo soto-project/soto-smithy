@@ -40,6 +40,18 @@ public struct HttpRequestTestsTrait: SingleValueTrait {
     public init(value: Value) {
         self.value = value
     }
+
+    public func validate(using model: Model, shape: Shape) throws {
+        guard self.selector.select(using: model, shape: shape) else {
+            throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
+        }
+        try self.value.forEach {
+            guard model.shape(for: $0.protocol ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \($0.protocol)") }
+            if let authScheme = $0.authScheme {
+                guard model.shape(for: authScheme ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(authScheme)") }
+            }
+        }
+    }
 }
 
 public struct HttpResponseTestsTrait: SingleValueTrait {
@@ -63,5 +75,17 @@ public struct HttpResponseTestsTrait: SingleValueTrait {
     public var value: [Test]
     public init(value: Value) {
         self.value = value
+    }
+
+    public func validate(using model: Model, shape: Shape) throws {
+        guard self.selector.select(using: model, shape: shape) else {
+            throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
+        }
+        try self.value.forEach {
+            guard model.shape(for: $0.protocol ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \($0.protocol)") }
+            if let authScheme = $0.authScheme {
+                guard model.shape(for: authScheme ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(authScheme)") }
+            }
+        }
     }
 }
