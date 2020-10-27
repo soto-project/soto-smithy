@@ -69,8 +69,8 @@ extension Smithy {
     /// Parse metadata section of IDL
     /// - Returns: Metadata dictionary
     func parseMetadataSection(_ state: ParserState) throws -> [String: Any] {
-        state.loadingMetadata = true
-        defer { state.loadingMetadata = false }
+        state.parsingMetadata = true
+        defer { state.parsingMetadata = false }
         
         var metaData: [String: Any] = [:]
         while !state.parser.reachedEnd() {
@@ -261,9 +261,15 @@ extension Smithy {
         case .grammar("["):
             return try parseArray(state)
         case .token(let string):
-            if state.loadingMetadata {
+            // Tokens ie strings without speech marks are treated differently based on what we are parsing
+            // A token inside metadata can only be a true/false boolean. If we are parsing a trait then convert
+            // it to a the full shape name for the string. Otherwise we are in a shape and we should convert this
+            // to a dictionary with a single value "target" which is the full shape name 
+            if state.parsingMetadata {
                 if let boolean = Bool(String(string)) { return boolean }
                 throw ParserError.unexpectedToken(token)
+            } else if state.parsingTrait {
+                return fullShapeName(string, state: state).rawValue
             } else {
                 return ["target": fullShapeName(string, state: state).rawValue]
             }
@@ -288,7 +294,7 @@ extension Smithy {
                     break
                 }
                 // dictionaries can have strings for keys when loading metadata
-            } else if case .string(let key) = token.type, state.loadingMetadata {
+            } else if case .string(let key) = token.type/*, state.loadingMetadata*/ {
                 try state.parser.expect(.grammar(":"))
                 let value = try parseValue(state)
                 dictionary[Substring(key)] = value
@@ -337,6 +343,9 @@ extension Smithy {
     }
 
     func parseTrait(_ state: ParserState) throws -> Any {
+        state.parsingTrait = true
+        defer { state.parsingTrait = false }
+
         let token = try state.parser.token()
         let value: Any
         if token == .newline {
@@ -434,7 +443,8 @@ extension Smithy {
         var parser: TokenParser
         var namespace: Substring?
         var use: [String: ShapeId]
-        var loadingMetadata: Bool
+        var parsingMetadata: Bool
+        var parsingTrait: Bool
         
         init(_ string: String) throws {
             self.text = string
@@ -442,7 +452,8 @@ extension Smithy {
             self.parser = TokenParser(tokens)
             self.namespace = nil
             self.use = [:]
-            self.loadingMetadata = false
+            self.parsingMetadata = false
+            self.parsingTrait = false
         }
     }
     
