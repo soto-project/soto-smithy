@@ -69,6 +69,6 @@ extension Smithy {
     /// Error thrown when parsing a selector failed
     public struct UnrecognisedSelectorError: SmithyError {
         public let value: String
-        public var reason: String { "Unrecoginise selector \"\(value)\"" }
+        public var reason: String { "Unrecoginised selector \"\(value)\"" }
     }
 }

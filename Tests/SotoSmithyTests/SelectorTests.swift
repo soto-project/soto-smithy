@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-import SotoSmithy
+@testable import SotoSmithy
 import XCTest
 
 class SelectorTests: XCTestCase {
@@ -58,7 +58,7 @@ class SelectorTests: XCTestCase {
         """
         let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
-        XCTAssertEqual(try model.select(from: "[trait:deprecated]").count, 1)
+        XCTAssertEqual(try model.select(from: "[trait|deprecated]").count, 1)
     }
 
     func testCustomTraitType() throws {
@@ -79,6 +79,52 @@ class SelectorTests: XCTestCase {
         """
         let model = try Smithy().decodeAST(from: Data(json.utf8))
         try model.validate()
-        XCTAssertEqual(try model.select(from: "[trait:smithy.example#StringDimensions]").count, 1)
+        XCTAssertEqual(try model.select(from: "[trait|smithy.example#StringDimensions]").count, 1)
+    }
+
+    func testShapeSelectorParsing() throws {
+        _ = Smithy()
+        let selector = try SelectorParser.parse(from: "operation")
+        XCTAssertTrue(selector is TypeSelector<OperationShape>)
+        let selector2 = try SelectorParser.parse(from: "number")
+        XCTAssertTrue(selector2 is NumberSelector)
+    }
+
+    func testTraitSelectorParsing() throws {
+        _ = Smithy()
+        let selector = try SelectorParser.parse(from: "[trait|deprecated]")
+        XCTAssertTrue(selector is TraitSelector<DeprecatedTrait>)
+    }
+
+    func testAndSelectorParsing() throws {
+        _ = Smithy()
+        let selector = try SelectorParser.parse(from: "service [trait|xmlNamespace]")
+        let andSelector = try XCTUnwrap(selector as? AndSelector)
+        XCTAssertTrue(andSelector.selectors[0] is TypeSelector<ServiceShape>)
+        XCTAssertTrue(andSelector.selectors[1] is TraitSelector<XmlNamespaceTrait>)
+    }
+
+    func testNotSelectorParsing() throws {
+        _ = Smithy()
+        let selector = try SelectorParser.parse(from: ":not(structure)")
+        let notSelector = try XCTUnwrap(selector as? NotSelector)
+        XCTAssertTrue(notSelector.selector is TypeSelector<StructureShape>)
+    }
+
+    func testNotAndSelectorParsing() throws {
+        _ = Smithy()
+        let selector = try SelectorParser.parse(from: ":not(service [trait|xmlNamespace])")
+        let notSelector = try XCTUnwrap(selector as? NotSelector)
+        let andSelector = try XCTUnwrap(notSelector.selector as? AndSelector)
+        XCTAssertTrue(andSelector.selectors[0] is TypeSelector<ServiceShape>)
+        XCTAssertTrue(andSelector.selectors[1] is TraitSelector<XmlNamespaceTrait>)
+    }
+
+    func testIsSelectorParsing() throws {
+        _ = Smithy()
+        let selector = try SelectorParser.parse(from: ":is([trait|required], operation)")
+        let andSelector = try XCTUnwrap(selector as? OrSelector)
+        XCTAssertTrue(andSelector.selectors[0] is TraitSelector<RequiredTrait>)
+        XCTAssertTrue(andSelector.selectors[1] is TypeSelector<OperationShape>)
     }
 }
