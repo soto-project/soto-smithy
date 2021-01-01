@@ -128,7 +128,9 @@ public struct Smithy {
                 // mqtt binding traits
                 MqttPublishTrait.self,
                 MqttSubscribeTrait.self,
-                MqttTopicLabelTrait.self
+                MqttTopicLabelTrait.self,
+                // waiters traits
+                WaitableTrait.self
             )
             Self.registeredShapes = true
         }

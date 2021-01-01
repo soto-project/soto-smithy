@@ -380,4 +380,57 @@ class TraitTests: XCTestCase {
         let httpRequestTestsTrait = try XCTUnwrap(shape.trait(type: HttpRequestTestsTrait.self))
         XCTAssertEqual(httpRequestTestsTrait.value.first?.id, "say_hello")
     }
+
+    func testWaitable() throws {
+        let smithy = """
+        namespace smithy.example
+
+        use smithy.waiters#waitable
+
+        @waitable(
+            ThingExists: {
+                description: "Waits until a thing has been created",
+                acceptors: [
+                    // Fail-fast if the thing transitions to a "failed" state.
+                    {
+                        state: "failure",
+                        matcher: {
+                            output: {
+                                path: "status",
+                                comparator: "stringEquals",
+                                expected: "failed"
+                            }
+                        }
+                    },
+                    // Succeed when the thing enters into a "success" state.
+                    {
+                        state: "success",
+                        matcher: {
+                            output: {
+                                path: "status",
+                                comparator: "stringEquals",
+                                expected: "success"
+                            }
+                        }
+                    }
+                ]
+            }
+        )
+        operation GetThing {
+            input: GetThingInput,
+            output: GetThingOutput,
+        }
+
+        structure GetThingInput {
+            @required
+            name: String,
+        }
+
+        structure GetThingOutput {
+            status: String
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        try model.validate()
+    }
 }

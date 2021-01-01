@@ -20,7 +20,7 @@ extension Smithy {
     /// - Parameter string: IDL
     /// - Throws: `ParserError`
     /// - Returns: Smithy Model
-    func parse(_ string: String) throws -> Model {
+    public func parse(_ string: String) throws -> Model {
         let state = try ParserState(string)
 
         var model: [String: Any]
