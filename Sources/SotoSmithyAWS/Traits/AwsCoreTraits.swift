@@ -25,6 +25,7 @@ public struct AwsServiceTrait: StaticTrait {
     public let arnNamespace: String
     public let cloudFormationName: String?
     public let cloudTrailEventSource: String?
+    public let endpointPrefix: String?
 }
 
 /// Defines an ARN of a Smithy resource shape.
