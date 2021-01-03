@@ -109,7 +109,7 @@ public struct AwsClientEndpointDiscoveryTrait: StaticTrait {
 /// discovery logic.
 public struct AwsClientDiscoveredEndpointTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#clientDiscoveredEndpoint"
-    public var selector: Selector { return TypeSelector<ServiceShape>() }
+    public var selector: Selector { return TypeSelector<OperationShape>() }
     public let required: Bool?
 }
 
@@ -117,4 +117,8 @@ public struct AwsClientDiscoveredEndpointTrait: StaticTrait {
 /// discover an endpoint for the service.
 public struct AwsClientEndpointDiscoveryIdTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#clientEndpointDiscoveryId"
+    public var selector: Selector { return AndSelector(
+        TypeSelector<OperationShape>(),
+        TraitSelector<AwsClientEndpointDiscoveryTrait>()
+    ) }
 }
