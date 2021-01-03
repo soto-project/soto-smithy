@@ -49,3 +49,14 @@ public struct ErrorTrait: SingleValueTrait {
         self.value = value
     }
 }
+
+/// Indicates that lists and maps MAY contain null values. The sparse trait has no effect on map keys; map keys are
+/// never allowed to be null.
+public struct SparseTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#sparse"
+    public var selector: Selector { OrSelector(
+        TypeSelector<ListShape>(),
+        TypeSelector<MapShape>()
+    ) }
+    public init() {}
+}

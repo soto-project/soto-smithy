@@ -71,6 +71,7 @@ public struct Smithy {
                 // type refinement traits
                 BoxTrait.self,
                 ErrorTrait.self,
+                SparseTrait.self,
                 // protocol traits
                 ProtocolDefinitionTrait.self,
                 JsonNameTrait.self,
