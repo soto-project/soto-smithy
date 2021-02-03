@@ -22,7 +22,7 @@ public struct AwsServiceTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#service"
     public var selector: Selector { return TypeSelector<ServiceShape>() }
     public let sdkId: String
-    public let arnNamespace: String
+    public let arnNamespace: String?
     public let cloudFormationName: String?
     public let cloudTrailEventSource: String?
     public let endpointPrefix: String?
