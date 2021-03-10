@@ -17,6 +17,10 @@ public struct EndpointTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#endpoint"
     public var selector: Selector { TypeSelector<OperationShape>() }
     public let hostPrefix: String
+
+    public init(hostPrefix: String) {
+        self.hostPrefix = hostPrefix
+    }
 }
 
 /// Binds a top-level operation input structure member to a label in the hostPrefix of an endpoint trait.

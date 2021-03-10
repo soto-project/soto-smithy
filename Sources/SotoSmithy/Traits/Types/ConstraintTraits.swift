@@ -71,6 +71,11 @@ public struct LengthTrait: StaticTrait {
     ) }
     public let min: Int?
     public let max: Int?
+
+    public init(min: Int?, max: Int?) {
+        self.min = min
+        self.max = max
+    }
 }
 
 /// Restricts string shape values to a specified regular expression.
@@ -96,6 +101,11 @@ public struct RangeTrait: StaticTrait {
     public var selector: Selector { OrTargetSelector(NumberSelector()) }
     public let min: Double?
     public let max: Double?
+
+    public init(min: Double?, max: Double?) {
+        self.min = min
+        self.max = max
+    }
 }
 
 /// Marks a structure member as required, meaning a value for the member MUST be present.

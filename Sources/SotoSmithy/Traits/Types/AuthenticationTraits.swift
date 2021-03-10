@@ -47,6 +47,11 @@ public struct HttpApiKeyAuthTrait: StaticTrait {
     public var selector: Selector { TypeSelector<ServiceShape>() }
     public let name: String
     public let `in`: String
+
+    public init(name: String, in: String) {
+        self.name = name
+        self.in = `in`
+    }
 }
 
 /// Indicates that an operation MAY be invoked without authentication, regardless of any authentication traits applied

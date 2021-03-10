@@ -17,6 +17,11 @@ public struct DeprecatedTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#deprecated"
     public let message: String?
     public let since: String?
+
+    public init(message: String?, since: String?) {
+        self.message = message
+        self.since = since
+    }
 }
 
 /// Adds documentation to a shape or member using the CommonMark format.

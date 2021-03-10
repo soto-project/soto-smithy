@@ -39,6 +39,10 @@ public struct RetryableTrait: StaticTrait {
     public static var staticName: ShapeId = "smithy.api#retryable"
     public var selector: Selector { AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>()) }
     public let throttling: Bool?
+
+    public init(throttling: Bool?) {
+        self.throttling = throttling
+    }
 }
 
 /// The paginated trait indicates that an operation intentionally limits the number of results returned in a single
@@ -50,6 +54,13 @@ public struct PaginatedTrait: StaticTrait {
     public let outputToken: String?
     public let items: String?
     public let pageSize: String?
+
+    public init(inputToken: String?, outputToken: String?, items: String?, pageSize: String?) {
+        self.inputToken = inputToken
+        self.outputToken = outputToken
+        self.items = items
+        self.pageSize = pageSize
+    }
 }
 
 /// Indicates that an operation requires a checksum in its HTTP request. By default, the checksum used for a
