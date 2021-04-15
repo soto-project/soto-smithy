@@ -64,6 +64,7 @@ public struct LengthTrait: StaticTrait {
     public var selector: Selector { OrTargetSelector(
         OrSelector(
             TypeSelector<ListShape>(),
+            TypeSelector<SetShape>(),
             TypeSelector<MapShape>(),
             TypeSelector<StringShape>(),
             TypeSelector<BlobShape>()
