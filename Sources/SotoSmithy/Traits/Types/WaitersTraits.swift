@@ -31,9 +31,9 @@ public struct WaitableTrait: SingleValueTrait {
     /// The output and inputOutput matchers test the result of a JMESPath expression against an expected value.
     /// These matchers are structures that support the following members.
     public struct PathMatcher: Decodable {
-        let path: String
-        let expected: String
-        let comparator: PathComparator
+        public let path: String
+        public let expected: String
+        public let comparator: PathComparator
     }
     /// A matcher defines how an acceptor determines if it matches the current state of a resource. A matcher is a union
     /// where exactly one of the following members MUST be set.

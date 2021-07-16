@@ -13,7 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 /// Protocol for Smithy Shape.
-public protocol Shape: class, Codable {
+public protocol Shape: AnyObject, Codable {
     /// Shape type string
     static var type: String { get }
     
