@@ -106,6 +106,12 @@ public struct HttpQueryTrait: SingleValueTrait {
     }
 }
 
+/// Binds an operation input structure member to a query string parameter.
+public struct HttpQueryParamsTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#httpQueryParams"
+    public var selector: Selector { TargetSelector(TypeSelector<MapShape>()) }
+}
+
 /// Indicates that the structure member represents an HTTP response status code.
 public struct HttpResponseCodeTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#httpResponseCode"

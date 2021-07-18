@@ -109,6 +109,7 @@ public struct Smithy {
                 HttpPayloadTrait.self,
                 HttpPrefixHeadersTrait.self,
                 HttpQueryTrait.self,
+                HttpQueryParamsTrait.self,
                 HttpResponseCodeTrait.self,
                 HttpCorsTrait.self,
                 // xml binding traits
