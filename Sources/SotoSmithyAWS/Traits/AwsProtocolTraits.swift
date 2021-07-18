@@ -44,6 +44,19 @@ public struct AwsProtocolsAwsQueryTrait: StaticTrait {
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
+/// Defines an HTTP response code for an operation error.
+public struct AwsProtocolsAwsQueryErrorTrait: StaticTrait {
+    public static let staticName: ShapeId = "aws.protocols#awsQueryError"
+    public var selector: Selector { AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>()) }
+    public var code: String
+    public var httpResponseCode: Int
+    
+    public init(code: String, httpResponseCode: Int) {
+        self.code = code
+        self.httpResponseCode = httpResponseCode
+    }
+}
+
 /// Adds support for an HTTP protocol that sends requests in the query string OR in a x-form-url-encoded body
 ///  and responses in XML documents. This protocol is an Amazon EC2-specific extension of the awsQuery protocol.
 public struct AwsProtocolsEc2QueryTrait: StaticTrait {
