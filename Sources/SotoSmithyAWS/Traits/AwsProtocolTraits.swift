@@ -2,7 +2,7 @@
 //
 // This source file is part of the Soto for AWS open source project
 //
-// Copyright (c) 2017-2020 the Soto project authors
+// Copyright (c) 2017-2021 the Soto project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -44,7 +44,8 @@ public struct AwsProtocolsAwsQueryTrait: StaticTrait {
     public var selector: Selector { return TypeSelector<ServiceShape>() }
 }
 
-/// Defines an HTTP response code for an operation error.
+/// Provides a custom "Code" value for awsQuery errors and an HTTP response code. The "Code" of an
+/// awsQuery error is used by clients to determine which type of error was encountered..
 public struct AwsProtocolsAwsQueryErrorTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.protocols#awsQueryError"
     public var selector: Selector { AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>()) }

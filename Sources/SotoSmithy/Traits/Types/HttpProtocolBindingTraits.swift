@@ -106,7 +106,7 @@ public struct HttpQueryTrait: SingleValueTrait {
     }
 }
 
-/// Binds an operation input structure member to a query string parameter.
+/// Binds a map of key-value pairs to query string parameters.
 public struct HttpQueryParamsTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#httpQueryParams"
     public var selector: Selector { TargetSelector(TypeSelector<MapShape>()) }
