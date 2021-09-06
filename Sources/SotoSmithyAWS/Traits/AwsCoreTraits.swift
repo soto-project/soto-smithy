@@ -26,6 +26,14 @@ public struct AwsServiceTrait: StaticTrait {
     public let cloudFormationName: String?
     public let cloudTrailEventSource: String?
     public let endpointPrefix: String?
+
+    public init(sdkId: String, arnNamespace: String?, cloudFormationName: String?, cloudTrailEventSource: String?, endpointPrefix: String?) {
+        self.sdkId = sdkId
+        self.arnNamespace = arnNamespace
+        self.cloudFormationName = cloudFormationName
+        self.cloudTrailEventSource = cloudTrailEventSource
+        self.endpointPrefix = endpointPrefix
+    }
 }
 
 /// Defines an ARN of a Smithy resource shape.
@@ -36,6 +44,13 @@ public struct AwsArnTrait: StaticTrait {
     public let absolute: Bool
     public let noAccount: Bool
     public let noRegion: Bool
+
+    public init(template: String, absolute: Bool, noAccount: Bool, noRegion: Bool) {
+        self.template = template
+        self.absolute = absolute
+        self.noAccount = noAccount
+        self.noRegion = noRegion
+    }
 }
 
 /// Specifies that a string shape contains a fully formed AWS ARN.
@@ -45,6 +60,12 @@ public struct AwsArnReferenceTrait: StaticTrait {
     public let type: String?
     public let service: ShapeId?
     public let resource: ShapeId?
+
+    public init(type: String?, service: ShapeId?, resource: ShapeId?) {
+        self.type = type
+        self.service = service
+        self.resource = resource
+    }
 }
 
 /// Indicates that the target contains data of the specified classification.
