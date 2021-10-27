@@ -70,3 +70,16 @@ public struct HttpChecksumRequiredTrait: StaticTrait {
     public var selector: Selector { TypeSelector<OperationShape>() }
     public init() {}
 }
+
+/// Indicates that an operation requires a checksum in its HTTP request.
+public struct HttpChecksumTrait: StaticTrait {
+    public static var staticName: ShapeId = "smithy.api#httpChecksum"
+    public var selector: Selector { TypeSelector<OperationShape>() }
+    public struct Property: Decodable {
+        let algorithm: String
+        let `in`: String
+        let name: String
+    }
+    public let request: [Property]?
+    public let response: [Property]?
+}

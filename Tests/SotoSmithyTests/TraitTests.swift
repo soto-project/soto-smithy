@@ -433,4 +433,37 @@ class TraitTests: XCTestCase {
         let model = try Smithy().parse(smithy)
         try model.validate()
     }
+
+    func testHttpChecksumTrait() throws {
+        let smithy = """
+        namespace smithy.example
+
+        @httpChecksum(
+            request: [
+                { algorithm: "sha256", in: "header", name: "x-checksum-sha256"},
+                { algorithm: "crc32", in: "header", name: "x-checksum-crc32"}
+            ],
+            response: [
+                { algorithm: "sha256", in: "header", name: "x-checksum-sha256"},
+                { algorithm: "crc32", in: "header", name: "x-checksum-crc32"}
+            ]
+        )
+        operation GetThing {
+            input: GetThingInput,
+            output: GetThingOutput,
+        }
+
+        structure GetThingInput {
+            @required
+            name: String,
+        }
+
+        structure GetThingOutput {
+            status: String
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        try model.validate()
+
+    }
 }
