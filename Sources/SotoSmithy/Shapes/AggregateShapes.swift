@@ -91,7 +91,7 @@ public class MapShape: Shape {
 
 /// Protocol for shape holding a collection of member shapes
 public protocol CollectionShape: Shape {
-    var members: [String: MemberShape]? { get }
+    var members: [String: MemberShape]? { get set }
 }
 
 extension CollectionShape {
