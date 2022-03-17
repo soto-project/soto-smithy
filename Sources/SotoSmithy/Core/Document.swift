@@ -66,7 +66,7 @@ extension Document: Decodable {
         } else if let string = try? container.decode(String.self) {
             self.init(value: string)
         } else if let array = try? container.decode([Document].self) {
-            self.init(value: array.map { $0.value })
+            self.init(value: array.map(\.value))
         } else if let dictionary = try? container.decode([String: Document].self) {
             self.init(value: dictionary.mapValues { $0.value })
         } else {
