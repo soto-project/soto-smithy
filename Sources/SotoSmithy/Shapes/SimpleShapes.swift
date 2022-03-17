@@ -128,3 +128,12 @@ public class DocumentShape: Shape {
         self.traits = traits
     }
 }
+
+/// Shape representing 
+public class UnitShape: Shape {
+    public static let type = "unit"
+    public var traits: TraitList?
+    public init(traits: TraitList? = nil) {
+        self.traits = traits
+    }
+}

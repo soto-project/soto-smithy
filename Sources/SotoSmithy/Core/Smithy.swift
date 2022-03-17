@@ -173,6 +173,7 @@ public struct Smithy {
         "smithy.api#PrimitiveFloat": FloatShape(traits: nil),
         "smithy.api#Double": DoubleShape(traits: [BoxTrait()]),
         "smithy.api#PrimitiveDouble": DoubleShape(traits: nil),
+        "smithy.api#Unit": UnitShape(traits: [UnitTypeTrait()]),
     ]
 
     private static var registeredShapes: Bool = false

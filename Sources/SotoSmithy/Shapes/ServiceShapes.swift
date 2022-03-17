@@ -41,6 +41,12 @@ public class OperationShape: Shape {
     public let input: MemberShape?
     public let output: MemberShape?
     public let errors: [MemberShape]?
+
+    public func validate(using model: Model) throws {
+        try input?.validate(using: model)
+        try output?.validate(using: model)
+        try self.validateTraits(using: model)
+    }
 }
 
 /// Shape representing resource member of service shape
