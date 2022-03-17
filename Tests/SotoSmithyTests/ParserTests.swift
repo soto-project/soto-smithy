@@ -335,6 +335,8 @@ class ParserTests: XCTestCase {
 
     func testApplyExamplesTrait() throws {
         let smithy = """
+        structure MyOperationInput {}
+        structure MyOperationOutput {}
         @readonly
         operation MyOperation {
             input: MyOperationInput,

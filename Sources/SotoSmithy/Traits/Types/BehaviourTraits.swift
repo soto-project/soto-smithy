@@ -83,3 +83,11 @@ public struct HttpChecksumTrait: StaticTrait {
     public let request: [Property]?
     public let response: [Property]?
 }
+
+/// Defines the shape to be a unit type similar to Void or None
+public struct UnitTypeTrait: StaticTrait {
+    public static var staticName: ShapeId = "smithy.api#unitType"
+    public var selector: Selector { TypeSelector<UnitShape>() }
+    public init() {}
+}
+
