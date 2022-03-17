@@ -28,6 +28,7 @@ extension Smithy {
             AwsClientEndpointDiscoveryTrait.self,
             AwsClientDiscoveredEndpointTrait.self,
             AwsClientEndpointDiscoveryIdTrait.self,
+            AwsHttpChecksumTrait.self,
             // Authentication Traits
             AwsAuthSigV4Trait.self,
             AwsAuthUnsignedPayloadTrait.self,
