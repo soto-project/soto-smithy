@@ -41,11 +41,11 @@ public struct AwsArnTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#arn"
     public var selector: Selector { return TypeSelector<ResourceShape>() }
     public let template: String
-    public let absolute: Bool
-    public let noAccount: Bool
-    public let noRegion: Bool
+    public let absolute: Bool?
+    public let noAccount: Bool?
+    public let noRegion: Bool?
 
-    public init(template: String, absolute: Bool, noAccount: Bool, noRegion: Bool) {
+    public init(template: String, absolute: Bool?, noAccount: Bool?, noRegion: Bool?) {
         self.template = template
         self.absolute = absolute
         self.noAccount = noAccount
