@@ -144,3 +144,28 @@ public struct AwsClientEndpointDiscoveryIdTrait: StaticTrait {
         TraitSelector<AwsClientEndpointDiscoveryTrait>()
     ) }
 }
+
+/// Specifies that a string shape contains a fully formed AWS ARN.
+public struct AwsHttpChecksumTrait: StaticTrait {
+    public static let staticName: ShapeId = "aws.protocols#httpChecksum"
+    public var selector: Selector { return TypeSelector<OperationShape>() }
+    public enum Algorithm: String, Codable {
+        case crc32c = "CRC32C"
+        case crc32 = "CRC32"
+        case sha1 = "SHA1"
+        case sha256 = "SHA256"
+    }
+    public let requestAlgorithmMember: String?
+    public let requestChecksumRequired: Bool?
+    public let requestValidationModeMember: String?
+    public let responseAlgorithms: Set<Algorithm>?
+
+    public init(requestAlgorithmMember: String?, requestChecksumRequired: Bool?, requestValidationModeMember: String?, responseAlgorithms: Set<Algorithm>?) {
+        self.requestAlgorithmMember = requestAlgorithmMember
+        self.requestChecksumRequired = requestChecksumRequired
+        self.requestValidationModeMember = requestValidationModeMember
+        self.responseAlgorithms = responseAlgorithms
+    }
+
+}
+
