@@ -43,7 +43,7 @@ public class Model: Decodable {
         }
         self.shapes = shapes
     }
-    
+
     /// Return Shape given ShapeId
     /// - Parameter identifier: shape identifier
     /// - Returns: Returns Shape if it exists in Model
@@ -62,7 +62,7 @@ public class Model: Decodable {
             return self.shapes[identifier]
         }
     }
-    
+
     /// Validate Model. Runs validate on all Shapes and verifies Trait selectors
     /// - Throws: `Smithy.ValidationError`
     public func validate() throws {
@@ -75,7 +75,7 @@ public class Model: Decodable {
             }
         }
     }
-    
+
     /// Return shapes from model that are matched by Selector
     /// - Parameter selector: Selector to match shapes
     /// - Returns: Map of shapeIds to Shapes that match selector
@@ -91,16 +91,16 @@ public class Model: Decodable {
     /// - Returns: Map of shapeIds to Shapes that match selector
     public func select(from string: String) throws -> [ShapeId: Shape] {
         let selector = try SelectorParser.parse(from: string)
-        return select(with: selector)
+        return self.select(with: selector)
     }
-    
+
     /// Return shapes from model that are of a certain type
     /// - Parameter shapeType: Shape type to match
     /// - Returns: Map of shapeIds to Shapes that match shape
     public func select<S: Shape>(type shapeType: S.Type) -> [ShapeId: S] {
         return self.shapes.compactMapValues { $0 as? S }
     }
-    
+
     /// Add trait to shape. This function will also match shape members if shape id is referencing a shape member
     /// - Parameters:
     ///   - trait: Trait to add

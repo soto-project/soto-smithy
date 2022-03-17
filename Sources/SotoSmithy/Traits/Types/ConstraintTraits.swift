@@ -24,7 +24,7 @@ public struct EnumTrait: SingleValueTrait {
             self.tags = tags
             self.deprecated = deprecated
         }
-        
+
         public let value: String
         public let name: String?
         public let documentation: String?
@@ -120,5 +120,5 @@ public struct RequiredTrait: StaticTrait {
 public struct UniqueItemsTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#uniqueItems"
     public init() {}
-    //TODO: Validation :test(list > member > simpleType)
+    // TODO: Validation :test(list > member > simpleType)
 }

@@ -43,8 +43,8 @@ public class OperationShape: Shape {
     public let errors: [MemberShape]?
 
     public func validate(using model: Model) throws {
-        try input?.validate(using: model)
-        try output?.validate(using: model)
+        try self.input?.validate(using: model)
+        try self.output?.validate(using: model)
         try self.validateTraits(using: model)
     }
 }

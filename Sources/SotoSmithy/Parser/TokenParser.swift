@@ -19,49 +19,49 @@ struct TokenParser {
 
     init(_ tokens: [Tokenizer.Token]) {
         self.tokens = tokens
-        position = tokens.startIndex
+        self.position = tokens.startIndex
     }
 
     func token() throws -> Tokenizer.Token {
-        guard position != tokens.endIndex else { throw Smithy.ParserError.overflow }
-        return tokens[position]
+        guard self.position != self.tokens.endIndex else { throw Smithy.ParserError.overflow }
+        return self.tokens[self.position]
     }
 
     mutating func nextToken() throws -> Tokenizer.Token {
-        guard position != tokens.endIndex else { throw Smithy.ParserError.overflow }
-        let token = tokens[position]
-        position += 1
+        guard self.position != self.tokens.endIndex else { throw Smithy.ParserError.overflow }
+        let token = self.tokens[self.position]
+        self.position += 1
         return token
     }
 
     mutating func advance() throws {
-        guard position != tokens.endIndex else { throw Smithy.ParserError.overflow }
-        position += 1
+        guard self.position != self.tokens.endIndex else { throw Smithy.ParserError.overflow }
+        self.position += 1
     }
 
     mutating func retreat() throws {
-        guard position != tokens.startIndex else { throw Smithy.ParserError.overflow }
-        position -= 1
+        guard self.position != self.tokens.startIndex else { throw Smithy.ParserError.overflow }
+        self.position -= 1
     }
 
     mutating func expect(_ token: Tokenizer.Token.TokenType) throws {
-        guard position != tokens.endIndex else { throw Smithy.ParserError.overflow }
-        guard tokens[position] == token else { throw Smithy.ParserError.unexpectedToken(tokens[position]) }
-        position += 1
+        guard self.position != self.tokens.endIndex else { throw Smithy.ParserError.overflow }
+        guard self.tokens[self.position] == token else { throw Smithy.ParserError.unexpectedToken(self.tokens[self.position]) }
+        self.position += 1
     }
 
     mutating func skip(while token: Tokenizer.Token.TokenType) {
-        while !reachedEnd() {
-            let nextToken = tokens[position]
-            position += 1
+        while !self.reachedEnd() {
+            let nextToken = self.tokens[self.position]
+            self.position += 1
             if nextToken != token {
-                position -= 1
+                self.position -= 1
                 return
             }
         }
     }
 
     func reachedEnd() -> Bool {
-        return position == tokens.endIndex
+        return self.position == self.tokens.endIndex
     }
 }

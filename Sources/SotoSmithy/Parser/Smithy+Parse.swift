@@ -15,7 +15,6 @@
 import Foundation
 
 extension Smithy {
-    
     /// Parse IDL to create Smithy Model
     /// - Parameter string: IDL
     /// - Throws: `ParserError`
@@ -26,9 +25,9 @@ extension Smithy {
         var model: [String: Any]
         do {
             // IDL is split into three distinct sections: control, metadata and shapes
-            model = try parseControlSection(state)
-            model["metadata"] = try parseMetadataSection(state)
-            model["shapes"] = try parserShapesSection(state)
+            model = try self.parseControlSection(state)
+            model["metadata"] = try self.parseMetadataSection(state)
+            model["shapes"] = try self.parserShapesSection(state)
         } catch let error as ParserError {
             // if returned error without context attempt to fill in context from current parser state
             if error.context == nil {
@@ -39,11 +38,11 @@ extension Smithy {
                 throw error
             }
         }
-        
+
         let data = try JSONSerialization.data(withJSONObject: model, options: [])
         return try Smithy().decodeAST(from: data)
     }
-    
+
     /// parse control section of IDL
     func parseControlSection(_ state: ParserState) throws -> [String: Any] {
         let model: [String: Any] = ["smithy": "1.0"]
@@ -64,13 +63,13 @@ extension Smithy {
         }
         return model
     }
-    
+
     /// Parse metadata section of IDL
     /// - Returns: Metadata dictionary
     func parseMetadataSection(_ state: ParserState) throws -> [String: Any] {
         state.parsingMetadata = true
         defer { state.parsingMetadata = false }
-        
+
         var metaData: [String: Any] = [:]
         while !state.parser.reachedEnd() {
             state.parser.skip(while: .newline)
@@ -101,13 +100,13 @@ extension Smithy {
         }
         return metaData
     }
-    
+
     /// parse shapes section of IDL
     /// - Returns: Shapes as a dictionary
     func parserShapesSection(_ state: ParserState) throws -> [String: Any] {
         var modelShapes: [String: Any] = [:]
         var traits: [String: Any] = [:]
-        var traitPosition: Int? = nil
+        var traitPosition: Int?
 
         while !state.parser.reachedEnd() {
             let token = try state.parser.nextToken()
@@ -123,7 +122,7 @@ extension Smithy {
                     guard state.namespace == nil else { throw ParserError("File contains two namespace definitions", state: state) }
                     guard modelShapes.count == 0 else { throw ParserError("Shapes defined before namespace has been set", state: state) }
                     state.namespace = name
-                // use shapeId
+                    // use shapeId
                 } else if string == "use" {
                     if traits.count > 0 {
                         if let position = traitPosition { state.parser.position = position }
@@ -134,10 +133,10 @@ extension Smithy {
                     guard modelShapes.count == 0 else { throw ParserError("Shapes defined before \"use\" statement", state: state) }
                     let shapeId = ShapeId(rawValue: String(name))
                     state.use[shapeId.shapeName] = shapeId
-                // unexpected metadata. Should have already been read
+                    // unexpected metadata. Should have already been read
                 } else if string == "metadata" {
                     throw ParserError.unexpectedToken(token)
-                // if trait
+                    // if trait
                 } else if string.first == "@" {
                     // record position of first trait
                     if traitPosition == nil {
@@ -152,7 +151,7 @@ extension Smithy {
                     guard modelShapes[shapeId.rawValue] != nil else { throw ParserError("Apply referencing non-existent Shape ID", state: state) }
                     let mergeDictionary: [String: Any] = [shapeId.rawValue: ["traits": [apply.trait.rawValue: apply.value]]]
                     modelShapes = mergeDictionaries(modelShapes, mergeDictionary)
-                // otherwise must be a shape
+                    // otherwise must be a shape
                 } else {
                     let token = try state.parser.nextToken()
                     guard case .token(let name) = token.type else { throw ParserError.unexpectedToken(token) }
@@ -168,7 +167,7 @@ extension Smithy {
                 }
             } else if case .documentationComment(let comment) = token.type {
                 traits["smithy.api#documentation"] = comment
-            } else if token == .newline{
+            } else if token == .newline {
                 if traits.count > 0 {
                     if let position = traitPosition { state.parser.position = position }
                     throw ParserError.unattachedTraits()
@@ -179,7 +178,7 @@ extension Smithy {
         }
         return modelShapes
     }
-    
+
     /// Parse shape from tokenized smithy
     func parseShape(_ state: ParserState, type: Substring) throws -> [String: Any] {
         var shape: [String: Any] = ["type": type]
@@ -188,10 +187,10 @@ extension Smithy {
         let next = try state.parser.nextToken()
         guard next != .newline else { return shape }
         guard next == .grammar("{") else { throw ParserError.unexpectedToken(next) }
-        
+
         var members: [Substring: Any] = [:]
-        var traitPosition: Int? = nil
-        
+        var traitPosition: Int?
+
         while !state.parser.reachedEnd() {
             let token = try state.parser.nextToken()
             if case .token(let string) = token.type {
@@ -204,13 +203,14 @@ extension Smithy {
                     let traitName = string.dropFirst()
                     let trait = try parseTrait(state)
                     traits[fullTraitName(traitName, state: state).rawValue] = trait
-                // otherwise assume token is a shape name
+                    // otherwise assume token is a shape name
                 } else {
                     try state.parser.expect(.grammar(":"))
                     let value = try parseValue(state)
                     if traits.count > 0,
                        var dictionary = value as? [String: Any],
-                       dictionary["target"] != nil {
+                       dictionary["target"] != nil
+                    {
                         dictionary["traits"] = traits
                         members[string] = dictionary
                     } else {
@@ -229,7 +229,7 @@ extension Smithy {
                     if let position = traitPosition { state.parser.position = position }
                     throw ParserError.unattachedTraits()
                 }
-            } else if token == .grammar("}"){
+            } else if token == .grammar("}") {
                 if traits.count > 0 {
                     if let position = traitPosition { state.parser.position = position }
                     throw ParserError.unattachedTraits()
@@ -240,7 +240,7 @@ extension Smithy {
                 throw ParserError.unexpectedToken(token)
             }
         }
-        
+
         if type == "union" || type == "structure" {
             shape["members"] = members
         } else {
@@ -250,7 +250,7 @@ extension Smithy {
         }
         return shape
     }
-    
+
     /// parse a value. This could be a string, number, array, dictionary or shape id
     func parseValue(_ state: ParserState) throws -> Any {
         let token = try state.parser.nextToken()
@@ -260,29 +260,28 @@ extension Smithy {
         case .number(let number):
             return number
         case .grammar("{"):
-            return try parseDictionary(state)
+            return try self.parseDictionary(state)
         case .grammar("["):
-            return try parseArray(state)
+            return try self.parseArray(state)
         case .token(let string):
             // is it a boolean
             if let boolean = Bool(String(string)) { return boolean }
             // Tokens ie strings without speech marks are treated differently based on what we are parsing
             // A token inside metadata can only be a true/false boolean. If we are parsing a trait then convert
             // it to a the full shape name for the string. Otherwise we are in a shape and we should convert this
-            // to a dictionary with a single value "target" which is the full shape name 
+            // to a dictionary with a single value "target" which is the full shape name
             if state.parsingMetadata {
                 throw ParserError.unexpectedToken(token)
             } else if state.parsingTrait {
-                return fullShapeName(string, state: state).rawValue
+                return self.fullShapeName(string, state: state).rawValue
             } else {
-                return ["target": fullShapeName(string, state: state).rawValue]
+                return ["target": self.fullShapeName(string, state: state).rawValue]
             }
         default:
             throw ParserError.unexpectedToken(token)
-
         }
     }
-    
+
     func parseMappedValues(_ state: ParserState, endToken: Tokenizer.Token.TokenType) throws -> [Substring: Any] {
         var dictionary: [Substring: Any] = [:]
         while !state.parser.reachedEnd() {
@@ -298,7 +297,7 @@ extension Smithy {
                     break
                 }
                 // dictionaries can have strings for keys when loading metadata
-            } else if case .string(let key) = token.type/*, state.loadingMetadata*/ {
+            } else if case .string(let key) = token.type /* , state.loadingMetadata */ {
                 try state.parser.expect(.grammar(":"))
                 let value = try parseValue(state)
                 dictionary[Substring(key)] = value
@@ -311,7 +310,7 @@ extension Smithy {
         }
         return dictionary
     }
-    
+
     func parseParameters(_ state: ParserState) throws -> Any {
         state.parser.skip(while: .newline)
         if case .token = try state.parser.token().type {
@@ -322,9 +321,9 @@ extension Smithy {
             return value
         }
     }
-    
+
     func parseDictionary(_ state: ParserState) throws -> [Substring: Any] {
-        return try parseMappedValues(state, endToken: .grammar("}"))
+        return try self.parseMappedValues(state, endToken: .grammar("}"))
     }
 
     func parseArray(_ state: ParserState) throws -> [Any] {
@@ -338,7 +337,7 @@ extension Smithy {
             } else {
                 let value = try parseValue(state)
                 array.append(value)
-                if try endCollection(state, endToken: .grammar("]")) {
+                if try self.endCollection(state, endToken: .grammar("]")) {
                     break
                 }
             }
@@ -356,7 +355,7 @@ extension Smithy {
             value = [:]
         } else if token == .grammar("(") {
             try state.parser.advance()
-            value = try parseParameters(state)
+            value = try self.parseParameters(state)
         } else if case .token = token.type {
             value = [:]
         } else {
@@ -376,7 +375,7 @@ extension Smithy {
         }
         return value
     }
-    
+
     func parseApply(_ state: ParserState, shapes: [String: Any]) throws -> (shape: Substring, trait: ShapeId, value: Any) {
         let shapeToken = try state.parser.nextToken()
         guard case .token(let shape) = shapeToken.type else { throw ParserError.unexpectedToken(shapeToken) }
@@ -385,10 +384,10 @@ extension Smithy {
         guard traitName.first == "@" else { throw ParserError.unexpectedToken(traitToken) }
         let fullTraitName = self.fullTraitName(traitName.dropFirst(), state: state)
         let trait = try parseTrait(state)
-    
+
         return (shape, fullTraitName, trait)
     }
-    
+
     func endCollection(_ state: ParserState, endToken: Tokenizer.Token.TokenType) throws -> Bool {
         let nextToken = try state.parser.nextToken()
         if nextToken.type == endToken {
@@ -403,7 +402,7 @@ extension Smithy {
             throw ParserError.unexpectedToken(nextToken)
         }
     }
-    
+
     /// Return full shape name given name. If name has no namespace search for shape in available namespaces
     /// otherwise prefix with current namespace
     func fullShapeName(_ name: Substring, state: ParserState) -> ShapeId {
@@ -421,7 +420,7 @@ extension Smithy {
         }
         return shapeId
     }
-    
+
     /// Return full trait name. If name has no namespace search for shape in available namespaces
     /// otherwise prefix with current namespace
     func fullTraitName(_ name: Substring, state: ParserState) -> ShapeId {
@@ -461,7 +460,7 @@ extension Smithy {
         var use: [String: ShapeId]
         var parsingMetadata: Bool
         var parsingTrait: Bool
-        
+
         init(_ string: String) throws {
             self.text = string
             let tokens = try Tokenizer().tokenize(string)
@@ -482,7 +481,7 @@ extension Smithy {
             self.reason = reason
             self.context = context
         }
-        
+
         init(_ reason: String, state: ParserState) {
             self.reason = reason
             do {
@@ -495,7 +494,7 @@ extension Smithy {
                 self.context = nil
             }
         }
-        
+
         static func unexpectedToken(_ token: Tokenizer.Token) -> Self { return .init("Unexpected token \(token)") }
         static var overflow: Self { return .init("File ended unexpectedly") }
         static func unattachedTraits() -> Self { return .init("Traits not attached to a shape") }

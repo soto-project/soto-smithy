@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-//import Foundation
+// import Foundation
 
 struct Tokenizer {
     struct Token: CustomStringConvertible {
@@ -24,6 +24,7 @@ struct Tokenizer {
             case documentationComment(Substring)
             case newline
         }
+
         let type: TokenType
         let position: String.Index
 
@@ -31,11 +32,11 @@ struct Tokenizer {
             self.type = type
             self.position = position
         }
-        
+
         static func == (lhs: Self, rhs: Tokenizer.Token.TokenType) -> Bool {
             return lhs.type == rhs
         }
-        
+
         static func != (lhs: Self, rhs: Tokenizer.Token.TokenType) -> Bool {
             return lhs.type != rhs
         }
@@ -70,13 +71,13 @@ struct Tokenizer {
     let grammarChars: Set<Character>
 
     init(tokenChars: String? = nil, tokenStartChars: String? = nil, grammarChars: String? = nil) {
-        self.tokenChars = tokenChars.map { Self.set(from: $0)} ?? Self.defaultTokenChars
-        self.tokenStartChars = tokenStartChars.map { Self.set(from: $0)} ?? Self.defaultTokenStartChars
-        self.grammarChars = grammarChars.map { Self.set(from: $0)} ?? Self.defaultGrammarChars
+        self.tokenChars = tokenChars.map { Self.set(from: $0) } ?? Self.defaultTokenChars
+        self.tokenStartChars = tokenStartChars.map { Self.set(from: $0) } ?? Self.defaultTokenStartChars
+        self.grammarChars = grammarChars.map { Self.set(from: $0) } ?? Self.defaultGrammarChars
     }
 
     static func set(from string: String) -> Set<Character> {
-        return .init(string.map{ $0 })
+        return .init(string.map { $0 })
     }
 
     func tokenize(_ smithy: String) throws -> [Token] {
@@ -97,7 +98,7 @@ struct Tokenizer {
                 tokens.append(.init(.token(token), position: position))
             } else if Self.numberStartChars.contains(current) {
                 let token = parser.read(while: Self.numberChars)
-                tokens.append(.init(.number(Double(token) ?? 0.0 ), position: position))
+                tokens.append(.init(.number(Double(token) ?? 0.0), position: position))
             } else if current == "\"" {
                 let text = try readQuotedText(from: &parser)
                 tokens.append(.init(.string(text), position: position))
@@ -111,7 +112,7 @@ struct Tokenizer {
         }
         return tokens
     }
-    
+
     func readQuotedText(from parser: inout Parser) throws -> String {
         var stringParser = parser
         defer { parser = stringParser }
@@ -122,7 +123,7 @@ struct Tokenizer {
             if try stringParser.current() == "\"" {
                 try stringParser.advance()
                 if !stringParser.reachedEnd(), try stringParser.current() == "\"" {
-                    return try readBlockText(from: &stringParser)
+                    return try self.readBlockText(from: &stringParser)
                 }
                 return ""
             }
@@ -158,10 +159,10 @@ struct Tokenizer {
         defer { parser = stringParser }
         try stringParser.advance()
         var text = ""
-        
+
         let newlineToken = try stringParser.character()
         guard newlineToken == "\n" else { throw Error.corruptTextBlock(stringParser) }
-        
+
         do {
             while true {
                 text += try stringParser.read(until: Set(Self.set(from: "\\\"")))
@@ -197,7 +198,7 @@ struct Tokenizer {
         } catch Parser.Error.overflow {
             throw Error.unterminatedString(parser)
         }
-        
+
         let lines = text.split(separator: "\n", omittingEmptySubsequences: false)
         let lastLine = lines.last!
         let numSpaces = lastLine.count
@@ -222,7 +223,6 @@ struct Tokenizer {
         }.dropFirst())
     }
 
-
     func readDocumentationComment(from parser: inout Parser) throws -> Substring? {
         try parser.advance()
         guard try parser.read("/") else {
@@ -237,7 +237,7 @@ struct Tokenizer {
         }
         return documentationComment ? text : nil
     }
-    
+
     struct Error: SmithyError {
         enum ErrorType {
             case unexpectedCharacter
@@ -245,6 +245,7 @@ struct Tokenizer {
             case unterminatedString
             case corruptTextBlock
         }
+
         let errorType: ErrorType
         let context: SmithyErrorContext?
 
@@ -252,9 +253,9 @@ struct Tokenizer {
         static func unrecognisedEscapeCharacter(_ parser: Parser) -> Self { .init(errorType: .unrecognisedEscapeCharacter, context: .init(parser)) }
         static func unterminatedString(_ parser: Parser) -> Self { .init(errorType: .unterminatedString, context: .init(parser)) }
         static func corruptTextBlock(_ parser: Parser) -> Self { .init(errorType: .corruptTextBlock, context: .init(parser)) }
-        
+
         var reason: String {
-            switch errorType {
+            switch self.errorType {
             case .unexpectedCharacter:
                 return "Unexpected character"
             case .unrecognisedEscapeCharacter:

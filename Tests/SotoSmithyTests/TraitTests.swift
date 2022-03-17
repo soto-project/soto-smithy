@@ -464,6 +464,5 @@ class TraitTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         try model.validate()
-
     }
 }

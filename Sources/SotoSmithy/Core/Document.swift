@@ -23,33 +23,33 @@ public struct Document {
     }
 
     /// return value as an integer
-    public var int : Int? { return value as? Int }
+    public var int: Int? { return self.value as? Int }
 
     /// return value as a float
-    public var float : Float? { return value as? Float }
+    public var float: Float? { return self.value as? Float }
 
     /// return value as a double
-    public var double : Double? { return value as? Double }
+    public var double: Double? { return self.value as? Double }
 
     /// return value as a bool
-    public var bool : Bool? { return value as? Bool }
+    public var bool: Bool? { return self.value as? Bool }
 
     /// return value as a string
-    public var string : String? {
-        return value as? String
+    public var string: String? {
+        return self.value as? String
     }
 
     /// return value as a dictionary
-    public var dictionary : [String:Any]? { return value as? [String:Any] }
+    public var dictionary: [String: Any]? { return self.value as? [String: Any] }
 
     /// return value as an array
-    public var array : [Any]? { return value as? [Any] }
+    public var array: [Any]? { return self.value as? [Any] }
 
     /// subscript value as if it is an array
-    public subscript(index:Int) -> Document { return Document(value: (value as? [Any])?[index]) }
+    public subscript(index: Int) -> Document { return Document(value: (self.value as? [Any])?[index]) }
 
     /// subscript value as if it is a dictionary
-    public subscript(key:String) -> Document { Document(value: (value as? [String:Any])?[key]) }
+    public subscript(key: String) -> Document { Document(value: (self.value as? [String: Any])?[key]) }
 }
 
 extension Document: Decodable {

@@ -20,4 +20,3 @@ public protocol Selector {
     ///   - shape: Shape to match
     func select(using model: Model, shape: Shape) -> Bool
 }
-

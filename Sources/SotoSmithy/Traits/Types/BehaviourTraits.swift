@@ -80,6 +80,7 @@ public struct HttpChecksumTrait: StaticTrait {
         let `in`: String
         let name: String
     }
+
     public let request: [Property]?
     public let response: [Property]?
 }
@@ -90,4 +91,3 @@ public struct UnitTypeTrait: StaticTrait {
     public var selector: Selector { TypeSelector<UnitShape>() }
     public init() {}
 }
-

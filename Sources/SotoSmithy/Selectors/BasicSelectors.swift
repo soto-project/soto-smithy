@@ -113,7 +113,6 @@ public struct TraitNameSelector: Selector {
     }
 
     public func select(using model: Model, shape: Shape) -> Bool {
-        return shape.trait(named: name) != nil
+        return shape.trait(named: self.name) != nil
     }
 }
-

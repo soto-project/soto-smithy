@@ -16,5 +16,5 @@
 /// a Model.
 class ApplyShape: Shape {
     public static var type: String { return "apply" }
-    var traits: TraitList?    
+    var traits: TraitList?
 }

@@ -22,7 +22,7 @@ public struct ShapeId: Equatable, Hashable, RawRepresentable {
     }
 
     public init<S: StringProtocol>(namespace: S?, shapeName: S) {
-        self.rawValue = "\(namespace.map{ "\($0)#" } ?? "")\(shapeName)"
+        self.rawValue = "\(namespace.map { "\($0)#" } ?? "")\(shapeName)"
     }
 
     /// namespace

@@ -16,20 +16,20 @@
 public protocol Shape: AnyObject, Codable {
     /// Shape type string
     static var type: String { get }
-    
+
     /// List of traits attached to this shape
     var traits: TraitList? { get set }
-    
+
     /// Validate this shape
     /// - Parameter model: The model the shape is part of
     func validate(using model: Model) throws
-    
+
     /// Add a trait to one of this shapes members
     /// - Parameters:
     ///   - trait: Trait to add
     ///   - member: Member to add trait to
     func add(trait: Trait, to member: String) throws
-    
+
     /// Remove a trait from a one of this shapes members
     /// - Parameters:
     ///   - trait: Trait type to remove
@@ -41,16 +41,16 @@ extension Shape {
     /// Default validate function which validates the traits attached to this shape
     /// - Parameter model: The model the shape is part of
     public func validate(using model: Model) throws {
-        try validateTraits(using: model)
+        try self.validateTraits(using: model)
     }
-    
+
     /// Get trait of type that is  attached to shape
     /// - Parameter type: Type of trait we are looking for
     /// - Returns: Trait if there is one attached
     public func trait<T: StaticTrait>(type: T.Type) -> T? {
         return traits?.trait(type: T.self)
     }
-    
+
     /// Return if shape has a trait of type
     /// - Parameter type: Trait type
     /// - Returns: whether shape has trait
@@ -64,7 +64,7 @@ extension Shape {
     public func trait(named: ShapeId) -> Trait? {
         return traits?.trait(named: named)
     }
-    
+
     /// Add trait to shape
     /// - Parameter trait: Trait to add
     public func add(trait: Trait) {
@@ -72,19 +72,19 @@ extension Shape {
             self.traits = TraitList(traits: [trait])
         }
     }
-    
+
     /// Remove trait of type from shape
     /// - Parameter trait: Trait type to remove
     public func remove(trait: StaticTrait.Type) {
         self.traits?.remove(trait: trait)
     }
-    
+
     /// Remove trait of type from shape
     /// - Parameter trait: Trait type to remove
     public func removeTrait(named: ShapeId) {
         self.traits?.removeTrait(named: named)
     }
-    
+
     /// Default implementation of adding trait to member. Throws an error. Shape which have members will override this
     /// - Throws: `MemberDoesNotExistError`
     public func add(trait: Trait, to member: String) throws {
@@ -96,9 +96,9 @@ extension Shape {
     public func remove(trait: StaticTrait.Type, from member: String) throws {
         throw Smithy.MemberDoesNotExistError(name: member)
     }
-    
+
     /// Selector used to find Shape of this type
-    static public var typeSelector: Selector {
+    public static var typeSelector: Selector {
         return TypeSelector<Self>()
     }
 

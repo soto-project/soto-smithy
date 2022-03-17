@@ -25,7 +25,7 @@ class AWSTraitTests: XCTestCase {
     }
 
     func testIAMConditionKeysTrait() {
-        testJson("""
+        self.testJson("""
         {
             "smithy": "1.0",
             "shapes": {
@@ -81,7 +81,7 @@ class AWSTraitTests: XCTestCase {
     }
 
     func testIAMDefineConditionKeysTrait() {
-        testJson("""
+        self.testJson("""
         {
             "smithy": "1.0",
             "shapes": {
@@ -113,7 +113,7 @@ class AWSTraitTests: XCTestCase {
     }
 
     func testApiGatewayIntegrationTrait() {
-        testJson("""
+        self.testJson("""
         {
             "smithy": "1.0",
             "shapes": {

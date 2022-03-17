@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-/// This protocol is used to ease decoding of single value traits. 
+/// This protocol is used to ease decoding of single value traits.
 public protocol SingleValueTrait: StaticTrait {
     associatedtype Value: Decodable
     var value: Value { get }
@@ -27,8 +27,8 @@ extension SingleValueTrait {
     }
 
     // Need to make Document encodable before we can re-implement Encodable SingleValueTraits
-    /*public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(value)
-    }*/
+    /* public func encode(to encoder: Encoder) throws {
+         var container = encoder.singleValueContainer()
+         try container.encode(value)
+     } */
 }
