@@ -20,14 +20,14 @@ class ParserTests: XCTestCase {
     func testShapeLoad() throws {
         let smithy = """
         namespace soto.example
-        
+
         string MyString
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
         XCTAssert(model.shape(for: "soto.example#MyString") is StringShape)
     }
-    
+
     func testMetadataLoad() throws {
         let smithy = """
         metadata "test" = "test string" // with speech marks
@@ -38,7 +38,7 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(model.metadata["test"].string, "test string")
         XCTAssertEqual(model.metadata["greeting"].string, "hello")
     }
-    
+
     func testMetadataArrayLoad() throws {
         let smithy = """
         metadata "testArray" = [1,2,3]
@@ -49,7 +49,7 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(model.metadata["testArray"][1].int, 2)
         XCTAssertEqual(model.metadata["testArray"][2].int, 3)
     }
-    
+
     func testMetadataDictionaryLoad() throws {
         let smithy = """
         metadata "testMap" = {
@@ -63,7 +63,7 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(model.metadata["testMap"]["string"].string, "string")
         XCTAssertEqual(model.metadata["testMap"]["integer"].string, "integer")
     }
-    
+
     func testComplexMetadata() throws {
         let smithy = """
         metadata foo = {
@@ -138,7 +138,7 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(map.key.target, "smithy.api#String")
         XCTAssertEqual(map.value.target, "soto.example#MyStructure")
     }
-    
+
     func testServiceLoad() throws {
         let smithy = """
         namespace soto.example
@@ -153,7 +153,7 @@ class ParserTests: XCTestCase {
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
     }
-    
+
     func testSimpleTrait() throws {
         let smithy = """
         namespace soto.example
@@ -165,7 +165,7 @@ class ParserTests: XCTestCase {
         let shape = try XCTUnwrap(model.shape(for: "soto.example#MyString"))
         XCTAssertNotNil(shape.trait(type: SensitiveTrait.self))
     }
-    
+
     func testSingleValueTrait() throws {
         let smithy = """
         namespace soto.example
@@ -194,7 +194,7 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(trait.min, 0)
         XCTAssertEqual(trait.max, 10)
     }
-    
+
     func testMemberTrait() throws {
         let smithy = """
         namespace soto.example
@@ -208,7 +208,7 @@ class ParserTests: XCTestCase {
         let shape = try XCTUnwrap(model.shape(for: "soto.example#MyString$value"))
         XCTAssertNotNil(shape.trait(type: RequiredTrait.self))
     }
-    
+
     func testDocumentationComment() throws {
         let smithy = """
         namespace soto.example
@@ -228,11 +228,11 @@ class ParserTests: XCTestCase {
         let myStringValueDoc = try XCTUnwrap(myStringValue.trait(type: DocumentationTrait.self))
         XCTAssertEqual(myStringValueDoc.value, "string value")
     }
-    
+
     func testApply() throws {
         let smithy = """
         namespace soto.example
-        
+
         string MyString
         apply MyString @documentation("test")
         """
@@ -296,7 +296,7 @@ class ParserTests: XCTestCase {
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
     }
-    
+
     func testHttpResponseTestsTrait() throws {
         let smithy = """
         namespace smithy.example
@@ -424,6 +424,5 @@ class ParserTests: XCTestCase {
         """
         let model = try Smithy().parse(smithy)
         XCTAssertNoThrow(try model.validate())
-
     }
 }

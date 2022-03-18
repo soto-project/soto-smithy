@@ -33,7 +33,7 @@ public struct TraitList: Codable {
     public func encode(to encoder: Encoder) throws {
         fatalError("TraitList.encode Not implemented")
     }
-    
+
     /// Return trait of type from list if it exists
     /// - Parameter type: Trait type
     /// - Returns: Trait if found
@@ -60,7 +60,7 @@ public struct TraitList: Codable {
     public mutating func add(trait: Trait) {
         self.traits[trait.traitName] = trait
     }
-    
+
     /// Remove trait of type from list
     /// - Parameter trait: trait type to remove
     public mutating func remove(trait: StaticTrait.Type) {

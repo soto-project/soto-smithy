@@ -92,10 +92,10 @@ enum SelectorParser {
         let token = try parser.nextToken()
         switch token.type {
         case .token(let text):
-            return typeSelector(from: text)
+            return self.typeSelector(from: text)
 
         case .grammar("["):
-            return try parseAttribute(&parser)
+            return try self.parseAttribute(&parser)
 
         case .grammar(":"):
             let functionTrait = try parser.nextToken()
@@ -106,7 +106,7 @@ enum SelectorParser {
                 return NotSelector(notSelector)
             case .token("is"):
                 try parser.expect(.grammar("("))
-                return try parseIsSelectors(&parser)
+                return try self.parseIsSelectors(&parser)
             default:
                 return nil
             }
@@ -120,7 +120,7 @@ enum SelectorParser {
         let token = try parser.nextToken()
         switch token.type {
         case .token("trait"):
-            return try parseTraitAttribute(&parser)
+            return try self.parseTraitAttribute(&parser)
         default:
             return nil
         }
@@ -130,7 +130,7 @@ enum SelectorParser {
         try parser.expect(.grammar("|"))
         let traitToken = try parser.nextToken()
         guard case .token(let name) = traitToken.type else { return nil }
-        let selector: Selector? = traitSelector(from: name)
+        let selector: Selector? = self.traitSelector(from: name)
 
         // parse until attribute end
         while try parser.nextToken() != .grammar("]") {}

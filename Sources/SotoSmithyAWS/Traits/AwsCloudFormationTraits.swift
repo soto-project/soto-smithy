@@ -40,6 +40,7 @@ public struct AwsCloudFormationMutabilityTrait: SingleValueTrait {
         case read
         case write
     }
+
     public let value: MutabilityValue
     public init(value: MutabilityValue) {
         self.value = value
@@ -61,4 +62,3 @@ public struct AwsCloudFormationAdditionalIdentifierTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.cloudformation#cfnAdditionalIdentifier"
     public var selector: Selector { TargetSelector(TypeSelector<StringShape>()) }
 }
-

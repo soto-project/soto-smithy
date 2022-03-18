@@ -22,6 +22,7 @@ public struct AwsApiGatewayApiKeySourceTrait: SingleValueTrait {
         case header = "HEADER"
         case authorizer = "AUTHORIZER"
     }
+
     public let value: KeySource
     public init(value: Value) {
         self.value = value
@@ -43,6 +44,7 @@ public struct AwsApiGatewayAuthorizersTrait: SingleValueTrait {
         let identityValidationExpression: String?
         let resultTtlInSeconds: Int?
     }
+
     public let value: [String: Authorizer]
     public init(value: Value) {
         self.value = value
@@ -69,6 +71,7 @@ public struct AwsApiGatewayRequestValidatorTrait: SingleValueTrait {
         case paramsOnly = "params-only"
         case bodyOnly = "body-only"
     }
+
     public let value: Validator
     public init(value: Value) {
         self.value = value
@@ -82,23 +85,27 @@ public struct AwsApiGatewayIntegrationTrait: StaticTrait {
     public enum IntegrationType: String, Codable {
         case http
         case httpProxy = "http-proxy"
-        case aws = "aws"
+        case aws
         case awsProxy = "aws-proxy"
     }
+
     public enum ContentHandling: String, Codable {
         case convertToText = "CONVERT_TO_TEXT"
         case convertToBinary = "CONVERT_TO_BINARY"
     }
+
     public enum ConnectionType: String, Codable {
         case internet = "INTERNET"
         case vpcLink = "VPC_LINK"
     }
+
     public struct Response: Codable {
         public let statusCode: String?
         public let responseTemplates: [String: String]?
         public let responseParameters: [String: String]?
         public let contentHandling: ContentHandling?
     }
+
     public let type: IntegrationType
     public let uri: String
     public let httpMethod: String
@@ -111,9 +118,9 @@ public struct AwsApiGatewayIntegrationTrait: StaticTrait {
     public let cacheNamespace: String?
     public let payloadFormatVersion: String?
     public let cacheKeyParameters: [String]?
-    public let requestParameters: [String:String]?
-    public let requestTemplates: [String:String]?
-    public let responses: [String:Response]?
+    public let requestParameters: [String: String]?
+    public let requestTemplates: [String: String]?
+    public let responses: [String: Response]?
 }
 
 /// Defines an API Gateway integration that returns a mock response.
@@ -121,7 +128,7 @@ public struct AwsApiGatewayMockIntegrationTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.apigateway#mockIntegration"
     public var selector: Selector { return OrSelector(TypeSelector<ServiceShape>(), TypeSelector<ResourceShape>(), TypeSelector<OperationShape>()) }
     public let passThroughBehavior: String?
-    public let requestParameters: [String:[String:String]]?
-    public let requestTemplates: [String:[String:String]]?
-    public let responses: [String:AwsApiGatewayIntegrationTrait.Response]?
+    public let requestParameters: [String: [String: String]]?
+    public let requestTemplates: [String: [String: String]]?
+    public let responses: [String: AwsApiGatewayIntegrationTrait.Response]?
 }

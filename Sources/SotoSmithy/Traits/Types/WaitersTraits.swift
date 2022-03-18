@@ -22,12 +22,14 @@ public struct WaitableTrait: SingleValueTrait {
         case failure
         case retry
     }
+
     public enum PathComparator: String, Decodable {
         case stringEquals
         case booleanEquals
         case allStringEquals
         case anyStringEquals
     }
+
     /// The output and inputOutput matchers test the result of a JMESPath expression against an expected value.
     /// These matchers are structures that support the following members.
     public struct PathMatcher: Decodable {
@@ -35,6 +37,7 @@ public struct WaitableTrait: SingleValueTrait {
         public let expected: String
         public let comparator: PathComparator
     }
+
     /// A matcher defines how an acceptor determines if it matches the current state of a resource. A matcher is a union
     /// where exactly one of the following members MUST be set.
     public enum Matcher: Decodable {
@@ -65,11 +68,13 @@ public struct WaitableTrait: SingleValueTrait {
             case errorType
         }
     }
+
     /// Acceptors cause a waiter to transition into one of the following states
     public struct Acceptor: Decodable {
         public let state: AcceptorState
         public let matcher: Matcher
     }
+
     /// A waiter defines a set of acceptors that are used to check if a resource has entered into a desired state.
     public struct Waiter: Decodable {
         public let documentation: String?
@@ -79,9 +84,9 @@ public struct WaitableTrait: SingleValueTrait {
         public let deprecated: Bool?
         public let tags: [String]?
     }
+
     public var value: [String: Waiter]
     public init(value: [String: Waiter]) {
         self.value = value
     }
 }
-

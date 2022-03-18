@@ -53,6 +53,7 @@ public struct TimestampFormatTrait: SingleValueTrait {
         case httpDate = "http-date"
         case epochSeconds = "epoch-seconds"
     }
+
     public let value: TimestampFormat
     public init(value: TimestampFormat) {
         self.value = value

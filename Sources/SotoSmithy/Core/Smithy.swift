@@ -138,14 +138,14 @@ public struct Smithy {
             Self.registeredShapes = true
         }
     }
-    
+
     /// Decode Smithy JSON AST
     /// - Parameter data: Data holding Smithy model in JSON AST format
     /// - Returns: Smithy model
     public func decodeAST(from data: Data) throws -> Model {
         try JSONDecoder().decode(Model.self, from: data)
     }
-    
+
     /// Register trait types with Smithy. All `StaticTrait` have to be registered if you want to decode them
     /// - Parameter traitTypes: List of traits to register
     public static func registerTraitTypes(_ traitTypes: StaticTrait.Type ...) {
@@ -177,5 +177,4 @@ public struct Smithy {
     ]
 
     private static var registeredShapes: Bool = false
-
 }

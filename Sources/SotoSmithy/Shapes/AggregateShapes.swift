@@ -22,12 +22,12 @@ public class MemberShape: Shape {
         self.target = target
         self.traits = traits
     }
-    
+
     public func validate(using model: Model) throws {
         guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)") }
         guard !(shape is OperationShape),
-            !(shape is ResourceShape),
-            !(shape is ServiceShape)
+              !(shape is ResourceShape),
+              !(shape is ServiceShape)
         else {
             throw Smithy.ValidationError(reason: "Member of ** references illegal shape \(self.target)")
         }
@@ -45,7 +45,7 @@ public class ListShape: Shape {
         self.traits = traits
         self.member = member
     }
-    
+
     public func validate(using model: Model) throws {
         try self.member.validate(using: model)
         try self.validateTraits(using: model)
@@ -62,7 +62,7 @@ public class SetShape: Shape {
         self.traits = traits
         self.member = member
     }
-    
+
     public func validate(using model: Model) throws {
         try self.member.validate(using: model)
         try self.validateTraits(using: model)
@@ -81,7 +81,7 @@ public class MapShape: Shape {
         self.key = key
         self.value = value
     }
-    
+
     public func validate(using model: Model) throws {
         try self.key.validate(using: model)
         try self.value.validate(using: model)
@@ -119,8 +119,8 @@ public class StructureShape: CollectionShape {
     public static let type = "structure"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
-    
-    public init(traits: TraitList? = nil, members: [String : MemberShape]? = nil) {
+
+    public init(traits: TraitList? = nil, members: [String: MemberShape]? = nil) {
         self.traits = traits
         self.members = members
     }
@@ -132,8 +132,8 @@ public class UnionShape: CollectionShape {
     public static let type = "union"
     public var traits: TraitList?
     public var members: [String: MemberShape]?
-    
-    public init(traits: TraitList? = nil, members: [String : MemberShape]? = nil) {
+
+    public init(traits: TraitList? = nil, members: [String: MemberShape]? = nil) {
         self.traits = traits
         self.members = members
     }

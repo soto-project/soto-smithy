@@ -38,4 +38,3 @@ public struct MqttTopicLabelTrait: StaticTrait {
     public var selector: Selector { AndSelector(TypeSelector<MemberShape>(), TraitSelector<RequiredTrait>()) }
     public init() {}
 }
-

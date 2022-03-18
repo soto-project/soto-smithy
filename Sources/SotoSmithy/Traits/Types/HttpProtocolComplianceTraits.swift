@@ -35,6 +35,7 @@ public struct HttpRequestTestsTrait: SingleValueTrait {
         public let vendorParams: Document?
         public let documentation: String?
     }
+
     public typealias Value = [Test]
     public var value: [Test]
     public init(value: Value) {
@@ -46,9 +47,9 @@ public struct HttpRequestTestsTrait: SingleValueTrait {
             throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
         }
         try self.value.forEach {
-            guard model.shape(for: $0.protocol ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \($0.protocol)") }
+            guard model.shape(for: $0.protocol) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \($0.protocol)") }
             if let authScheme = $0.authScheme {
-                guard model.shape(for: authScheme ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(authScheme)") }
+                guard model.shape(for: authScheme) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(authScheme)") }
             }
         }
     }
@@ -71,6 +72,7 @@ public struct HttpResponseTestsTrait: SingleValueTrait {
         public let vendorParams: Document?
         public let documentation: String?
     }
+
     public typealias Value = [Test]
     public var value: [Test]
     public init(value: Value) {
@@ -82,9 +84,9 @@ public struct HttpResponseTestsTrait: SingleValueTrait {
             throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **")
         }
         try self.value.forEach {
-            guard model.shape(for: $0.protocol ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \($0.protocol)") }
+            guard model.shape(for: $0.protocol) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \($0.protocol)") }
             if let authScheme = $0.authScheme {
-                guard model.shape(for: authScheme ) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(authScheme)") }
+                guard model.shape(for: authScheme) != nil else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(authScheme)") }
             }
         }
     }

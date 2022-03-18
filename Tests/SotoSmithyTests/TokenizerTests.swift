@@ -35,14 +35,14 @@ class TokenizerTests: XCTestCase {
         XCTAssertEqual(tokens[4].type, .number(1))
         XCTAssertEqual(tokens[5].type, .grammar(")"))
     }
-    
+
     func testString() throws {
         let string = "@testTrait(\"test string\")"
         let tokens = try Tokenizer().tokenize(string)
         XCTAssertEqual(tokens.count, 4)
         XCTAssertEqual(tokens[2].type, .string("test string"))
     }
-    
+
     func testNewline() throws {
         let string = """
         namespace soto.example
@@ -57,14 +57,14 @@ class TokenizerTests: XCTestCase {
             }
         }
     }
-    
+
     func testEscapeCharacter() throws {
         let string = #"@testTrait("test \"string\"")"#
         let tokens = try Tokenizer().tokenize(string)
         XCTAssertEqual(tokens.count, 4)
         XCTAssertEqual(tokens[2].type, .string(#"test "string""#))
     }
-    
+
     func testInvalidEscapeCharacter() throws {
         let string = #"@testTrait("test \string\"")"#
         XCTAssertThrowsError(_ = try Tokenizer().tokenize(string)) { error in
@@ -78,7 +78,7 @@ class TokenizerTests: XCTestCase {
             }
         }
     }
-    
+
     func testComment() throws {
         let string = """
         namespace soto.example
@@ -88,7 +88,7 @@ class TokenizerTests: XCTestCase {
         let tokens = try Tokenizer().tokenize(string)
         XCTAssertEqual(tokens[3].type, .token("string"))
     }
-    
+
     func testDocumentationComment() throws {
         let string = """
         namespace soto.example
@@ -109,20 +109,20 @@ class TokenizerTests: XCTestCase {
             }
         }
     }
-    
+
     func testBlockTextErrors() {
-        testBlockTextError(text:"""
+        self.testBlockTextError(text: """
         @trait(\"""
          new line
           \"""
         string MyString
         """)
-        testBlockTextError(text:"""
+        self.testBlockTextError(text: """
         @trait(\"""new line
           \"""
         string MyString
         """)
-        testBlockTextError(text:"""
+        self.testBlockTextError(text: """
         @trait(\"""
           new line\"""
         string MyString
@@ -152,9 +152,9 @@ class TokenizerTests: XCTestCase {
         let tokens2 = try Tokenizer().tokenize(string2)
         XCTAssertEqual(tokens2[2].type, .string("block text\n\nnew line"))
         let test = """
-            hello \
-            goodbye
-            """
+        hello \
+        goodbye
+        """
         print(test)
     }
 }

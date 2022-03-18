@@ -80,6 +80,7 @@ public struct AwsDataTrait: SingleValueTrait {
             TypeSelector<MemberShape>()
         )
     }
+
     public enum DataValue: String, Codable {
         case content
         case account
@@ -87,6 +88,7 @@ public struct AwsDataTrait: SingleValueTrait {
         case tagging
         case permissions
     }
+
     public typealias Value = DataValue
     public let value: Value
     public init(value: Value) {
@@ -155,6 +157,7 @@ public struct AwsHttpChecksumTrait: StaticTrait {
         case sha1 = "SHA1"
         case sha256 = "SHA256"
     }
+
     public let requestAlgorithmMember: String?
     public let requestChecksumRequired: Bool?
     public let requestValidationModeMember: String?
@@ -166,6 +169,4 @@ public struct AwsHttpChecksumTrait: StaticTrait {
         self.requestValidationModeMember = requestValidationModeMember
         self.responseAlgorithms = responseAlgorithms
     }
-
 }
-

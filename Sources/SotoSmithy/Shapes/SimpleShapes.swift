@@ -129,7 +129,7 @@ public class DocumentShape: Shape {
     }
 }
 
-/// Shape representing 
+/// Shape representing
 public class UnitShape: Shape {
     public static let type = "unit"
     public var traits: TraitList?

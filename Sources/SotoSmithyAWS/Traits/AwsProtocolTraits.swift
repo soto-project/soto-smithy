@@ -51,7 +51,7 @@ public struct AwsProtocolsAwsQueryErrorTrait: StaticTrait {
     public var selector: Selector { AndSelector(TypeSelector<StructureShape>(), TraitSelector<ErrorTrait>()) }
     public var code: String
     public var httpResponseCode: Int
-    
+
     public init(code: String, httpResponseCode: Int) {
         self.code = code
         self.httpResponseCode = httpResponseCode

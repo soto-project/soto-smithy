@@ -54,11 +54,13 @@ public struct AwsIAMDefineConditionKeysTrait: SingleValueTrait {
         case arrayOfNumeric = "ArrayOfNumeric"
         case arrayOfString = "ArrayOfString"
     }
+
     public struct ConditionKey: Codable {
         let type: KeyType
         let documentation: String?
         let externalDocumentation: String?
     }
+
     public let value: [String: ConditionKey]
     public init(value: [String: ConditionKey]) {
         self.value = value
@@ -80,4 +82,3 @@ public struct AwsIAMRequiredActionsTrait: SingleValueTrait {
         self.value = value
     }
 }
-

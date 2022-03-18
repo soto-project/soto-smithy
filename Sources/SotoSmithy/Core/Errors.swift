@@ -27,7 +27,7 @@ public struct SmithyErrorContext {
     public let line: String
     public let lineNumber: Int
     public let columnNumber: Int
-    
+
     init(_ parser: Parser) {
         let context = parser.getContext()
 
@@ -45,7 +45,6 @@ public struct SmithyErrorContext {
         }
         self.init(parser)
     }
-    
 }
 
 extension Smithy {
@@ -53,22 +52,22 @@ extension Smithy {
     public struct ValidationError: SmithyError {
         public let reason: String
     }
-    
+
     /// Error thrown when shape being looked for doesnt exist
     public struct ShapeDoesNotExistError: SmithyError {
         public let id: ShapeId
-        public var reason: String { "Shape \(id) does not exist" }
+        public var reason: String { "Shape \(self.id) does not exist" }
     }
 
     /// Error thrown when shape member being looked for doesnt exist
     public struct MemberDoesNotExistError: SmithyError {
         public let name: String
-        public var reason: String { "Shape member \(name) does not exist" }
+        public var reason: String { "Shape member \(self.name) does not exist" }
     }
-    
+
     /// Error thrown when parsing a selector failed
     public struct UnrecognisedSelectorError: SmithyError {
         public let value: String
-        public var reason: String { "Unrecoginised selector \"\(value)\"" }
+        public var reason: String { "Unrecoginised selector \"\(self.value)\"" }
     }
 }
