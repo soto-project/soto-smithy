@@ -50,6 +50,20 @@ public struct ErrorTrait: SingleValueTrait {
     }
 }
 
+/// Specializes a structure for use only as the input of a single operation.
+public struct InputTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#input"
+    public var selector: Selector { TypeSelector<StructureShape>() }
+    public init() {}
+}
+
+/// Specializes a structure for use only as the output of a single operation.
+public struct OutputTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#output"
+    public var selector: Selector { TypeSelector<StructureShape>() }
+    public init() {}
+}
+
 /// Indicates that lists and maps MAY contain null values. The sparse trait has no effect on map keys; map keys are
 /// never allowed to be null.
 public struct SparseTrait: StaticTrait {
