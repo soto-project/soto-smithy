@@ -69,6 +69,18 @@ public struct InternalTrait: StaticTrait {
     public init() {}
 }
 
+/// Indicates that a structure member SHOULD be set. This trait is useful when the majority of use cases for a
+/// structure benefit from providing a value for a member, but the member is not actually required or cannot be
+/// made required backward compatibly.
+public struct RecommendedTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#recommended"
+    public var selector: Selector { AndSelector(TypeSelector<MemberShape>(), NotSelector(TraitSelector<RequiredTrait>())) }
+    public let reason: String?
+    public init(reason: String?) {
+        self.reason = reason
+    }
+}
+
 /// Indicates that the data stored in the shape or member is sensitive and MUST be handled with care.
 public struct SensitiveTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#sensitive"

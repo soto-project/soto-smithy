@@ -63,6 +63,7 @@ public struct Smithy {
                 ExamplesTrait.self,
                 ExternalDocumentationTrait.self,
                 InternalTrait.self,
+                RecommendedTrait.self,
                 SensitiveTrait.self,
                 SinceTrait.self,
                 TagsTrait.self,
