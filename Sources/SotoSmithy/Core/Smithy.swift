@@ -70,6 +70,7 @@ public struct Smithy {
                 TitleTrait.self,
                 UnstableTrait.self,
                 // type refinement traits
+                DefaultTrait.self,
                 BoxTrait.self,
                 ErrorTrait.self,
                 InputTrait.self,

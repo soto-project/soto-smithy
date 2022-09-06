@@ -74,3 +74,44 @@ public struct SparseTrait: StaticTrait {
     ) }
     public init() {}
 }
+
+public struct DefaultTrait: SingleValueTrait {
+    public static let staticName: ShapeId = "smithy.api#default"
+    public enum Value: Decodable {
+        case boolean(Bool)
+        case number(Double)
+        case string(String)
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            if let value = try? container.decode(Bool.self) {
+                self = .boolean(value)
+            } else if let value = try? container.decode(Double.self) {
+                self = .number(value)
+            } else if let value = try? container.decode(String.self) {
+                self = .string(value)
+            } else {
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "DefaultTrait value cannot be decoded")
+            }
+        }
+    }
+
+    public let value: Value
+    public init(value: Value) {
+        self.value = value
+    }
+
+    public func validate(using model: Model, shape: Shape) throws {
+        guard let member = shape as? MemberShape else { throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **") }
+        guard let target = model.shape(for: member.target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(member.target)") }
+        switch self.value {
+        case .boolean(let b):
+            guard target is BooleanShape else { throw Smithy.ValidationError(reason: "Invalid default value \(b) for **") }
+        case .number(let n):
+            let selector = NumberSelector()
+            guard selector.select(using: model, shape: target) else { throw Smithy.ValidationError(reason: "Invalid default value \(n) for **") }
+        case .string(let s):
+            guard target is StringShape else { throw Smithy.ValidationError(reason: "Invalid default value \(s) for **") }
+        }
+    }
+}
