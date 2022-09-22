@@ -32,3 +32,21 @@ extension SingleValueTrait {
          try container.encode(value)
      } */
 }
+
+public protocol OptionalSingleValueTrait: StaticTrait {
+    associatedtype Value: Decodable
+    var value: Value? { get }
+    init(value: Value?)
+}
+
+extension OptionalSingleValueTrait {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() {
+            self.init(value: nil)
+        } else {
+            let value = try container.decode(Value.self)
+            self.init(value: value)
+        }
+    }
+}

@@ -75,9 +75,10 @@ public struct SparseTrait: StaticTrait {
     public init() {}
 }
 
-public struct DefaultTrait: SingleValueTrait {
+/// Provides a structure member with a default value.
+public struct DefaultTrait: OptionalSingleValueTrait {
     public static let staticName: ShapeId = "smithy.api#default"
-    public enum Value: Decodable {
+    public enum DefaultValue: Decodable {
         case boolean(Bool)
         case number(Double)
         case string(String)
@@ -96,22 +97,40 @@ public struct DefaultTrait: SingleValueTrait {
         }
     }
 
-    public let value: Value
-    public init(value: Value) {
+    public let value: DefaultValue?
+    public init(value: DefaultValue?) {
         self.value = value
     }
 
     public func validate(using model: Model, shape: Shape) throws {
-        guard let member = shape as? MemberShape else { throw Smithy.ValidationError(reason: "Trait \(traitName) cannot be applied to shape **") }
-        guard let target = model.shape(for: member.target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(member.target)") }
+        let targetShape: Shape
+        if let member = shape as? MemberShape {
+            guard let target = model.shape(for: member.target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(member.target)") }
+            targetShape = target
+        } else {
+            targetShape = shape
+        }
         switch self.value {
         case .boolean(let b):
-            guard target is BooleanShape else { throw Smithy.ValidationError(reason: "Invalid default value \(b) for **") }
+            guard targetShape is BooleanShape else { throw Smithy.ValidationError(reason: "Invalid default value \(b) for **") }
         case .number(let n):
             let selector = NumberSelector()
-            guard selector.select(using: model, shape: target) else { throw Smithy.ValidationError(reason: "Invalid default value \(n) for **") }
+            guard selector.select(using: model, shape: targetShape) else { throw Smithy.ValidationError(reason: "Invalid default value \(n) for **") }
         case .string(let s):
-            guard target is StringShape else { throw Smithy.ValidationError(reason: "Invalid default value \(s) for **") }
+            guard targetShape is StringShape || targetShape is EnumShape else { throw Smithy.ValidationError(reason: "Invalid default value \(s) for **") }
+        case .none:
+            // do nothing
+            break
         }
     }
+}
+
+/// Indicates that the default trait was added to a structure member after initially publishing the member.
+/// This allows tooling to decide whether to ignore the @default trait if it will break backward compatibility
+/// in the tool.
+/// Specializes a structure for use only as the input of a single operation.
+public struct AddedDefaultTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#addedDefault"
+    public var selector: Selector { TypeSelector<MemberShape>() }
+    public init() {}
 }

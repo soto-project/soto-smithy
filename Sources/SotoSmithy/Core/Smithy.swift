@@ -39,6 +39,7 @@ public struct Smithy {
                 MapShape.self,
                 StructureShape.self,
                 UnionShape.self,
+                EnumShape.self,
                 // Service shapes
                 ServiceShape.self,
                 OperationShape.self,
@@ -71,6 +72,7 @@ public struct Smithy {
                 UnstableTrait.self,
                 // type refinement traits
                 DefaultTrait.self,
+                AddedDefaultTrait.self,
                 BoxTrait.self,
                 ErrorTrait.self,
                 InputTrait.self,

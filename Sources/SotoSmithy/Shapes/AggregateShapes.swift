@@ -144,3 +144,20 @@ public class UnionShape: CollectionShape {
         try self.validateTraits(using: model)
     }
 }
+
+/// Shape representing a set of named, unordered, heterogeneous values. Contains a set of members mapping
+/// to other shapes in the model
+public class EnumShape: CollectionShape {
+    public static let type = "enum"
+    public var traits: TraitList?
+    public var members: [String: MemberShape]?
+
+    public init(traits: TraitList? = nil, members: [String: MemberShape]? = nil) {
+        self.traits = traits
+        self.members = members
+    }
+
+    public func validate(using model: Model) throws {
+        guard let version = Double(model.version), version >= 2.0 else { throw Smithy.ValidationError(reason: "Enum Shapes are not available in Smithy 2.0 or later") }
+    }
+}
