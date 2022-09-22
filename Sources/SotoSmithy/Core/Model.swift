@@ -51,8 +51,8 @@ public class Model: Decodable {
         if let member = identifier.member {
             if let shape = shapes[identifier.rootShapeId] {
                 switch shape {
-                case let structure as StructureShape:
-                    return structure.members?[member]
+                case let collection as CollectionShape:
+                    return collection.members?[member]
                 default:
                     break
                 }
