@@ -73,6 +73,7 @@ public struct Smithy {
                 // type refinement traits
                 DefaultTrait.self,
                 AddedDefaultTrait.self,
+                ClientOptionalTrait.self,
                 BoxTrait.self,
                 ErrorTrait.self,
                 InputTrait.self,

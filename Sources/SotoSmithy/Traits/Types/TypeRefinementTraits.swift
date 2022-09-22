@@ -134,3 +134,11 @@ public struct AddedDefaultTrait: StaticTrait {
     public var selector: Selector { TypeSelector<MemberShape>() }
     public init() {}
 }
+
+/// Requires that non-authoritative generators like clients treat a structure member as optional regardless
+/// of if the member is also marked with the required trait or default trait.
+public struct ClientOptionalTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#clientOptional"
+    public var selector: Selector { TypeSelector<MemberShape>() }
+    public init() {}
+}
