@@ -74,6 +74,7 @@ public struct Smithy {
                 DefaultTrait.self,
                 AddedDefaultTrait.self,
                 ClientOptionalTrait.self,
+                EnumValueTrait.self,
                 BoxTrait.self,
                 ErrorTrait.self,
                 InputTrait.self,

@@ -142,3 +142,27 @@ public struct ClientOptionalTrait: StaticTrait {
     public var selector: Selector { TypeSelector<MemberShape>() }
     public init() {}
 }
+
+public struct EnumValueTrait: SingleValueTrait {
+    public static let staticName: ShapeId = "smithy.api#enumValue"
+    public enum EnumValue: Decodable {
+        case integer(Int)
+        case string(String)
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            if let value = try? container.decode(Int.self) {
+                self = .integer(value)
+            } else if let value = try? container.decode(String.self) {
+                self = .string(value)
+            } else {
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "EnumValueTrait value cannot be decoded")
+            }
+        }
+    }
+
+    public let value: EnumValue
+    public init(value: EnumValue) {
+        self.value = value
+    }
+}
