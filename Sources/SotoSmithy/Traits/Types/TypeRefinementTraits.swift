@@ -78,7 +78,7 @@ public struct SparseTrait: StaticTrait {
 /// Provides a structure member with a default value.
 public struct DefaultTrait: OptionalSingleValueTrait {
     public static let staticName: ShapeId = "smithy.api#default"
-    public enum DefaultValue: Decodable {
+    public enum DefaultValue: Decodable, Equatable {
         case boolean(Bool)
         case number(Double)
         case string(String)
@@ -145,7 +145,7 @@ public struct ClientOptionalTrait: StaticTrait {
 
 public struct EnumValueTrait: SingleValueTrait {
     public static let staticName: ShapeId = "smithy.api#enumValue"
-    public enum EnumValue: Decodable {
+    public enum EnumValue: Decodable, Equatable {
         case integer(Int)
         case string(String)
 
