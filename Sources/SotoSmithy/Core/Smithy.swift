@@ -40,6 +40,7 @@ public struct Smithy {
                 StructureShape.self,
                 UnionShape.self,
                 EnumShape.self,
+                IntEnumShape.self,
                 // Service shapes
                 ServiceShape.self,
                 OperationShape.self,
@@ -105,6 +106,9 @@ public struct Smithy {
                 NoReplaceTrait.self,
                 ReferencesTrait.self,
                 ResourceIdentifierTrait.self,
+                NestedPropertiesTrait.self,
+                NotPropertyTrait.self,
+                PropertyTrait.self,
                 // streaming traits
                 StreamingTrait.self,
                 RequiresLengthTrait.self,

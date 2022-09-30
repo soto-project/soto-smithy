@@ -45,15 +45,16 @@ extension Smithy {
 
     /// parse control section of IDL
     func parseControlSection(_ state: ParserState) throws -> [String: Any] {
-        let model: [String: Any] = ["smithy": "1.0"]
+        var model: [String: Any] = ["smithy": "1.0"]
         while !state.parser.reachedEnd() {
             state.parser.skip(while: .newline)
             let token = try state.parser.token()
             if case .token(let string) = token.type {
                 if string == "$version" {
                     try state.parser.advance()
-                    // currently we support version "1.0"
-                    try state.parser.expect(.string("1.0"))
+                    try state.parser.expect(.grammar(":"))
+                    let version = try self.expectString(state)
+                    model["smithy"] = version
                 } else {
                     break
                 }
@@ -191,6 +192,10 @@ extension Smithy {
         var members: [Substring: Any] = [:]
         var traitPosition: Int?
 
+        if type == "enum" || type == "intEnum" {
+            return try self.parseEnumMembers(state, shape: shape)
+        }
+
         while !state.parser.reachedEnd() {
             let token = try state.parser.nextToken()
             if case .token(let string) = token.type {
@@ -251,6 +256,71 @@ extension Smithy {
         return shape
     }
 
+    /// Parse enum shape from tokenized smithy
+    func parseEnumMembers(_ state: ParserState, shape: [String: Any]) throws -> [String: Any] {
+        var shape: [String: Any] = shape
+        var traits: [String: Any] = [:]
+        var members: [Substring: Any] = [:]
+        var traitPosition: Int?
+
+        while !state.parser.reachedEnd() {
+            let token = try state.parser.nextToken()
+            if case .token(let string) = token.type {
+                // if trait
+                if string.first == "@" {
+                    // record position of first trait
+                    if traitPosition == nil {
+                        traitPosition = state.parser.position
+                    }
+                    let traitName = string.dropFirst()
+                    let trait = try parseTrait(state)
+                    traits[fullTraitName(traitName, state: state).rawValue] = trait
+                    // otherwise assume token is a shape name
+                } else {
+                    let nextToken = try state.parser.nextToken()
+                    if nextToken == .grammar("=") {
+                        let value = try self.parseValue(state)
+                        traits["smithy.api#enumValue"] = value
+                    } else {
+                        try state.parser.retreat()
+                    }
+
+                    var dictionary: [String: Any] = ["target": "smithy.api#Unit"]
+                    if traits.count > 0 {
+                        dictionary["traits"] = traits
+                        members[string] = dictionary
+                    } else {
+                        members[string] = dictionary
+                    }
+                    traits = [:]
+                    traitPosition = nil
+                    if try endCollection(state, endToken: .grammar("}")) {
+                        break
+                    }
+                }
+            } else if case .documentationComment(let comment) = token.type {
+                traits["smithy.api#documentation"] = comment
+            } else if token == .newline {
+                if traits.count > 0 {
+                    if let position = traitPosition { state.parser.position = position }
+                    throw ParserError.unattachedTraits()
+                }
+            } else if token == .grammar("}") {
+                if traits.count > 0 {
+                    if let position = traitPosition { state.parser.position = position }
+                    throw ParserError.unattachedTraits()
+                }
+                // closed curly bracket so we are done
+                break
+            } else {
+                throw ParserError.unexpectedToken(token)
+            }
+        }
+
+        shape["members"] = members
+        return shape
+    }
+
     /// parse a value. This could be a string, number, array, dictionary or shape id
     func parseValue(_ state: ParserState) throws -> Any {
         let token = try state.parser.nextToken()
@@ -280,6 +350,24 @@ extension Smithy {
         default:
             throw ParserError.unexpectedToken(token)
         }
+    }
+
+    /// expect to parse a string
+    func expectString(_ state: ParserState) throws -> String {
+        let token = try state.parser.nextToken()
+        if case .string(let string) = token.type {
+            return string
+        }
+        throw ParserError.unexpectedToken(token)
+    }
+
+    /// expect to parse a number
+    func expectNumber(_ state: ParserState) throws -> Double {
+        let token = try state.parser.nextToken()
+        if case .number(let number) = token.type {
+            return number
+        }
+        throw ParserError.unexpectedToken(token)
     }
 
     func parseMappedValues(_ state: ParserState, endToken: Tokenizer.Token.TokenType) throws -> [Substring: Any] {
@@ -392,13 +480,13 @@ extension Smithy {
         let nextToken = try state.parser.nextToken()
         if nextToken.type == endToken {
             return true
-        } else if nextToken == .grammar(",") {
+        } else if nextToken == .grammar(",") || nextToken == .newline {
             return false
-        } else if nextToken == .newline {
-            state.parser.skip(while: .newline)
-            try state.parser.expect(endToken)
-            return true
-        } else {
+        } /* else if nextToken == .newline {
+             state.parser.skip(while: .newline)
+             try state.parser.expect(endToken)
+             return true
+         } */ else {
             throw ParserError.unexpectedToken(nextToken)
         }
     }

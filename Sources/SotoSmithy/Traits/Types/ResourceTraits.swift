@@ -52,3 +52,30 @@ public struct ResourceIdentifierTrait: SingleValueTrait {
         self.value = value
     }
 }
+
+/// Allows the binding of resource properties to occur within a nested structure deeper than the lifecycle
+/// operation's input or output shape.
+public struct NestedPropertiesTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#nestedProperties"
+    public static var selector: Selector = TypeSelector<MemberShape>()
+}
+
+/// Indicates that a top-level input or output shape member is not bound to a resource property. This trait
+/// can also mark another trait as a carrier for @notProperty so that if that trait is applied to a member,
+/// the member is considered implicitly marked with @notProperty.
+public struct NotPropertyTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#notProperty"
+    public static var selector: Selector = TypeSelector<MemberShape>()
+}
+
+/// Binds a top-level input or output structure member to a resource property with a different name.
+public struct PropertyTrait: StaticTrait {
+    public static let staticName: ShapeId = "smithy.api#property"
+    public static var selector: Selector = TypeSelector<MemberShape>()
+
+    public let name: String
+
+    public init(name: String) {
+        self.name = name
+    }
+}
