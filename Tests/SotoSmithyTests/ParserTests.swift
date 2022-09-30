@@ -444,4 +444,23 @@ class ParserTests: XCTestCase {
         XCTAssertNotNil(members?["two"])
         XCTAssertEqual(members?["two"]?.trait(type: EnumValueTrait.self)?.value, .string("TWO"))
     }
+
+    func testIntEnumShape() throws {
+        let smithy = """
+        $version: "2"
+        namespace soto.example
+        intEnum Number {
+            one = 1
+            two = 2
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        XCTAssertNoThrow(try model.validate())
+        let shape = try XCTUnwrap(model.shape(for: "soto.example#Number"))
+        let enumShape = try XCTUnwrap(shape as? IntEnumShape)
+        let members = enumShape.members
+        XCTAssertNotNil(members?["one"])
+        XCTAssertNotNil(members?["two"])
+        XCTAssertEqual(members?["two"]?.trait(type: EnumValueTrait.self)?.value, .integer(2))
+    }
 }

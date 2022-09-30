@@ -145,8 +145,7 @@ public class UnionShape: CollectionShape {
     }
 }
 
-/// Shape representing a set of named, unordered, heterogeneous values. Contains a set of members mapping
-/// to other shapes in the model
+/// The enum shape is used to represent a fixed set of one or more string values.
 public class EnumShape: CollectionShape {
     public static let type = "enum"
     public var traits: TraitList?
@@ -159,5 +158,40 @@ public class EnumShape: CollectionShape {
 
     public func validate(using model: Model) throws {
         guard let version = Double(model.version), version >= 2.0 else { throw Smithy.ValidationError(reason: "Enum Shapes are only available in Smithy 2.0 or later") }
+        guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Enum has no members") }
+        try members.forEach {
+            if let valueTrait = $0.value.trait(type: EnumValueTrait.self) {
+                guard case .string = valueTrait.value else {
+                    throw Smithy.ValidationError(reason: "String based Enum has none string enum value trait")
+                }
+            }
+            try $0.value.validate(using: model)
+        }
+        try self.validateTraits(using: model)
+    }
+}
+
+/// An intEnum is used to represent an enumerated set of one or more integer values.
+public class IntEnumShape: CollectionShape {
+    public static let type = "intEnum"
+    public var traits: TraitList?
+    public var members: [String: MemberShape]?
+
+    public init(traits: TraitList? = nil, members: [String: MemberShape]? = nil) {
+        self.traits = traits
+        self.members = members
+    }
+
+    public func validate(using model: Model) throws {
+        guard let version = Double(model.version), version >= 2.0 else { throw Smithy.ValidationError(reason: "Enum Shapes are only available in Smithy 2.0 or later") }
+        guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Enum has no members") }
+        try members.forEach {
+            guard let valueTrait = $0.value.trait(type: EnumValueTrait.self) else { throw Smithy.ValidationError(reason: "IntEnum members require a enumValue trait") }
+            guard case .integer = valueTrait.value else {
+                throw Smithy.ValidationError(reason: "IntEnum has none integer enum value trait")
+            }
+            try $0.value.validate(using: model)
+        }
+        try self.validateTraits(using: model)
     }
 }

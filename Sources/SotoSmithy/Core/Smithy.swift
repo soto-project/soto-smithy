@@ -40,6 +40,7 @@ public struct Smithy {
                 StructureShape.self,
                 UnionShape.self,
                 EnumShape.self,
+                IntEnumShape.self,
                 // Service shapes
                 ServiceShape.self,
                 OperationShape.self,
