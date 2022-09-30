@@ -64,7 +64,7 @@ struct Tokenizer {
 
     static var defaultGrammarChars = set(from: "(){}:[],=")
     static var defaultTokenChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.#$_-")
-    static var defaultTokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@")
+    static var defaultTokenStartChars = set(from: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@$")
 
     let tokenChars: Set<Character>
     let tokenStartChars: Set<Character>

@@ -158,6 +158,6 @@ public class EnumShape: CollectionShape {
     }
 
     public func validate(using model: Model) throws {
-        guard let version = Double(model.version), version >= 2.0 else { throw Smithy.ValidationError(reason: "Enum Shapes are not available in Smithy 2.0 or later") }
+        guard let version = Double(model.version), version >= 2.0 else { throw Smithy.ValidationError(reason: "Enum Shapes are only available in Smithy 2.0 or later") }
     }
 }
