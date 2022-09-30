@@ -62,3 +62,12 @@ public struct AwsCloudFormationAdditionalIdentifierTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.cloudformation#cfnAdditionalIdentifier"
     public var selector: Selector { TargetSelector(TypeSelector<StringShape>()) }
 }
+
+/// Indicates that the member annotated has a default value for that property of the CloudFormation resource. Thus,
+/// when this trait annotates an @output structure member, it indicates that the CloudFormation property generated
+/// from that member has a default value in the CloudFormation schema. This trait can be used to indicate that an
+/// output field with a value may return a default value assigned by the service.
+public struct AwsCloudFormationDefaultValueTrait: StaticTrait {
+    public static let staticName: ShapeId = "aws.cloudformation#cfnDefaultValue"
+    public var selector: Selector { TypeSelector<MemberShape>() }
+}

@@ -106,6 +106,9 @@ public struct Smithy {
                 NoReplaceTrait.self,
                 ReferencesTrait.self,
                 ResourceIdentifierTrait.self,
+                NestedPropertiesTrait.self,
+                NotPropertyTrait.self,
+                PropertyTrait.self,
                 // streaming traits
                 StreamingTrait.self,
                 RequiresLengthTrait.self,

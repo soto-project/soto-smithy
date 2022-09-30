@@ -170,3 +170,35 @@ public struct AwsHttpChecksumTrait: StaticTrait {
         self.responseAlgorithms = responseAlgorithms
     }
 }
+
+/// Indicates the service supports resource level tagging consistent with AWS services.
+public struct AwsTagEnabledTrait: StaticTrait {
+    public static let staticName: ShapeId = "aws.api#tagEnabled"
+    public var selector: Selector { TypeSelector<OperationShape>() }
+
+    public let disableDefaultOperations: Bool?
+
+    public init(disableDefaultOperations: Bool?) {
+        self.disableDefaultOperations = disableDefaultOperations
+    }
+}
+
+/// Indicates the resource supports AWS tag associations and identifies resource specific operations
+/// that perform CRUD on the associated tags.
+public struct AwsTaggableTrait: StaticTrait {
+    public static let staticName: ShapeId = "aws.api#taggable"
+    public var selector: Selector { TypeSelector<ResourceShape>() }
+    public struct TaggableResourceAPI: Decodable {
+        let tagApi: ShapeId
+        let untagApi: ShapeId
+        let listTagsApi: ShapeId
+    }
+
+    public let property: String?
+    public let apiConfig: TaggableResourceAPI?
+
+    public init(property: String?, apiConfig: TaggableResourceAPI?) {
+        self.property = property
+        self.apiConfig = apiConfig
+    }
+}

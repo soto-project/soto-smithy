@@ -29,6 +29,8 @@ extension Smithy {
             AwsClientDiscoveredEndpointTrait.self,
             AwsClientEndpointDiscoveryIdTrait.self,
             AwsHttpChecksumTrait.self,
+            AwsTagEnabledTrait.self,
+            AwsTaggableTrait.self,
             // Authentication Traits
             AwsAuthSigV4Trait.self,
             AwsAuthUnsignedPayloadTrait.self,
@@ -63,6 +65,7 @@ extension Smithy {
             AwsCloudFormationMutabilityTrait.self,
             AwsCloudFormationNameTrait.self,
             AwsCloudFormationAdditionalIdentifierTrait.self,
+            AwsCloudFormationDefaultValueTrait.self,
             // S3 traits
             AwsS3UnwrappedXmlOutputTrait.self
         )
