@@ -32,7 +32,8 @@ public struct NumberSelector: Selector {
             shape is FloatShape ||
             shape is DoubleShape ||
             shape is BigDecimalShape ||
-            shape is BigIntegerShape
+            shape is BigIntegerShape ||
+            shape is IntEnumShape
     }
 }
 
@@ -53,6 +54,8 @@ public struct SimpleTypeSelector: Selector {
             shape is BigDecimalShape ||
             shape is BigIntegerShape ||
             shape is TimestampShape ||
+            shape is IntEnumShape ||
+            shape is EnumShape ||
             shape is DocumentShape
     }
 }

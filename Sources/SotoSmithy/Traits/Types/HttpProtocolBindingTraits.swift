@@ -39,6 +39,7 @@ public struct HttpHeaderTrait: SingleValueTrait {
         TypeSelector<BooleanShape>(),
         NumberSelector(),
         TypeSelector<StringShape>(),
+        TypeSelector<EnumShape>(),
         TypeSelector<TimestampShape>(),
         // TODO: really need to check member of List/Set
         TypeSelector<ListShape>(),
@@ -58,6 +59,7 @@ public struct HttpLabelTrait: StaticTrait {
             TypeSelector<BooleanShape>(),
             NumberSelector(),
             TypeSelector<StringShape>(),
+            TypeSelector<EnumShape>(),
             TypeSelector<TimestampShape>()
         )),
         TraitSelector<RequiredTrait>()
@@ -95,6 +97,7 @@ public struct HttpQueryTrait: SingleValueTrait {
         TypeSelector<BooleanShape>(),
         NumberSelector(),
         TypeSelector<StringShape>(),
+        TypeSelector<EnumShape>(),
         TypeSelector<TimestampShape>(),
         // TODO: really need to check member of List/Set
         TypeSelector<ListShape>(),

@@ -67,6 +67,7 @@ public struct LengthTrait: StaticTrait {
             TypeSelector<SetShape>(),
             TypeSelector<MapShape>(),
             TypeSelector<StringShape>(),
+            TypeSelector<EnumShape>(),
             TypeSelector<BlobShape>()
         )
     ) }
