@@ -83,7 +83,12 @@ public struct LengthTrait: StaticTrait {
 /// Restricts string shape values to a specified regular expression.
 public struct PatternTrait: SingleValueTrait {
     public static let staticName: ShapeId = "smithy.api#pattern"
-    public var selector: Selector { OrTargetSelector(TypeSelector<StringShape>()) }
+    public var selector: Selector { OrTargetSelector(
+        OrSelector(
+            TypeSelector<StringShape>(),
+            TypeSelector<EnumShape>()
+        )
+    ) }
     public var value: String
     public init(value: String) {
         self.value = value
