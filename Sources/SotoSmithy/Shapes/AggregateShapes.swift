@@ -96,8 +96,21 @@ public protocol CollectionShape: Shape {
 
 extension CollectionShape {
     public func validate(using model: Model) throws {
-        try self.members?.forEach { try $0.value.validate(using: model) }
+        try self.validateMembers(using: model)
         try self.validateTraits(using: model)
+    }
+
+    func validateMembers(using model: Model) throws {
+        if let members = self.members {
+            for member in members {
+                do {
+                    try member.value.validate(using: model)
+                } catch let error as Smithy.ValidationError {
+                    // replace "**" with name of shape
+                    throw Smithy.ValidationError(reason: error.reason.replacingOccurrences(of: "**", with: "**$\(member.key)"))
+                }
+            }
+        }
     }
 
     public func add(trait: Trait, to member: String) throws {
@@ -140,7 +153,7 @@ public class UnionShape: CollectionShape {
 
     public func validate(using model: Model) throws {
         guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Union has no members") }
-        try members.forEach { try $0.value.validate(using: model) }
+        try self.validateMembers(using: model)
         try self.validateTraits(using: model)
     }
 }
@@ -165,8 +178,8 @@ public class EnumShape: CollectionShape {
                     throw Smithy.ValidationError(reason: "String based Enum has none string enum value trait")
                 }
             }
-            try $0.value.validate(using: model)
         }
+        try self.validateMembers(using: model)
         try self.validateTraits(using: model)
     }
 }
@@ -190,8 +203,8 @@ public class IntEnumShape: CollectionShape {
             guard case .integer = valueTrait.value else {
                 throw Smithy.ValidationError(reason: "IntEnum has none integer enum value trait")
             }
-            try $0.value.validate(using: model)
         }
+        try self.validateMembers(using: model)
         try self.validateTraits(using: model)
     }
 }
