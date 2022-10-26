@@ -82,8 +82,15 @@ public struct DefaultTrait: OptionalSingleValueTrait {
         case boolean(Bool)
         case number(Double)
         case string(String)
+        case empty
 
         public init(from decoder: Decoder) throws {
+            struct DontDecode: Decodable {
+                public init(from decoder: Decoder) throws {
+                    let container = try decoder.singleValueContainer()
+                    throw DecodingError.dataCorruptedError(in: container, debugDescription: "DefaultTrait value cannot be decoded")
+                }
+            }
             let container = try decoder.singleValueContainer()
             if let value = try? container.decode(Bool.self) {
                 self = .boolean(value)
@@ -91,6 +98,10 @@ public struct DefaultTrait: OptionalSingleValueTrait {
                 self = .number(value)
             } else if let value = try? container.decode(String.self) {
                 self = .string(value)
+            } else if let _ = try? container.decode([DontDecode].self) {
+                self = .empty
+            } else if let _ = try? container.decode([String: DontDecode].self) {
+                self = .empty
             } else {
                 throw DecodingError.dataCorruptedError(in: container, debugDescription: "DefaultTrait value cannot be decoded")
             }
@@ -117,7 +128,9 @@ public struct DefaultTrait: OptionalSingleValueTrait {
             let selector = NumberSelector()
             guard selector.select(using: model, shape: targetShape) else { throw Smithy.ValidationError(reason: "Invalid default value \(n) for **") }
         case .string(let s):
-            guard targetShape is StringShape || targetShape is EnumShape else { throw Smithy.ValidationError(reason: "Invalid default value \(s) for **") }
+            guard targetShape is StringShape || targetShape is EnumShape || targetShape is BlobShape else { throw Smithy.ValidationError(reason: "Invalid default value \(s) for **") }
+        case .empty:
+            guard targetShape is ListShape || targetShape is MapShape else { throw Smithy.ValidationError(reason: "Invalid default value for **") }
         case .none:
             // do nothing
             break
