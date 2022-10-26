@@ -19,6 +19,7 @@ public struct XmlAttributeTrait: StaticTrait {
         TypeSelector<BooleanShape>(),
         NumberSelector(),
         TypeSelector<StringShape>(),
+        TypeSelector<EnumShape>(),
         TypeSelector<TimestampShape>()
     )) }
     public init() {}
