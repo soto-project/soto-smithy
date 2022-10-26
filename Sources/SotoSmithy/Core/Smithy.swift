@@ -145,7 +145,13 @@ public struct Smithy {
                 MqttSubscribeTrait.self,
                 MqttTopicLabelTrait.self,
                 // waiters traits
-                WaitableTrait.self
+                WaitableTrait.self,
+                // rules traits
+                EndpointRuleSetTrait.self,
+                EndpointTestsTrait.self,
+                ContextParamTrait.self,
+                ClientContextParamsTrait.self,
+                StaticContextParamsTrait.self
             )
             Self.registeredShapes = true
         }
