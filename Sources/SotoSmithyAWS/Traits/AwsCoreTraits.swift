@@ -73,7 +73,7 @@ public struct AwsDataTrait: SingleValueTrait {
     public static let staticName: ShapeId = "aws.api#data"
     public var selector: Selector {
         return OrSelector(
-            NumberSelector(),
+            SimpleTypeSelector(),
             CollectionSelector(),
             TypeSelector<StructureShape>(),
             TypeSelector<UnionShape>(),
