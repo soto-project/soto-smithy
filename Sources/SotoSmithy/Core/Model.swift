@@ -23,7 +23,7 @@ public class Model: Decodable {
         self.version = try container.decode(String.self, forKey: .version)
         self.metadata = try container.decodeIfPresent(Document.self, forKey: .metadata) ?? Document(value: nil)
 
-        var shapes = Smithy.preludeShapes
+        var shapes = Smithy.preludeShapes.mapValues { $0() }
         if let decodedShapes = try container.decodeIfPresent([String: DecodableShape].self, forKey: .shapes) {
             for shape in decodedShapes {
                 guard !(shape.value.value is ApplyShape) else { continue }
