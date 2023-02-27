@@ -368,7 +368,7 @@ class ParserTests: XCTestCase {
         XCTAssertNoThrow(try model.validate())
         let myOperation = try XCTUnwrap(model.shape(for: "MyOperation"))
         let exampleTrait = try XCTUnwrap(myOperation.trait(type: ExamplesTrait.self))
-        XCTAssertEqual(exampleTrait.value[0].input["tags"][1].string, "baz")
+        XCTAssertEqual(exampleTrait.value[0].input?["tags"][1].string, "baz")
         XCTAssertTrue(myOperation.hasTrait(type: ReadonlyTrait.self))
     }
 
