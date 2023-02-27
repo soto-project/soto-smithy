@@ -41,8 +41,14 @@ public struct ExamplesTrait: SingleValueTrait {
     public struct Example: Decodable {
         public let title: String
         public let documentation: String?
-        public let input: Document
-        public let output: Document
+        public let input: Document?
+        public let output: Document?
+        public let error: ErrorExample?
+    }
+
+    public struct ErrorExample: Decodable {
+        public let shapeId: ShapeId?
+        public let content: Document?
     }
 
     public typealias Value = [Example]
