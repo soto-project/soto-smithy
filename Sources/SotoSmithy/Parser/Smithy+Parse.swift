@@ -440,12 +440,12 @@ extension Smithy {
         let token = try state.parser.token()
         let value: Any
         if token == .newline {
-            value = [:]
+            value = [String: Any]()
         } else if token == .grammar("(") {
             try state.parser.advance()
             value = try self.parseParameters(state)
         } else if case .token = token.type {
-            value = [:]
+            value = [String: Any]()
         } else {
             throw ParserError.unexpectedToken(token)
         }
