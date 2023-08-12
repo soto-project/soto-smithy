@@ -17,6 +17,10 @@ import Foundation
 /// Management for SotoSmithy. Decode Smithy models with this and register new Trait types
 public struct Smithy {
     public init() {
+        Self.registerShapesAndTraits()
+    }
+
+    public static func registerShapesAndTraits() {
         if Self.registeredShapes == false {
             Model.registerShapeTypes([
                 // Simple shapes
