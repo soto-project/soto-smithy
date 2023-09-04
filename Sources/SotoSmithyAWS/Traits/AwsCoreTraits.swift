@@ -174,7 +174,7 @@ public struct AwsHttpChecksumTrait: StaticTrait {
 /// Indicates the service supports resource level tagging consistent with AWS services.
 public struct AwsTagEnabledTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#tagEnabled"
-    public var selector: Selector { TypeSelector<OperationShape>() }
+    public var selector: Selector { TypeSelector<ServiceShape>() }
 
     public let disableDefaultOperations: Bool?
 
