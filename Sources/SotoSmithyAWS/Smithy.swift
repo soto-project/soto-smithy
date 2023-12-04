@@ -41,6 +41,7 @@ extension Smithy {
             AwsProtocolsAwsJson1_1Trait.self,
             AwsProtocolsAwsQueryTrait.self,
             AwsProtocolsAwsQueryErrorTrait.self,
+            AwsProtocolsAwsQueryCompatibleTrait.self,
             AwsProtocolsEc2QueryTrait.self,
             AwsProtocolsRestXmlTrait.self,
             AwsProtocolsEc2QueryNameTrait.self,

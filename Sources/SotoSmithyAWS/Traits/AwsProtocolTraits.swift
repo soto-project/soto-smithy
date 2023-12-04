@@ -58,6 +58,24 @@ public struct AwsProtocolsAwsQueryErrorTrait: StaticTrait {
     }
 }
 
+/// When using the awsQuery protocol, custom Code and HTTP response code values can be defined
+/// for an error response via the awsQueryError trait.
+///
+/// The awsQueryCompatible trait allows services to backward compatibly migrate from awsQuery
+/// to awsJson1_0 without removing values defined in the awsQueryError trait.
+///
+/// This trait adds the x-amzn-query-error header in the form of Code;Fault to error responses.
+/// Code is the value defined in the awsQueryError, and Fault is one of Sender or Receiver.
+public struct AwsProtocolsAwsQueryCompatibleTrait: StaticTrait {
+    public static let staticName: ShapeId = "aws.protocols#awsQueryCompatible"
+    public var selector: Selector {
+        AndSelector(
+            TypeSelector<ServiceShape>(),
+            TraitSelector<AwsProtocolsAwsJson1_0Trait>()
+        )
+    }
+}
+
 /// Adds support for an HTTP protocol that sends requests in the query string OR in a x-form-url-encoded body
 ///  and responses in XML documents. This protocol is an Amazon EC2-specific extension of the awsQuery protocol.
 public struct AwsProtocolsEc2QueryTrait: StaticTrait {
