@@ -46,6 +46,8 @@ extension Smithy {
             AwsProtocolsRestXmlTrait.self,
             AwsProtocolsEc2QueryNameTrait.self,
             // IAM traits
+            AwsIAMAction.self,
+            AwsIAMActionName.self,
             AwsIAMConditionKeysTrait.self,
             AwsIAMRequiredActionsTrait.self,
             AwsIAMDefineConditionKeysTrait.self,

@@ -14,6 +14,37 @@
 
 import SotoSmithy
 
+/// Indicates properties of a Smithy operation in AWS IAM.
+public struct AwsIAMAction: StaticTrait {
+    public struct ActionResource: Codable {
+        let conditionKeys: [String]
+    }
+
+    public struct ActionResources: Codable {
+        let required: [String: ActionResource]
+        let optional: [String: ActionResource]
+    }
+
+    public static let staticName: ShapeId = "aws.iam#action"
+    public var selector: Selector { TypeSelector<OperationShape>() }
+    public let name: String
+    public let documentation: String
+    public let relativeDocumentation: String
+    public let requiredActions: [String]
+    public let resources: ActionResources
+    public let createsResources: [String]
+}
+
+/// Provides a custom IAM action name.
+public struct AwsIAMActionName: SingleValueTrait {
+    public static let staticName: ShapeId = "aws.iam#actionName"
+    public var selector: Selector { TypeSelector<OperationShape>() }
+    public let value: String
+    public init(value: String) {
+        self.value = value
+    }
+}
+
 /// A brief description of what granting the user permission to invoke an operation would entail.
 public struct AwsIAMActionPermissionDescriptionTrait: SingleValueTrait {
     public static let staticName: ShapeId = "aws.iam#actionPermissionDescription"
