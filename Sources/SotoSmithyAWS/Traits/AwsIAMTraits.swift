@@ -27,12 +27,12 @@ public struct AwsIAMAction: StaticTrait {
 
     public static let staticName: ShapeId = "aws.iam#iamAction"
     public var selector: Selector { TypeSelector<OperationShape>() }
-    public let name: String
-    public let documentation: String
-    public let relativeDocumentation: String
-    public let requiredActions: [String]
-    public let resources: ActionResources
-    public let createsResources: [String]
+    public let name: String?
+    public let documentation: String?
+    public let relativeDocumentation: String?
+    public let requiredActions: [String]?
+    public let resources: ActionResources?
+    public let createsResources: [String]?
 }
 
 /// Provides a custom IAM action name.
