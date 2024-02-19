@@ -465,4 +465,29 @@ class TraitTests: XCTestCase {
         let model = try Smithy().parse(smithy)
         try model.validate()
     }
+
+    func testRequestCompression() throws {
+        let smithy = """
+        $version: "2"
+        namespace smithy.example
+
+        @requestCompression(
+            encodings: ["gzip"]
+        )
+        operation PutWithContentEncoding {
+            input: PutWithContentEncodingInput
+        }
+
+        @input
+        structure PutWithContentEncodingInput {
+            @httpHeader("Content-Encoding")
+            customEncoding: String // brotli
+
+            @httpPayload
+            data: String
+        }
+        """
+        let model = try Smithy().parse(smithy)
+        try model.validate()
+    }
 }

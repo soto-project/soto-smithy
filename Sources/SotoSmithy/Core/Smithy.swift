@@ -106,6 +106,7 @@ public struct Smithy {
                 PaginatedTrait.self,
                 HttpChecksumRequiredTrait.self,
                 HttpChecksumTrait.self,
+                RequestCompression.self,
                 // resource traits
                 NoReplaceTrait.self,
                 ReferencesTrait.self,

@@ -91,3 +91,13 @@ public struct UnitTypeTrait: StaticTrait {
     public var selector: Selector { TypeSelector<UnitShape>() }
     public init() {}
 }
+
+/// Defines the shape to be a unit type similar to Void or None
+public struct RequestCompression: StaticTrait {
+    public static var staticName: ShapeId = "smithy.api#requestCompression"
+    public var selector: Selector { TypeSelector<OperationShape>() }
+    public let encodings: [String]
+    public init(encodings: [String]) {
+        self.encodings = encodings
+    }
+}
