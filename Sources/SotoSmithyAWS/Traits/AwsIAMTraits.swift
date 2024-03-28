@@ -98,6 +98,17 @@ public struct AwsIAMDefineConditionKeysTrait: SingleValueTrait {
     }
 }
 
+/// Specifies the list of IAM condition keys which must be resolved by the service, as opposed
+/// to the value being pulled from the request.
+public struct AwsIAMServiceResolvedConditionKeys: SingleValueTrait {
+    public static let staticName: ShapeId = "aws.iam#serviceResolvedConditionKeys"
+    public var selector: Selector { TypeSelector<ServiceShape>() }
+    public let value: [String]
+    public init(value: [String]) {
+        self.value = value
+    }
+}
+
 /// Uses the associated member’s value for the specified condition key.
 public struct AwsIAMConditionKeyValueTrait: SingleValueTrait {
     public static let staticName: ShapeId = "aws.iam#conditionKeyValue"
