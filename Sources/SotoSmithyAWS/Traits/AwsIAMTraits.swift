@@ -98,10 +98,20 @@ public struct AwsIAMDefineConditionKeysTrait: SingleValueTrait {
     }
 }
 
+/// Uses the associated member’s value for the specified condition key.
+public struct AwsIAMConditionKeyValueTrait: SingleValueTrait {
+    public static let staticName: ShapeId = "aws.iam#conditionKeyValue"
+    public var selector: Selector { TypeSelector<MemberShape>() }
+    public let value: String
+    public init(value: String) {
+        self.value = value
+    }
+}
+
 /// Declares that the condition keys of a resource should not be inferred.
-public struct AwsDisableConditionKeyInferenceTrait: StaticTrait {
+public struct AwsIAMDisableConditionKeyInferenceTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.iam#disableConditionKeyInference"
-    public var selector: Selector { TypeSelector<ResourceShape>() }
+    public var selector: Selector { OrSelector(TypeSelector<ResourceShape>(), TypeSelector<ServiceShape>()) }
 }
 
 /// Other actions that the invoker must be authorized to perform when executing the targeted operation.

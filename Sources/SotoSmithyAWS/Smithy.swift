@@ -52,7 +52,8 @@ extension Smithy {
             AwsIAMRequiredActionsTrait.self,
             AwsIAMDefineConditionKeysTrait.self,
             AwsIAMActionPermissionDescriptionTrait.self,
-            AwsDisableConditionKeyInferenceTrait.self,
+            AwsIAMConditionKeyValueTrait.self,
+            AwsIAMDisableConditionKeyInferenceTrait.self,
             AwsIAMSupportPrincipalTypesTrait.self,
             AwsIAMResourceTrait.self,
             // API Gateway traits
