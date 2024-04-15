@@ -21,7 +21,12 @@ public struct CustomTrait: Trait {
 
     public func validate(using model: Model, shape: Shape) throws {
         guard let traitShape = model.shape(for: self.shapeId) else {
-            throw Smithy.ValidationError(reason: "Trait \(self.traitName) applied to shape ** does not exist")
+            // Only throw error is trait is unrecognised and is in the "smithy.api" or "aws.api" namespaces
+            if self.traitName.namespace == "smithy.api" || self.traitName.namespace == "aws.api" {
+                throw Smithy.ValidationError(reason: "Trait \(self.traitName) applied to shape ** does not exist")
+            } else {
+                return
+            }
         }
         guard self.selector.select(using: model, shape: shape) else {
             throw Smithy.ValidationError(reason: "Trait \(self.traitName) cannot be applied to shape **")
