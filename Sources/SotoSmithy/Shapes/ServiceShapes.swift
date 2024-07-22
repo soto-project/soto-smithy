@@ -16,7 +16,7 @@
 public class ServiceShape: Shape {
     public static let type = "service"
     public var traits: TraitList?
-    public let version: String
+    public let version: String?
     public let operations: [OperationMemberShape]?
     public let resources: [ResourceMemberShape]?
 }
