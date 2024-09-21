@@ -38,8 +38,8 @@ public class OperationMemberShape: Shape {
 public class OperationShape: Shape {
     public static let type = "operation"
     public var traits: TraitList?
-    public let input: MemberShape?
-    public let output: MemberShape?
+    public var input: MemberShape?
+    public var output: MemberShape?
     public let errors: [MemberShape]?
 
     public func validate(using model: Model) throws {
