@@ -74,7 +74,7 @@ public struct AwsDataTrait: SingleValueTrait {
     public var selector: Selector {
         return OrSelector(
             SimpleTypeSelector(),
-            CollectionSelector(),
+            TypeSelector<ListShape>(),
             TypeSelector<StructureShape>(),
             TypeSelector<UnionShape>(),
             TypeSelector<MemberShape>()
