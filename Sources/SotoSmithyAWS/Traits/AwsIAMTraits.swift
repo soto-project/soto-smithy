@@ -90,6 +90,8 @@ public struct AwsIAMDefineConditionKeysTrait: SingleValueTrait {
         let type: KeyType
         let documentation: String?
         let externalDocumentation: String?
+        let relativeDocumentation: String?
+        let required: Bool?
     }
 
     public let value: [String: ConditionKey]
@@ -156,8 +158,7 @@ public struct AwsIAMSupportPrincipalTypesTrait: SingleValueTrait {
 public struct AwsIAMResourceTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.iam#iamResource"
     public var selector: Selector { TypeSelector<ResourceShape>() }
-    public let name: String
-    public init(name: String) {
-        self.name = name
-    }
+    public let name: String?
+    public let relativeDocumentation: String?
+    public let disableConditionKeyInheritance: Bool?
 }
