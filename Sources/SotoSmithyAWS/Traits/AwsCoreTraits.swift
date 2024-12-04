@@ -20,14 +20,20 @@ import SotoSmithy
 /// like the name used to generate AWS SDK client classes and the namespace used in ARNs.
 public struct AwsServiceTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#service"
-    public var selector: Selector { return TypeSelector<ServiceShape>() }
+    public var selector: Selector { TypeSelector<ServiceShape>() }
     public let sdkId: String
     public let arnNamespace: String?
     public let cloudFormationName: String?
     public let cloudTrailEventSource: String?
     public let endpointPrefix: String?
 
-    public init(sdkId: String, arnNamespace: String?, cloudFormationName: String?, cloudTrailEventSource: String?, endpointPrefix: String?) {
+    public init(
+        sdkId: String,
+        arnNamespace: String?,
+        cloudFormationName: String?,
+        cloudTrailEventSource: String?,
+        endpointPrefix: String?
+    ) {
         self.sdkId = sdkId
         self.arnNamespace = arnNamespace
         self.cloudFormationName = cloudFormationName
@@ -39,7 +45,7 @@ public struct AwsServiceTrait: StaticTrait {
 /// Defines an ARN of a Smithy resource shape.
 public struct AwsArnTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#arn"
-    public var selector: Selector { return TypeSelector<ResourceShape>() }
+    public var selector: Selector { TypeSelector<ResourceShape>() }
     public let template: String
     public let absolute: Bool?
     public let noAccount: Bool?
@@ -56,7 +62,7 @@ public struct AwsArnTrait: StaticTrait {
 /// Specifies that a string shape contains a fully formed AWS ARN.
 public struct AwsArnReferenceTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#arnReference"
-    public var selector: Selector { return TypeSelector<StringShape>() }
+    public var selector: Selector { TypeSelector<StringShape>() }
     public let type: String?
     public let service: ShapeId?
     public let resource: ShapeId?
@@ -72,7 +78,7 @@ public struct AwsArnReferenceTrait: StaticTrait {
 public struct AwsDataTrait: SingleValueTrait {
     public static let staticName: ShapeId = "aws.api#data"
     public var selector: Selector {
-        return OrSelector(
+        OrSelector(
             SimpleTypeSelector(),
             TypeSelector<ListShape>(),
             TypeSelector<StructureShape>(),
@@ -100,7 +106,7 @@ public struct AwsDataTrait: SingleValueTrait {
 public struct AwsControlPlaneTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#controlPlane"
     public var selector: Selector {
-        return OrSelector(
+        OrSelector(
             TypeSelector<ServiceShape>(),
             TypeSelector<ResourceShape>(),
             TypeSelector<OperationShape>()
@@ -112,7 +118,7 @@ public struct AwsControlPlaneTrait: StaticTrait {
 public struct AwsDataPlaneTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#dataPlane"
     public var selector: Selector {
-        return OrSelector(
+        OrSelector(
             TypeSelector<ServiceShape>(),
             TypeSelector<ResourceShape>(),
             TypeSelector<OperationShape>()
@@ -124,7 +130,7 @@ public struct AwsDataPlaneTrait: StaticTrait {
 /// for the service and the error returned when the endpoint being accessed has expired.
 public struct AwsClientEndpointDiscoveryTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#clientEndpointDiscovery"
-    public var selector: Selector { return TypeSelector<ServiceShape>() }
+    public var selector: Selector { TypeSelector<ServiceShape>() }
     public let operation: ShapeId
     public let error: ShapeId
 }
@@ -133,7 +139,7 @@ public struct AwsClientEndpointDiscoveryTrait: StaticTrait {
 /// discovery logic.
 public struct AwsClientDiscoveredEndpointTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#clientDiscoveredEndpoint"
-    public var selector: Selector { return TypeSelector<OperationShape>() }
+    public var selector: Selector { TypeSelector<OperationShape>() }
     public let required: Bool?
 }
 
@@ -141,16 +147,18 @@ public struct AwsClientDiscoveredEndpointTrait: StaticTrait {
 /// discover an endpoint for the service.
 public struct AwsClientEndpointDiscoveryIdTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.api#clientEndpointDiscoveryId"
-    public var selector: Selector { return AndSelector(
-        TypeSelector<OperationShape>(),
-        TraitSelector<AwsClientEndpointDiscoveryTrait>()
-    ) }
+    public var selector: Selector {
+        AndSelector(
+            TypeSelector<OperationShape>(),
+            TraitSelector<AwsClientEndpointDiscoveryTrait>()
+        )
+    }
 }
 
 /// Specifies that a string shape contains a fully formed AWS ARN.
 public struct AwsHttpChecksumTrait: StaticTrait {
     public static let staticName: ShapeId = "aws.protocols#httpChecksum"
-    public var selector: Selector { return TypeSelector<OperationShape>() }
+    public var selector: Selector { TypeSelector<OperationShape>() }
     public enum Algorithm: String, Codable {
         case crc32c = "CRC32C"
         case crc32 = "CRC32"
@@ -163,7 +171,12 @@ public struct AwsHttpChecksumTrait: StaticTrait {
     public let requestValidationModeMember: String?
     public let responseAlgorithms: Set<Algorithm>?
 
-    public init(requestAlgorithmMember: String?, requestChecksumRequired: Bool?, requestValidationModeMember: String?, responseAlgorithms: Set<Algorithm>?) {
+    public init(
+        requestAlgorithmMember: String?,
+        requestChecksumRequired: Bool?,
+        requestValidationModeMember: String?,
+        responseAlgorithms: Set<Algorithm>?
+    ) {
         self.requestAlgorithmMember = requestAlgorithmMember
         self.requestChecksumRequired = requestChecksumRequired
         self.requestValidationModeMember = requestValidationModeMember

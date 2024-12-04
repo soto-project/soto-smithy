@@ -24,12 +24,16 @@ public class MemberShape: Shape {
     }
 
     public func validate(using model: Model) throws {
-        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)") }
+        guard let shape = model.shape(for: target) else {
+            throw Smithy.ValidationError(
+                reason: "Member of ** references non-existent shape \(self.target)")
+        }
         guard !(shape is OperationShape),
-              !(shape is ResourceShape),
-              !(shape is ServiceShape)
+            !(shape is ResourceShape),
+            !(shape is ServiceShape)
         else {
-            throw Smithy.ValidationError(reason: "Member of ** references illegal shape \(self.target)")
+            throw Smithy.ValidationError(
+                reason: "Member of ** references illegal shape \(self.target)")
         }
         try self.validateTraits(using: model)
     }
@@ -89,7 +93,7 @@ public class MapShape: Shape {
     }
 }
 
-/// Protocol for shape holding a collection of member shapes
+/// Protocol for shape holding a key/value collection of member shapes
 public protocol CollectionShape: Shape {
     var members: [String: MemberShape]? { get set }
 }
@@ -107,7 +111,9 @@ extension CollectionShape {
                     try member.value.validate(using: model)
                 } catch let error as Smithy.ValidationError {
                     // replace "**" with name of shape
-                    throw Smithy.ValidationError(reason: error.reason.replacingOccurrences(of: "**", with: "**$\(member.key)"))
+                    throw Smithy.ValidationError(
+                        reason: error.reason.replacingOccurrences(
+                            of: "**", with: "**$\(member.key)"))
                 }
             }
         }
@@ -152,7 +158,9 @@ public class UnionShape: CollectionShape {
     }
 
     public func validate(using model: Model) throws {
-        guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Union has no members") }
+        guard let members = self.members, members.count > 0 else {
+            throw Smithy.ValidationError(reason: "Union has no members")
+        }
         try self.validateMembers(using: model)
         try self.validateTraits(using: model)
     }
@@ -170,12 +178,18 @@ public class EnumShape: CollectionShape {
     }
 
     public func validate(using model: Model) throws {
-        guard let version = Double(model.version), version >= 2.0 else { throw Smithy.ValidationError(reason: "Enum Shapes are only available in Smithy 2.0 or later") }
-        guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Enum has no members") }
+        guard let version = Double(model.version), version >= 2.0 else {
+            throw Smithy.ValidationError(
+                reason: "Enum Shapes are only available in Smithy 2.0 or later")
+        }
+        guard let members = self.members, members.count > 0 else {
+            throw Smithy.ValidationError(reason: "Enum has no members")
+        }
         try members.forEach {
             if let valueTrait = $0.value.trait(type: EnumValueTrait.self) {
                 guard case .string = valueTrait.value else {
-                    throw Smithy.ValidationError(reason: "String based Enum has none string enum value trait")
+                    throw Smithy.ValidationError(
+                        reason: "String based Enum has none string enum value trait")
                 }
             }
         }
@@ -196,10 +210,17 @@ public class IntEnumShape: CollectionShape {
     }
 
     public func validate(using model: Model) throws {
-        guard let version = Double(model.version), version >= 2.0 else { throw Smithy.ValidationError(reason: "Enum Shapes are only available in Smithy 2.0 or later") }
-        guard let members = self.members, members.count > 0 else { throw Smithy.ValidationError(reason: "Enum has no members") }
+        guard let version = Double(model.version), version >= 2.0 else {
+            throw Smithy.ValidationError(
+                reason: "Enum Shapes are only available in Smithy 2.0 or later")
+        }
+        guard let members = self.members, members.count > 0 else {
+            throw Smithy.ValidationError(reason: "Enum has no members")
+        }
         try members.forEach {
-            guard let valueTrait = $0.value.trait(type: EnumValueTrait.self) else { throw Smithy.ValidationError(reason: "IntEnum members require a enumValue trait") }
+            guard let valueTrait = $0.value.trait(type: EnumValueTrait.self) else {
+                throw Smithy.ValidationError(reason: "IntEnum members require a enumValue trait")
+            }
             guard case .integer = valueTrait.value else {
                 throw Smithy.ValidationError(reason: "IntEnum has none integer enum value trait")
             }
