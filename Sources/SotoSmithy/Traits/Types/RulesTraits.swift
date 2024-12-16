@@ -39,8 +39,11 @@ public struct ClientContextParamsTrait: StaticTrait {
     public init() {}
 }
 
-public struct StaticContextParamsTrait: StaticTrait {
+public struct StaticContextParamsTrait: SingleValueTrait {
     public static let staticName: ShapeId = "smithy.rules#staticContextParams"
     public var selector: Selector { TypeSelector<OperationShape>() }
-    public init() {}
+    public var value: [String: Document]
+    public init(value: [String: Document]) {
+        self.value = value
+    }
 }
