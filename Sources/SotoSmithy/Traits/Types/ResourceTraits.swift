@@ -42,11 +42,13 @@ public struct ReferencesTrait: SingleValueTrait {
 /// Indicates that the targeted structure member provides an identifier for a resource.
 public struct ResourceIdentifierTrait: SingleValueTrait {
     public static let staticName: ShapeId = "smithy.api#resourceIdentifier"
-    public static var selector: Selector { AndSelector(
-        TypeSelector<MemberShape>(),
-        TraitSelector<RequiredTrait>(),
-        TargetSelector(TypeSelector<StringShape>())
-    ) }
+    public static var selector: Selector {
+        AndSelector(
+            TypeSelector<MemberShape>(),
+            TraitSelector<RequiredTrait>(),
+            TargetSelector(TypeSelector<StringShape>())
+        )
+    }
     public var value: String
     public init(value: String) {
         self.value = value
@@ -73,9 +75,9 @@ public struct PropertyTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#property"
     public static var selector: Selector = TypeSelector<MemberShape>()
 
-    public let name: String
+    public let name: String?
 
-    public init(name: String) {
+    public init(name: String?) {
         self.name = name
     }
 }

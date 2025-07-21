@@ -19,17 +19,19 @@
 /// the box trait. All other shapes are always considered boxed.
 public struct BoxTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#box"
-    public var selector: Selector { OrTargetSelector(
-        OrSelector(
-            TypeSelector<BooleanShape>(),
-            TypeSelector<ByteShape>(),
-            TypeSelector<ShortShape>(),
-            TypeSelector<IntegerShape>(),
-            TypeSelector<LongShape>(),
-            TypeSelector<FloatShape>(),
-            TypeSelector<DoubleShape>()
+    public var selector: Selector {
+        OrTargetSelector(
+            OrSelector(
+                TypeSelector<BooleanShape>(),
+                TypeSelector<ByteShape>(),
+                TypeSelector<ShortShape>(),
+                TypeSelector<IntegerShape>(),
+                TypeSelector<LongShape>(),
+                TypeSelector<FloatShape>(),
+                TypeSelector<DoubleShape>()
+            )
         )
-    ) }
+    }
     public init() {}
 }
 
@@ -68,10 +70,12 @@ public struct OutputTrait: StaticTrait {
 /// never allowed to be null.
 public struct SparseTrait: StaticTrait {
     public static let staticName: ShapeId = "smithy.api#sparse"
-    public var selector: Selector { OrSelector(
-        TypeSelector<ListShape>(),
-        TypeSelector<MapShape>()
-    ) }
+    public var selector: Selector {
+        OrSelector(
+            TypeSelector<ListShape>(),
+            TypeSelector<MapShape>()
+        )
+    }
     public init() {}
 }
 
@@ -116,21 +120,31 @@ public struct DefaultTrait: OptionalSingleValueTrait {
     public func validate(using model: Model, shape: Shape) throws {
         let targetShape: Shape
         if let member = shape as? MemberShape {
-            guard let target = model.shape(for: member.target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(member.target)") }
+            guard let target = model.shape(for: member.target) else {
+                throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(member.target)")
+            }
             targetShape = target
         } else {
             targetShape = shape
         }
         switch self.value {
         case .boolean(let b):
-            guard targetShape is BooleanShape else { throw Smithy.ValidationError(reason: "Invalid default value \(b) for **") }
+            guard targetShape is BooleanShape else {
+                throw Smithy.ValidationError(reason: "Invalid default value \(b) for **")
+            }
         case .number(let n):
             let selector = NumberSelector()
-            guard selector.select(using: model, shape: targetShape) else { throw Smithy.ValidationError(reason: "Invalid default value \(n) for **") }
+            guard selector.select(using: model, shape: targetShape) else {
+                throw Smithy.ValidationError(reason: "Invalid default value \(n) for **")
+            }
         case .string(let s):
-            guard targetShape is StringShape || targetShape is EnumShape || targetShape is BlobShape else { throw Smithy.ValidationError(reason: "Invalid default value \(s) for **") }
+            guard targetShape is StringShape || targetShape is EnumShape || targetShape is BlobShape else {
+                throw Smithy.ValidationError(reason: "Invalid default value \(s) for **")
+            }
         case .empty:
-            guard targetShape is ListShape || targetShape is MapShape else { throw Smithy.ValidationError(reason: "Invalid default value for **") }
+            guard targetShape is ListShape || targetShape is MapShape || targetShape is DocumentShape else {
+                throw Smithy.ValidationError(reason: "Invalid default value for **")
+            }
         case .none:
             // do nothing
             break
