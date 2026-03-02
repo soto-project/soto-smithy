@@ -134,7 +134,7 @@ public struct DefaultTrait: OptionalSingleValueTrait {
             }
         case .number(let n):
             let selector = NumberSelector()
-            guard selector.select(using: model, shape: targetShape) else {
+            guard selector.select(using: model, shape: targetShape) || targetShape is TimestampShape else {
                 throw Smithy.ValidationError(reason: "Invalid default value \(n) for **")
             }
         case .string(let s):

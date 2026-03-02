@@ -16,7 +16,7 @@
 public struct TypeSelector<S: Shape>: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
-        return type(of: shape) == S.self
+        type(of: shape) == S.self
     }
 }
 
@@ -24,16 +24,8 @@ public struct TypeSelector<S: Shape>: Selector {
 public struct NumberSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
-        return
-            shape is ByteShape ||
-            shape is ShortShape ||
-            shape is IntegerShape ||
-            shape is LongShape ||
-            shape is FloatShape ||
-            shape is DoubleShape ||
-            shape is BigDecimalShape ||
-            shape is BigIntegerShape ||
-            shape is IntEnumShape
+        shape is ByteShape || shape is ShortShape || shape is IntegerShape || shape is LongShape || shape is FloatShape || shape is DoubleShape
+            || shape is BigDecimalShape || shape is BigIntegerShape || shape is IntEnumShape
     }
 }
 
@@ -41,22 +33,9 @@ public struct NumberSelector: Selector {
 public struct SimpleTypeSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
-        return
-            shape is BlobShape ||
-            shape is StringShape ||
-            shape is BooleanShape ||
-            shape is ByteShape ||
-            shape is ShortShape ||
-            shape is IntegerShape ||
-            shape is LongShape ||
-            shape is FloatShape ||
-            shape is DoubleShape ||
-            shape is BigDecimalShape ||
-            shape is BigIntegerShape ||
-            shape is TimestampShape ||
-            shape is IntEnumShape ||
-            shape is EnumShape ||
-            shape is DocumentShape
+        shape is BlobShape || shape is StringShape || shape is BooleanShape || shape is ByteShape || shape is ShortShape || shape is IntegerShape
+            || shape is LongShape || shape is FloatShape || shape is DoubleShape || shape is BigDecimalShape || shape is BigIntegerShape
+            || shape is TimestampShape || shape is IntEnumShape || shape is EnumShape || shape is DocumentShape
     }
 }
 
@@ -64,7 +43,7 @@ public struct SimpleTypeSelector: Selector {
 public struct CollectionSelector: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
-        return shape is ListShape
+        shape is ListShape
     }
 }
 
@@ -103,7 +82,7 @@ public struct OrTargetSelector: Selector {
 public struct TraitSelector<T: StaticTrait>: Selector {
     public init() {}
     public func select(using model: Model, shape: Shape) -> Bool {
-        return shape.trait(type: T.self) != nil
+        shape.trait(type: T.self) != nil
     }
 }
 
@@ -116,6 +95,6 @@ public struct TraitNameSelector: Selector {
     }
 
     public func select(using model: Model, shape: Shape) -> Bool {
-        return shape.trait(named: self.name) != nil
+        shape.trait(named: self.name) != nil
     }
 }
