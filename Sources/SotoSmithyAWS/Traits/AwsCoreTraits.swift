@@ -162,9 +162,14 @@ public struct AwsHttpChecksumTrait: StaticTrait {
     public enum Algorithm: String, Codable {
         case crc32c = "CRC32C"
         case crc32 = "CRC32"
+        case md5 = "MD5"
         case sha1 = "SHA1"
         case sha256 = "SHA256"
+        case sha512 = "SHA512"
         case crc64NVME = "CRC64NVME"
+        case xxHash64 = "XXHASH64"
+        case xxHash3 = "XXHASH3"
+        case xxHash128 = "XXHASH128"
     }
 
     public let requestAlgorithmMember: String?
