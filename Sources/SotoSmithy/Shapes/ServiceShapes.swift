@@ -19,6 +19,8 @@ public class ServiceShape: Shape {
     public let version: String?
     public let operations: [OperationMemberShape]?
     public let resources: [ResourceMemberShape]?
+    public let errors: [ErrorMemberShape]?
+    public let rename: [ShapeId: String]?
 }
 
 /// Shape representing operation member of service shape
@@ -28,7 +30,9 @@ public class OperationMemberShape: Shape {
     public let target: ShapeId
 
     public func validate(using model: Model) throws {
-        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)") }
+        guard let shape = model.shape(for: target) else {
+            throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)")
+        }
         guard shape is OperationShape else { throw Smithy.ValidationError(reason: "Operation ** references illegal shape \(self.target)") }
         try self.validateTraits(using: model)
     }
@@ -56,7 +60,9 @@ public class ResourceMemberShape: Shape {
     public let target: ShapeId
 
     public func validate(using model: Model) throws {
-        guard let shape = model.shape(for: target) else { throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)") }
+        guard let shape = model.shape(for: target) else {
+            throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)")
+        }
         guard shape is ResourceShape else { throw Smithy.ValidationError(reason: "Operation ** references illegal shape \(self.target)") }
         try self.validateTraits(using: model)
     }
@@ -76,4 +82,21 @@ public class ResourceShape: Shape {
     public let operations: [MemberShape]?
     public let collectionOperations: [MemberShape]?
     public let resources: [MemberShape]?
+}
+
+/// Shape representing error member of service shape
+public class ErrorMemberShape: Shape {
+    public static let type = "error"
+    public var traits: TraitList?
+    public let target: ShapeId
+
+    public func validate(using model: Model) throws {
+        guard let shape = model.shape(for: target) else {
+            throw Smithy.ValidationError(reason: "Member of ** references non-existent shape \(self.target)")
+        }
+        guard shape.hasTrait(type: ErrorTrait.self) else {
+            throw Smithy.ValidationError(reason: "Operation ** references illegal shape \(self.target)")
+        }
+        try self.validateTraits(using: model)
+    }
 }
